@@ -1,0 +1,32 @@
+import '../models/branch_model.dart';
+import '../models/user_role.dart';
+import '../../../shared/models/user_session.dart';
+
+abstract class IAuthRepository {
+  Future<UserSession> login({
+    required String emailOrPhone,
+    required String password,
+    required UserRole role,
+  });
+
+  Future<bool> verifyOtp({
+    required String otpCode,
+    required String method,
+  });
+
+  Future<bool> resendOtp();
+
+  Future<bool> requestPasswordReset({
+    required String emailOrPhone,
+  });
+
+  Future<bool> resetPassword({
+    required String newPassword,
+  });
+
+  Future<bool> unlockSession({
+    required String passwordOrPin,
+  });
+
+  Future<List<BranchModel>> getAvailableBranches();
+}
