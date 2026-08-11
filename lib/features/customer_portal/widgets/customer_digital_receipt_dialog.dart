@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/file_downloader.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
 import '../../loans/models/loan_model.dart';
@@ -148,8 +149,18 @@ class CustomerDigitalReceiptDialog extends StatelessWidget {
           child: const Text('Close'),
         ),
         OutlinedButton.icon(
-          onPressed: () {
-            KcToast.info(context, 'Receipt PDF generated for #${payment.receiptNumber}.', title: 'Print / Download');
+          onPressed: () async {
+            await FileDownloader.downloadReceiptPdf(
+              receiptNumber: payment.receiptNumber,
+              customerName: customerName,
+              loanId: payment.loanId,
+              amount: payment.amount,
+              paymentMethod: payment.method.label,
+              date: payment.paymentDate,
+            );
+            if (context.mounted) {
+              KcToast.info(context, 'Receipt PDF generated & downloaded for #${payment.receiptNumber}.', title: 'Downloaded');
+            }
           },
           icon: const Icon(Icons.print_rounded, size: 16),
           label: const Text('Print / Download'),

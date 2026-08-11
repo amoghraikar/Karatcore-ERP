@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/file_downloader.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../models/loan_model.dart';
@@ -126,8 +127,18 @@ class ReceiptPreviewDialog extends StatelessWidget {
                 KcOutlinedButton(
                   label: 'Download PDF',
                   icon: Icons.picture_as_pdf_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Receipt PDF downloaded.')));
+                  onPressed: () async {
+                    await FileDownloader.downloadReceiptPdf(
+                      receiptNumber: receiptNumber,
+                      customerName: customerName,
+                      loanId: loan.id,
+                      amount: amount,
+                      paymentMethod: paymentMethod,
+                      date: date,
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Downloaded $receiptNumber.pdf')));
+                    }
                   },
                 ),
                 const Spacer(),

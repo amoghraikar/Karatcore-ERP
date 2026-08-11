@@ -7,6 +7,7 @@ from app.api.routes.customer_payments import router as customer_payments_router
 from app.api.routes.customer_portal import router as customer_portal_router
 from app.api.routes.customers import router as customer_router
 from app.api.routes.diagnostics import router as diagnostics_router
+from app.api.routes.export import router as export_router
 from app.api.routes.health import router as health_router
 from app.api.routes.kyc import router as owner_kyc_router
 from app.api.routes.loans import router as loan_router
@@ -51,6 +52,7 @@ app.include_router(loan_router, prefix=settings.API_V1_STR)
 app.include_router(payment_router, prefix=settings.API_V1_STR)
 app.include_router(accounting_router, prefix=settings.API_V1_STR)
 app.include_router(owner_kyc_router, prefix=settings.API_V1_STR)
+app.include_router(export_router, prefix=settings.API_V1_STR)
 app.include_router(webhook_router, prefix=settings.API_V1_STR)
 app.include_router(customer_portal_router, prefix=settings.API_V1_STR)
 app.include_router(customer_kyc_router, prefix=settings.API_V1_STR)
