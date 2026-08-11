@@ -21,6 +21,7 @@ import '../../features/accounting/presentation/pages/receivables_page.dart';
 import '../../features/accounting/presentation/pages/transaction_details_page.dart';
 import '../../features/accounting/presentation/pages/transactions_page.dart';
 import '../../features/accounting/presentation/pages/trial_balance_page.dart';
+import '../../features/audit/presentation/pages/audit_log_page.dart';
 import '../../features/auth/models/auth_state.dart';
 import '../../features/auth/presentation/pages/access_denied_page.dart';
 import '../../features/auth/presentation/pages/branch_selection_page.dart';
@@ -31,6 +32,17 @@ import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../../features/customer_portal/presentation/pages/customer_documents_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_home_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_jewellery_detail_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_jewellery_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_kyc_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_loan_detail_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_loans_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_notifications_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_payments_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_profile_page.dart';
+import '../../features/customer_portal/presentation/pages/customer_shell_page.dart';
 import '../../features/customers/presentation/pages/create_customer_page.dart';
 import '../../features/customers/presentation/pages/customer_details_page.dart';
 import '../../features/customers/presentation/pages/customers_page.dart';
@@ -49,6 +61,7 @@ import '../../features/loans/presentation/pages/loan_renewal_page.dart';
 import '../../features/loans/presentation/pages/loan_settlement_page.dart';
 import '../../features/loans/presentation/pages/loans_page.dart';
 import '../../features/loans/presentation/pages/record_payment_page.dart';
+import '../../features/notifications/presentation/pages/communication_log_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/ornaments/presentation/pages/create_ornament_page.dart';
 import '../../features/ornaments/presentation/pages/inventory_categories_page.dart';
@@ -70,21 +83,10 @@ import '../../features/reports/presentation/pages/profitability_reports_page.dar
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/reports/presentation/pages/risk_reports_page.dart';
 import '../../features/reports/presentation/pages/saved_report_detail_page.dart';
-import '../../features/audit/presentation/pages/audit_log_page.dart';
 import '../../features/security/presentation/pages/security_dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/settings_subpages.dart';
 import '../../features/showcase/presentation/pages/showcase_page.dart';
-import '../../features/staff/presentation/pages/branches_page.dart';
-import '../../features/staff/presentation/pages/create_role_page.dart';
-import '../../features/staff/presentation/pages/create_staff_page.dart';
-import '../../features/staff/presentation/pages/departments_page.dart';
-import '../../features/staff/presentation/pages/modify_staff_permissions_page.dart';
-import '../../features/staff/presentation/pages/permission_matrix_page.dart';
-import '../../features/staff/presentation/pages/roles_page.dart';
-import '../../features/staff/presentation/pages/staff_dashboard_page.dart';
-import '../../features/staff/presentation/pages/staff_profile_page.dart';
-import '../../features/staff/providers/staff_providers.dart';
 
 import '../../shared/widgets/navigation/kc_bottom_navigation.dart';
 import '../../shared/widgets/navigation/kc_navigation_rail.dart';
@@ -97,9 +99,6 @@ import 'routes.dart';
 class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this.ref) {
     ref.listen<AuthState>(authStateProvider, (_, __) {
-      notifyListeners();
-    });
-    ref.listen(currentStaffUserProvider, (_, __) {
       notifyListeners();
     });
   }
@@ -159,9 +158,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return AppRoutes.dashboard;
         }
 
-        final currentStaff = ref.read(currentStaffUserProvider);
-        final authService = ref.read(authorizationServiceProvider);
-        if (!authService.canAccessRoute(user: currentStaff, routePath: currentPath) && currentPath != AppRoutes.accessDenied) {
+        final ownerAuth = ref.read(ownerAuthorizationServiceProvider);
+        if (!ownerAuth.canAccessOwnerArea(authState.session, currentPath) && currentPath != AppRoutes.accessDenied) {
           return AppRoutes.accessDenied;
         }
       }
@@ -467,44 +465,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const NotificationsPage(),
           ),
           GoRoute(
-            path: AppRoutes.staff,
-            builder: (context, state) => const StaffDashboardPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.staffCreate,
-            builder: (context, state) => const CreateStaffPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.staffDetail,
-            builder: (context, state) => StaffProfilePage(staffId: state.pathParameters['id'] ?? 'STF-001'),
-          ),
-          GoRoute(
-            path: AppRoutes.staffEdit,
-            builder: (context, state) => CreateStaffPage(editStaffId: state.pathParameters['id']),
-          ),
-          GoRoute(
-            path: AppRoutes.staffPermissions,
-            builder: (context, state) => ModifyStaffPermissionsPage(staffId: state.pathParameters['id'] ?? 'STF-001'),
-          ),
-          GoRoute(
-            path: AppRoutes.roles,
-            builder: (context, state) => const RolesPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.roleCreate,
-            builder: (context, state) => const CreateRolePage(),
-          ),
-          GoRoute(
-            path: AppRoutes.permissions,
-            builder: (context, state) => const PermissionMatrixPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.branches,
-            builder: (context, state) => const BranchesPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.departments,
-            builder: (context, state) => const DepartmentsPage(),
+            path: AppRoutes.communication,
+            builder: (context, state) => const CommunicationLogPage(),
           ),
           GoRoute(
             path: AppRoutes.securityActivity,
@@ -545,6 +507,51 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.help,
             builder: (context, state) => const HelpPage(),
+          ),
+        ],
+      ),
+      ShellRoute(
+        builder: (context, state, child) => CustomerShellPage(child: child),
+        routes: [
+          GoRoute(
+            path: AppRoutes.customerHome,
+            builder: (context, state) => const CustomerHomePage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerLoans,
+            builder: (context, state) => const CustomerLoansPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerLoanDetail,
+            builder: (context, state) => CustomerLoanDetailPage(loanId: state.pathParameters['id'] ?? ''),
+          ),
+          GoRoute(
+            path: AppRoutes.customerJewellery,
+            builder: (context, state) => const CustomerJewelleryPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerJewelleryDetail,
+            builder: (context, state) => CustomerJewelleryDetailPage(ornamentId: state.pathParameters['id'] ?? ''),
+          ),
+          GoRoute(
+            path: AppRoutes.customerPayments,
+            builder: (context, state) => const CustomerPaymentsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerDocuments,
+            builder: (context, state) => const CustomerDocumentsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerKyc,
+            builder: (context, state) => const CustomerKycPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerNotifications,
+            builder: (context, state) => const CustomerNotificationsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.customerProfile,
+            builder: (context, state) => const CustomerProfilePage(),
           ),
         ],
       ),

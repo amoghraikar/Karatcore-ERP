@@ -113,8 +113,6 @@ void updateBreadcrumbsForPath(WidgetRef ref, String path) {
     items.add(const BreadcrumbItem(label: 'Reports & Analytics'));
   } else if (path.startsWith(AppRoutes.notifications)) {
     items.add(const BreadcrumbItem(label: 'Notifications'));
-  } else if (path.startsWith(AppRoutes.staff)) {
-    items.add(const BreadcrumbItem(label: 'Staff Management'));
   } else if (path.startsWith(AppRoutes.settings)) {
     items.add(const BreadcrumbItem(label: 'Settings'));
   } else if (path.startsWith(AppRoutes.profile)) {

@@ -6,7 +6,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/inputs/kc_search_field.dart';
-import '../../../staff/providers/staff_providers.dart';
+import '../../../security/providers/security_providers.dart';
 
 class AuditLogPage extends ConsumerStatefulWidget {
   const AuditLogPage({super.key});
@@ -20,7 +20,7 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
 
   @override
   Widget build(BuildContext context) {
-    final auditAsync = ref.watch(staffAuditTrailProvider('ALL'));
+    final auditAsync = ref.watch(storeAuditTrailProvider('ALL'));
 
     return Scaffold(
       body: ListView(

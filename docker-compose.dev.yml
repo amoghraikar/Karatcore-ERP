@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: karatcore_postgres_dev
+    environment:
+      POSTGRES_USER: karatcore_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: karatcore_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U karatcore_user -d karatcore_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: karatcore_backend_dev
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql://karatcore_user:secure_password@postgres:5432/karatcore_db
+      - JWT_SECRET_KEY=karatcore_super_secret_jwt_key_change_in_production_998214
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:8080","http://127.0.0.1:3000","*"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             python seed.py &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  postgres_dev_data:

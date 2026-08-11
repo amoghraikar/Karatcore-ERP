@@ -4,10 +4,20 @@ import '../models/branch_model.dart';
 import '../models/user_role.dart';
 import '../repository/mock_auth_repository.dart';
 import '../services/auth_service.dart';
+import '../services/customer_data_isolation_service.dart';
+import '../services/owner_authorization_service.dart';
 import '../../../shared/models/user_session.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   return MockAuthRepository();
+});
+
+final ownerAuthorizationServiceProvider = Provider<IOwnerAuthorizationService>((ref) {
+  return const OwnerAuthorizationService();
+});
+
+final customerDataIsolationServiceProvider = Provider<ICustomerDataIsolationService>((ref) {
+  return const CustomerDataIsolationService();
 });
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -141,29 +151,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void forceAuthenticateAsRole(UserRole role) {
-    String name = 'Arjun Rathore';
-    String id = 'USR-101';
-    String email = 'owner@karatcore.com';
-
-    if (role == UserRole.admin) {
-      name = 'Vikram Malhotra';
-      id = 'USR-102';
-      email = 'admin@karatcore.com';
-    } else if (role == UserRole.manager) {
-      name = 'Priya Sharma';
-      id = 'USR-103';
-      email = 'manager@karatcore.com';
-    } else if (role == UserRole.employee) {
-      name = 'Rahul Verma';
-      id = 'USR-104';
-      email = 'employee@karatcore.com';
-    }
-
     final session = UserSession(
-      id: id,
-      name: name,
-      role: role,
-      email: email,
+      id: 'OWN-101',
+      name: 'Demo Owner',
+      role: UserRole.owner,
+      email: 'owner@karatcore.com',
       phone: '+91 98200 12345',
       branch: BranchModel.mockBranches[0],
     );

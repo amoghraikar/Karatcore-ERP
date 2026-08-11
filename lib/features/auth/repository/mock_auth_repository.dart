@@ -17,25 +17,12 @@ class MockAuthRepository implements IAuthRepository {
     }
 
     final lowerInput = emailOrPhone.toLowerCase();
-    String name = 'Arjun Rathore';
-    String id = 'USR-101';
-
-    if (role == UserRole.admin || lowerInput.contains('admin')) {
-      name = 'Vikram Malhotra';
-      id = 'USR-102';
-    } else if (role == UserRole.manager || lowerInput.contains('manager')) {
-      name = 'Priya Sharma';
-      id = 'USR-103';
-    } else if (role == UserRole.employee || lowerInput.contains('employee')) {
-      name = 'Rahul Verma';
-      id = 'USR-104';
-    }
 
     return UserSession(
-      id: id,
-      name: name,
-      role: role,
-      email: lowerInput.contains('@') ? lowerInput : '$lowerInput@karatcore.com',
+      id: 'OWN-101',
+      name: 'Demo Owner',
+      role: UserRole.owner,
+      email: lowerInput.contains('@') ? lowerInput : 'owner@karatcore.com',
       phone: lowerInput.startsWith('+') ? lowerInput : '+91 98200 12345',
       branch: BranchModel.mockBranches[0],
       is2faEnabled: true,

@@ -94,20 +94,7 @@ abstract final class AppRoutes {
   static const reportsAudit = '/reports/audit';
   static const reportsDetail = '/reports/:reportId';
   static const notifications = '/notifications';
-  static const staff = '/staff';
-  static const staffCreate = '/staff/create';
-  static const staffDetail = '/staff/:id';
-  static const staffEdit = '/staff/:id/edit';
-  static const staffPermissions = '/staff/:id/permissions';
-  static const staffActivity = '/staff/:id/activity';
-  static const staffAudit = '/staff/:id/audit';
-  static const staffSessions = '/staff/:id/sessions';
-  static const roles = '/roles';
-  static const roleCreate = '/roles/create';
-  static const roleDetail = '/roles/:id';
-  static const permissions = '/permissions';
-  static const branches = '/branches';
-  static const departments = '/departments';
+  static const communication = '/communication';
   static const securityActivity = '/security/activity';
   static const settings = '/settings';
   static const settingsSecurity = '/settings/security';
@@ -119,6 +106,18 @@ abstract final class AppRoutes {
   static const profile = '/profile';
   static const help = '/help';
   static const showcase = '/showcase';
+
+  // Customer Portal Routes
+  static const customerHome = '/customer';
+  static const customerLoans = '/customer/loans';
+  static const customerLoanDetail = '/customer/loans/:id';
+  static const customerJewellery = '/customer/jewellery';
+  static const customerJewelleryDetail = '/customer/jewellery/:id';
+  static const customerPayments = '/customer/payments';
+  static const customerDocuments = '/customer/documents';
+  static const customerKyc = '/customer/kyc';
+  static const customerNotifications = '/customer/notifications';
+  static const customerProfile = '/customer/profile';
 
   static const List<NavSection> navigationSections = [
     NavSection(

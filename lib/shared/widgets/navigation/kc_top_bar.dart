@@ -6,6 +6,7 @@ import '../../../core/routing/breadcrumbs.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../features/auth/providers/auth_provider.dart';
+import '../../../features/notifications/providers/notification_providers.dart';
 import '../../components/kc_avatar.dart';
 import '../../components/kc_breadcrumb_bar.dart';
 import '../../widgets/dialogs/kc_bottom_sheets.dart';
@@ -79,51 +80,101 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
             icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
             tooltip: 'Toggle Theme',
           ),
-          Stack(
-            children: [
-              IconButton(
-                onPressed: () {
-                  KcBottomSheets.show(
-                    context: context,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('System Alerts & Notifications', style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 16),
-                          const ListTile(
-                            leading: Icon(Icons.shield_rounded, color: KcColors.signalOrange),
-                            title: Text('Vault Audit Scheduled for 4:00 PM'),
-                            subtitle: Text('Inspecting 24K bullion reserve stock'),
+          Consumer(
+            builder: (context, ref, _) {
+              final unreadCount = ref.watch(unreadCountProvider);
+              final urgentCount = ref.watch(urgentAlertsCountProvider);
+              final notifsAsync = ref.watch(notificationsNotifierProvider);
+              final notifs = notifsAsync.valueOrNull ?? [];
+
+              final badgeText = unreadCount > 99 ? '99+' : '$unreadCount';
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      KcBottomSheets.show(
+                        context: context,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Recent Store Alerts ($unreadCount Unread)', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      context.go(AppRoutes.notifications);
+                                    },
+                                    child: const Text('View All'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              if (notifs.isEmpty)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 24),
+                                  child: Center(child: Text('No store notifications available.')),
+                                )
+                              else
+                                ...notifs.take(4).map((n) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: n.type.color.withValues(alpha: 0.12),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(n.type.icon, color: n.type.color, size: 18),
+                                    ),
+                                    title: Text(n.title, style: TextStyle(fontWeight: n.isUnread ? FontWeight.w800 : FontWeight.w600, fontSize: 13)),
+                                    subtitle: Text(n.message, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      if (n.isUnread) {
+                                        ref.read(notificationsNotifierProvider.notifier).markAsRead(n.id);
+                                      }
+                                      if (n.actionRoute != null) {
+                                        context.go(n.actionRoute!);
+                                      } else {
+                                        context.go(AppRoutes.notifications);
+                                      }
+                                    },
+                                  );
+                                }),
+                            ],
                           ),
-                          const ListTile(
-                            leading: Icon(Icons.monetization_on_rounded, color: KcColors.signalGreen),
-                            title: Text('Loan Repayment #902 Cleared'),
-                            subtitle: Text('₹4,90,000 credited to store account'),
-                          ),
-                        ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'Notifications ($unreadCount Unread)',
+                  ),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: 4,
+                      top: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: urgentCount > 0 ? KcColors.signalRed : const Color(0xFF2563EB),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          badgeText,
+                          style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800),
+                        ),
                       ),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.notifications_outlined),
-                tooltip: 'Notifications',
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: KcColors.signalRed,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
           const SizedBox(width: 8),
           PopupMenuButton<String>(

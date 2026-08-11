@@ -18,14 +18,8 @@ class AccountingPermissions {
   static const String viewAccountingAudit = 'VIEW_ACCOUNTING_AUDIT';
 
   static bool canPerform(UserRole role, String permission) {
-    if (role == UserRole.owner || role == UserRole.admin) {
+    if (role == UserRole.owner) {
       return true;
-    }
-    if (role == UserRole.manager) {
-      return permission != closeAccountingPeriod;
-    }
-    if (role == UserRole.employee) {
-      return permission == viewAccounts || permission == viewLedger || permission == createExpense || permission == createIncome;
     }
     return false;
   }

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
+import '../../../../shared/widgets/feedback/kc_toast.dart';
+import '../../../notifications/models/notification_models.dart';
+import '../../../notifications/providers/notification_providers.dart';
 
 class SettingsSecurityPage extends StatelessWidget {
   const SettingsSecurityPage({super.key});
@@ -179,43 +184,207 @@ class _SettingsFinancialPageState extends State<SettingsFinancialPage> {
   }
 }
 
-class SettingsNotificationsPage extends StatelessWidget {
+class SettingsNotificationsPage extends ConsumerStatefulWidget {
   const SettingsNotificationsPage({super.key});
 
   @override
+  ConsumerState<SettingsNotificationsPage> createState() => _SettingsNotificationsPageState();
+}
+
+class _SettingsNotificationsPageState extends ConsumerState<SettingsNotificationsPage> {
+  late NotificationPreferencesModel _prefs;
+  bool _initialized = false;
+
+  @override
   Widget build(BuildContext context) {
+    final prefsAsync = ref.watch(notificationPreferencesNotifierProvider);
+
     return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.all(context.pageGutter),
-        children: [
-          Text('Notification Preferences', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          Text('Customer SMS alerts, due-date reminders & operational push notifications', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          const SizedBox(height: 24),
-          const KcCard(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Alert Dispatch Controls', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                SizedBox(height: 12),
-                SwitchListTile(
-                  title: Text('Customer Interest Due SMS Alerts'),
-                  subtitle: Text('Automatically send SMS 7 days prior to interest payment due date'),
-                  value: true,
-                  onChanged: null,
+      body: prefsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, st) => Center(child: Text('Error loading preferences: $err')),
+        data: (savedPrefs) {
+          if (!_initialized) {
+            _prefs = savedPrefs;
+            _initialized = true;
+          }
+
+          return ListView(
+            padding: EdgeInsets.all(context.pageGutter),
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Notification & Communication Preferences', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        Text('Store Owner alert rules, Quiet Hours parameters & customer channel dispatch controls', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  KcPrimaryButton(
+                    label: 'Save Preferences',
+                    icon: Icons.save_rounded,
+                    onPressed: () async {
+                      await ref.read(notificationPreferencesNotifierProvider.notifier).updatePreferences(_prefs);
+                      if (context.mounted) {
+                        KcToast.success(context, 'Notification and alert preferences saved successfully.', title: 'Preferences Saved');
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Owner Business Alerts
+              KcCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Owner Alert Category Subscriptions', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      title: const Text('Pledge & Loan Due Alerts'),
+                      subtitle: const Text('Notify 30, 7, and 1 days before loan installment due dates'),
+                      value: _prefs.loanAlertsEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(loanAlertsEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('Payment & Receipt Confirmations'),
+                      subtitle: const Text('Notify upon payment recording and digital receipt generation'),
+                      value: _prefs.paymentAlertsEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(paymentAlertsEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('KYC Verification Review Requests'),
+                      subtitle: const Text('Notify when new customer KYC documents require Store Owner review'),
+                      value: _prefs.kycAlertsEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(kycAlertsEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('Security & Device Monitor Alerts'),
+                      subtitle: const Text('Notify on web terminal logins, session locks & biometric actions'),
+                      value: _prefs.securityAlertsEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(securityAlertsEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('Accounting & System Engine Alerts'),
+                      subtitle: const Text('Notify on monthly ledger period closes & database backup reminders'),
+                      value: _prefs.systemAlertsEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(systemAlertsEnabled: val)),
+                    ),
+                  ],
                 ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Pledge Intake Payment Receipts'),
-                  subtitle: Text('Instantly send digital receipt SMS upon pledge creation or payment'),
-                  value: true,
-                  onChanged: null,
+              ),
+              const SizedBox(height: 24),
+
+              // Communication Channel Settings
+              KcCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Communication Delivery Channels', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    const SizedBox(height: 4),
+                    const Text('In-App delivery is active. External channels are placeholder architecture.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      title: const Text('In-App Notification Center'),
+                      subtitle: const Text('Active internal notification feed (Always Recommended)'),
+                      value: _prefs.inAppChannelEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(inAppChannelEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('Email Gateway (Placeholder Architecture)'),
+                      subtitle: const Text('Simulated email dispatch for reports and ledger statements'),
+                      value: _prefs.emailChannelEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(emailChannelEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('SMS Gateway (Placeholder Architecture)'),
+                      subtitle: const Text('Simulated SMS dispatch for loan due reminders'),
+                      value: _prefs.smsChannelEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(smsChannelEnabled: val)),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: const Text('WhatsApp Business API (Placeholder Architecture)'),
+                      subtitle: const Text('Simulated WhatsApp receipt & pledge updates'),
+                      value: _prefs.whatsappChannelEnabled,
+                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(whatsappChannelEnabled: val)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+              const SizedBox(height: 24),
+
+              // Quiet Hours Configuration
+              KcCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Store Quiet Hours Configuration', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      title: const Text('Enable Store Quiet Hours'),
+                      subtitle: const Text('Suppress non-urgent notifications during off-business hours'),
+                      value: _prefs.quietHours.isEnabled,
+                      onChanged: (val) => setState(() {
+                        _prefs = _prefs.copyWith(
+                          quietHours: _prefs.quietHours.copyWith(isEnabled: val),
+                        );
+                      }),
+                    ),
+                    if (_prefs.quietHours.isEnabled) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              decoration: const InputDecoration(labelText: 'Start Time (e.g. 22:00)', border: OutlineInputBorder()),
+                              controller: TextEditingController(text: _prefs.quietHours.startTime),
+                              onChanged: (v) => _prefs = _prefs.copyWith(quietHours: _prefs.quietHours.copyWith(startTime: v)),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextField(
+                              decoration: const InputDecoration(labelText: 'End Time (e.g. 08:00)', border: OutlineInputBorder()),
+                              controller: TextEditingController(text: _prefs.quietHours.endTime),
+                              onChanged: (v) => _prefs = _prefs.copyWith(quietHours: _prefs.quietHours.copyWith(endTime: v)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      SwitchListTile(
+                        title: const Text('Allow Critical Security Exceptions'),
+                        subtitle: const Text('Deliver urgent security and high-value overdue alerts during quiet hours'),
+                        value: _prefs.quietHours.allowCriticalExceptions,
+                        onChanged: (val) => setState(() {
+                          _prefs = _prefs.copyWith(
+                            quietHours: _prefs.quietHours.copyWith(allowCriticalExceptions: val),
+                          );
+                        }),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

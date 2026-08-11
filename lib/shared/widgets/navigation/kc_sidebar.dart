@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/color_tokens.dart';
 import '../../../core/routing/routes.dart';
-import '../../../features/staff/providers/staff_providers.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 import '../../components/kc_avatar.dart';
 import '../../components/kc_brand.dart';
 
@@ -24,10 +24,12 @@ class KcSidebar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scheme = Theme.of(context).colorScheme;
-    final currentStaff = ref.watch(currentStaffUserProvider);
-    final authService = ref.watch(authorizationServiceProvider);
+    final authState = ref.watch(authStateProvider);
+    final ownerAuth = ref.watch(ownerAuthorizationServiceProvider);
+    final user = authState.session;
 
-    final initials = currentStaff.fullName
+    final name = user?.name ?? 'Demo Owner';
+    final initials = name
         .split(' ')
         .take(2)
         .map((e) => e.isNotEmpty ? e[0] : '')
@@ -94,7 +96,7 @@ class KcSidebar extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               children: [
                 for (final nav in AppRoutes.navigationSections) ...[
-                  if (nav.items.any((i) => authService.canAccessRoute(user: currentStaff, routePath: i.path))) ...[
+                  if (nav.items.any((i) => ownerAuth.canAccessOwnerArea(user, i.path))) ...[
                     if (!isCollapsed && nav.sectionHeader != null)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 16, 12, 6),
@@ -108,7 +110,7 @@ class KcSidebar extends ConsumerWidget {
                         ),
                       ),
                     for (final item in nav.items)
-                      if (authService.canAccessRoute(user: currentStaff, routePath: item.path))
+                      if (ownerAuth.canAccessOwnerArea(user, item.path))
                         _NavTile(
                           item: item,
                           selected: currentPath.startsWith(item.path),
@@ -134,12 +136,12 @@ class KcSidebar extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              currentStaff.fullName,
+                              name,
                               style: Theme.of(context).textTheme.titleSmall,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              '${currentStaff.roleCode} • ${currentStaff.branchName}',
+                              'STORE OWNER • Main Branch',
                               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),

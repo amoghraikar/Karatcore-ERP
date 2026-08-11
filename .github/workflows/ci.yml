@@ -1,0 +1,78 @@
+name: KaratCore ERP — CI/CD Quality & Security Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-quality-and-security:
+    name: Python Backend Test & Audit
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: karatcore_user
+          POSTGRES_PASSWORD: secure_password
+          POSTGRES_DB: karatcore_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: postgresql://karatcore_user:secure_password@localhost:5432/karatcore_test_db
+        run: |
+          cd backend
+          alembic upgrade head
+          python seed.py
+
+      - name: Execute Full Pytest Test Suite
+        env:
+          DATABASE_URL: postgresql://karatcore_user:secure_password@localhost:5432/karatcore_test_db
+          JWT_SECRET_KEY: test_ci_jwt_secret_key_9918237
+        run: |
+          cd backend
+          pytest -v tests/
+
+  flutter-static-analysis:
+    name: Flutter Analysis & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Flutter Static Analysis
+        run: flutter analyze

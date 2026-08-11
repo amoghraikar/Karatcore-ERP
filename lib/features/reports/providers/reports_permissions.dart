@@ -14,14 +14,8 @@ class ReportPermissions {
   static const String exportReports = 'EXPORT_REPORTS';
 
   static bool canPerform(UserRole role, String permission) {
-    if (role == UserRole.owner || role == UserRole.admin) {
+    if (role == UserRole.owner) {
       return true;
-    }
-    if (role == UserRole.manager) {
-      return permission != viewRiskReports && permission != viewAuditReports;
-    }
-    if (role == UserRole.employee) {
-      return permission == viewReports || permission == viewCustomerReports || permission == viewInventoryReports;
     }
     return false;
   }

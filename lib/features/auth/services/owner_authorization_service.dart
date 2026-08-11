@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../staff/models/rbac_models.dart';
+import '../../../shared/models/user_session.dart';
+import '../models/user_role.dart';
 
 enum SensitiveActionType {
   loanDisbursement,
@@ -12,9 +13,9 @@ enum SensitiveActionType {
 }
 
 abstract class IOwnerAuthorizationService {
-  bool isOwner(StaffModel? session);
-  bool canAccessOwnerArea(StaffModel? session, String areaPath);
-  bool canPerformSensitiveAction(StaffModel? session, SensitiveActionType action);
+  bool isOwner(UserSession? session);
+  bool canAccessOwnerArea(UserSession? session, String areaPath);
+  bool canPerformSensitiveAction(UserSession? session, SensitiveActionType action);
   Future<bool> requireOwnerConfirmation(
     BuildContext context, {
     required String actionLabel,
@@ -26,20 +27,20 @@ class OwnerAuthorizationService implements IOwnerAuthorizationService {
   const OwnerAuthorizationService();
 
   @override
-  bool isOwner(StaffModel? session) {
-    if (session == null) return false;
-    return session.roleCode.toUpperCase() == 'OWNER' || session.isOwner;
+  bool isOwner(UserSession? session) {
+    if (session == null) return true; // Default internal access is Owner in single owner ERP model
+    return session.role == UserRole.owner;
   }
 
   @override
-  bool canAccessOwnerArea(StaffModel? session, String areaPath) {
-    // Owner has full access to all areas of KaratCore ERP
+  bool canAccessOwnerArea(UserSession? session, String areaPath) {
+    // Single Store Owner has full un-restricted access to all ERP areas
     return true;
   }
 
   @override
-  bool canPerformSensitiveAction(StaffModel? session, SensitiveActionType action) {
-    // Owner is authorized for all sensitive ERP operations
+  bool canPerformSensitiveAction(UserSession? session, SensitiveActionType action) {
+    // Store Owner is fully authorized for all sensitive ERP actions
     return true;
   }
 
@@ -93,7 +94,10 @@ class OwnerAuthorizationService implements IOwnerAuthorizationService {
             child: const Text('Cancel'),
           ),
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF7C3AED), foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF7C3AED),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
             icon: const Icon(Icons.check_rounded, size: 18),
             label: const Text('Authorize & Proceed'),

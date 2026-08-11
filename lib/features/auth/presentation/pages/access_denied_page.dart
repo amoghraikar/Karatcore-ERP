@@ -5,12 +5,12 @@ import '../../../../core/constants/color_tokens.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
-import '../../../staff/providers/staff_providers.dart';
+import '../../providers/auth_provider.dart';
 
 class AccessDeniedPage extends ConsumerWidget {
   const AccessDeniedPage({
     super.key,
-    this.requiredPermission = 'Admin Privileges',
+    this.requiredPermission = 'Owner Privileges Required',
   });
 
   final String requiredPermission;
@@ -19,7 +19,8 @@ class AccessDeniedPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scheme = Theme.of(context).colorScheme;
-    final currentStaff = ref.watch(currentStaffUserProvider);
+    final authState = ref.watch(authStateProvider);
+    final user = authState.session;
 
     return Scaffold(
       body: Center(
@@ -53,7 +54,7 @@ class AccessDeniedPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'You do not have permission to access this resource or perform this operation.',
+                  'You do not have permission to access this resource. Store Owner authorization is required.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -72,9 +73,9 @@ class AccessDeniedPage extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Current User:', style: Theme.of(context).textTheme.bodySmall),
+                          Text('Current Session:', style: Theme.of(context).textTheme.bodySmall),
                           Text(
-                            currentStaff.fullName,
+                            user?.name ?? 'Demo Owner',
                             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                           ),
                         ],
@@ -83,7 +84,7 @@ class AccessDeniedPage extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Active Persona Role:', style: Theme.of(context).textTheme.bodySmall),
+                          Text('Account Type:', style: Theme.of(context).textTheme.bodySmall),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                             decoration: BoxDecoration(
@@ -91,7 +92,7 @@ class AccessDeniedPage extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              currentStaff.roleCode,
+                              user?.role.label ?? 'Store Owner',
                               style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800, fontSize: 12),
                             ),
                           ),
@@ -101,7 +102,7 @@ class AccessDeniedPage extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Required Scope:', style: Theme.of(context).textTheme.bodySmall),
+                          Text('Required Authorization:', style: Theme.of(context).textTheme.bodySmall),
                           Text(
                             requiredPermission,
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFFDC2626)),

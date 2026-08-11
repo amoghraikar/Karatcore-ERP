@@ -5,7 +5,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/cards/kc_metric_card.dart';
-import '../../../staff/providers/staff_providers.dart';
+import '../../providers/security_providers.dart';
 
 class SecurityDashboardPage extends ConsumerWidget {
   const SecurityDashboardPage({super.key});
