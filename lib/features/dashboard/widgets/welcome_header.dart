@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../shared/models/user_session.dart';
-import '../../../shared/widgets/feedback/kc_status_badge.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 
-class WelcomeHeader extends StatelessWidget {
+class WelcomeHeader extends ConsumerWidget {
   const WelcomeHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
+    final authState = ref.watch(authStateProvider);
+    final userName = authState.session?.name;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,7 +24,7 @@ class WelcomeHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back, ${UserSession.mock.name}',
+                    userName != null ? 'Welcome back, $userName' : 'Welcome to KaratCore',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
@@ -30,26 +32,13 @@ class WelcomeHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '$dateStr • Operational Overview & Bullion Vault Status',
+                    '$dateStr • Operational Overview',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
                   ),
                 ],
               ),
-            ),
-            const Wrap(
-              spacing: 8,
-              children: [
-                KcStatusBadge(
-                  label: 'VAULT AUDITED',
-                  type: KcStatusType.success,
-                ),
-                KcStatusBadge(
-                  label: 'LIVE GOLD: ₹7,450/g',
-                  type: KcStatusType.info,
-                ),
-              ],
             ),
           ],
         ),

@@ -13,7 +13,7 @@ abstract class IValuationService {
   });
 }
 
-class MockValuationService implements IValuationService {
+class ValuationService implements IValuationService {
   @override
   double getStandardMetalRatePerGram(MetalType metal, OrnamentPurity purity) {
     if (metal == MetalType.gold) {

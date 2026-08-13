@@ -1,22 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/api_client.dart';
 import '../models/loan_model.dart';
+import '../repository/api_loan_repository.dart';
+import '../repository/api_pledge_repository.dart';
 import '../repository/loan_repository.dart';
-import '../repository/mock_loan_repository.dart';
-import '../repository/mock_pledge_repository.dart';
 import '../repository/pledge_repository.dart';
 import '../services/loan_calculation_service.dart';
 
 final loanRepositoryProvider = Provider<ILoanRepository>((ref) {
-  return MockLoanRepository();
+  return ApiLoanRepository(ref.watch(apiClientProvider));
 });
 
 final pledgeRepositoryProvider = Provider<IPledgeRepository>((ref) {
-  return MockPledgeRepository();
-});
-
-final loanCalculationServiceProvider = Provider<ILoanCalculationService>((ref) {
-  return MockLoanCalculationService();
+  return ApiPledgeRepository(ref.watch(apiClientProvider));
 });
 
 final loanSearchQueryProvider = StateProvider<String>((ref) => '');
@@ -144,3 +141,8 @@ final customerLoansProvider = FutureProvider.family<List<LoanModel>, String>((re
   final repo = ref.watch(loanRepositoryProvider);
   return repo.getLoansByCustomerId(customerId);
 });
+
+final loanCalculationServiceProvider = Provider<ILoanCalculationService>((ref) {
+  return LoanCalculationService();
+});
+

@@ -55,21 +55,8 @@ class TodayTasksWidget extends ConsumerWidget {
                     ),
               ),
               value: task.completed,
-              onChanged: (val) {
-                ref.read(dashboardTasksProvider.notifier).update((list) {
-                  return [
-                    for (final item in list)
-                      if (item.id == task.id)
-                        DashboardTask(
-                          id: item.id,
-                          title: item.title,
-                          subtitle: item.subtitle,
-                          completed: val ?? false,
-                        )
-                      else
-                        item,
-                  ];
-                });
+              onChanged: (_) {
+                ref.read(dashboardTasksProvider.notifier).toggleTask(task.id);
               },
             ),
         ],

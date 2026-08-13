@@ -8,10 +8,10 @@ class UserSession extends Equatable {
     required this.name,
     required this.role,
     required this.email,
-    this.phone = '+91 98200 12345',
+    required this.phone,
     this.avatarUrl,
     this.branch,
-    this.is2faEnabled = true,
+    this.is2faEnabled = false,
   });
 
   final String id;
@@ -44,16 +44,6 @@ class UserSession extends Equatable {
       is2faEnabled: is2faEnabled ?? this.is2faEnabled,
     );
   }
-
-  static final mock = UserSession(
-    id: 'USR-101',
-    name: 'Arjun Rathore',
-    role: UserRole.owner,
-    email: 'arjun@karatcore.com',
-    phone: '+91 98200 12345',
-    branch: BranchModel.mockBranches[0],
-    is2faEnabled: true,
-  );
 
   @override
   List<Object?> get props => [id, name, role, email, phone, avatarUrl, branch, is2faEnabled];

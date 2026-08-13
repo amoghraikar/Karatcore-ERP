@@ -1,21 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../core/network/api_client.dart';
 import '../models/ornament_model.dart';
+import '../repository/api_inventory_repository.dart';
 import '../repository/inventory_repository.dart';
-import '../repository/mock_inventory_repository.dart';
 import '../services/barcode_service.dart';
 import '../services/valuation_service.dart';
 
 final inventoryRepositoryProvider = Provider<IInventoryRepository>((ref) {
-  return MockInventoryRepository();
+  return ApiInventoryRepository(ref.watch(apiClientProvider));
 });
 
 final valuationServiceProvider = Provider<IValuationService>((ref) {
-  return MockValuationService();
+  return ValuationService();
 });
 
 final barcodeServiceProvider = Provider<IBarcodeService>((ref) {
-  return MockBarcodeService();
+  return BarcodeService();
 });
 
 final inventorySearchQueryProvider = StateProvider<String>((ref) => '');

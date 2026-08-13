@@ -7,11 +7,21 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class OwnerRegisterRequest(BaseModel):
+    full_name: str
+    business_name: str
+    phone: str
+    email: EmailStr
+    password: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user_type: str
     sub: str
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
     customer_id: Optional[str] = None
 
 

@@ -9,8 +9,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "KaratCore ERP Backend"
     API_V1_STR: str = "/api/v1"
 
-    # Database
+    # Database (Supabase PostgreSQL / SQLite)
     DATABASE_URL: str = "sqlite:///./karatcore.db"
+
+    # Supabase Integration
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
 
     # JWT Security
     JWT_SECRET_KEY: str = "karatcore_super_secret_jwt_key_change_in_production_998214"
@@ -26,6 +31,22 @@ class Settings(BaseSettings):
     PAYMENT_PROVIDER: str = "MOCK"
     IDENTITY_PROVIDER: str = "MOCK"
     LOG_LEVEL: str = "INFO"
+
+    # SMS Gateway Configuration (Twilio / Fast2SMS)
+    SMS_PROVIDER: str = "twilio"  # twilio | fast2sms | mock
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_FROM_NUMBER: str = ""
+    FAST2SMS_API_KEY: str = ""
+
+    # SMTP Email Server Configuration
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_TLS: bool = True
+    EMAILS_FROM_EMAIL: str = "notifications@karatcore.com"
+    EMAILS_FROM_NAME: str = "KaratCore Security"
 
     @field_validator("JWT_SECRET_KEY")
     @classmethod

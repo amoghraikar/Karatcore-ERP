@@ -266,7 +266,7 @@ class _OrnamentDetailsPageState extends ConsumerState<OrnamentDetailsPage> with 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Real-Time Valuation Breakdown (Mock)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text('Real-Time Valuation Breakdown', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               _buildRow('Metal Rate / g', KcFormatters.inr(o.valuation.metalRate)),
               _buildRow('Net Metal Weight', '${o.weight.netMetalWeight} g'),

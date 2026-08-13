@@ -1,22 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/api_client.dart';
 import '../models/accounting_model.dart';
 import '../repository/accounting_repository.dart';
-import '../repository/mock_accounting_repository.dart';
+import '../repository/api_accounting_repository.dart';
 import '../services/accounting_calculation_service.dart';
 import '../services/accounting_integration_service.dart';
 
 final accountingRepositoryProvider = Provider<IAccountingRepository>((ref) {
-  return MockAccountingRepository();
+  return ApiAccountingRepository(ref.watch(apiClientProvider));
 });
 
 final accountingCalculationServiceProvider = Provider<IAccountingCalculationService>((ref) {
-  return MockAccountingCalculationService();
+  return AccountingCalculationService();
 });
 
 final accountingIntegrationServiceProvider = Provider<IAccountingIntegrationService>((ref) {
   final repo = ref.watch(accountingRepositoryProvider);
-  return MockAccountingIntegrationService(repo);
+  return AccountingIntegrationService(repo);
 });
 
 // Accounting Period State

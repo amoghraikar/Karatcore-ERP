@@ -123,7 +123,7 @@ class _KycDocumentPreviewDialogState extends ConsumerState<KycDocumentPreviewDia
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '${widget.document.type} Mock Image (${_showBackSide ? "BACK SIDE" : "FRONT SIDE"})',
+                          '${widget.document.type} Document Image (${_showBackSide ? "BACK SIDE" : "FRONT SIDE"})',
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 4),

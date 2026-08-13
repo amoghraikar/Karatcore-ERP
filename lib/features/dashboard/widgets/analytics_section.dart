@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/extensions/context_extensions.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/cards/kc_card.dart';
 import '../../../shared/widgets/charts/kc_chart_wrapper.dart';
 import '../providers/dashboard_provider.dart';
@@ -36,11 +37,16 @@ class AnalyticsSection extends ConsumerWidget {
                                 ),
                           ),
                           const Spacer(),
-                          Text(
-                            '₹95.3L Total',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                          Builder(
+                            builder: (context) {
+                              final total = revenueData.fold(0.0, (sum, item) => sum + item.value);
+                              return Text(
+                                '${KcFormatters.inrCompact(total)} Total',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              );
+                            },
                           ),
                         ],
                       ),

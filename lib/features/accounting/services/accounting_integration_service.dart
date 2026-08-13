@@ -24,8 +24,8 @@ abstract class IAccountingIntegrationService {
   Future<FinancialTransactionModel> recordIncomeTransaction(IncomeModel income);
 }
 
-class MockAccountingIntegrationService implements IAccountingIntegrationService {
-  MockAccountingIntegrationService(this._repository);
+class AccountingIntegrationService implements IAccountingIntegrationService {
+  AccountingIntegrationService(this._repository);
 
   final IAccountingRepository _repository;
 

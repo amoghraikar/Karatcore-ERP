@@ -22,10 +22,25 @@ class AccountingPeriodSelector extends ConsumerWidget {
         border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
       ),
       child: periodsAsync.when(
-        loading: () => const SizedBox(width: 140, child: Text('Loading Periods...')),
-        error: (err, st) => const Text('Periods Error'),
+        loading: () => const SizedBox(width: 140, child: Text('Loading...')),
+        error: (err, st) => const Text('Current Period'),
         data: (periods) {
-          final active = selectedPeriod ?? periods.firstWhere((p) => p.name.contains('August') || p.isOpen, orElse: () => periods.first);
+          if (periods.isEmpty) {
+            return const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.date_range_rounded, size: 18),
+                SizedBox(width: 8),
+                Text('Current Financial Year'),
+              ],
+            );
+          }
+
+          final active = selectedPeriod ??
+              periods.firstWhere(
+                (p) => p.status == 'Open',
+                orElse: () => periods.first,
+              );
 
           return Row(
             mainAxisSize: MainAxisSize.min,
@@ -53,7 +68,7 @@ class AccountingPeriodSelector extends ConsumerWidget {
               const SizedBox(width: 8),
               KcStatusBadge(
                 label: active.status,
-                statusColor: active.isOpen ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                statusColor: active.status == 'Open' ? const Color(0xFF059669) : const Color(0xFFDC2626),
               ),
             ],
           );

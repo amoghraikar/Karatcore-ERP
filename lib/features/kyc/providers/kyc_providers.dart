@@ -1,16 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../core/network/api_client.dart';
 import '../models/kyc_model.dart';
+import '../repository/api_kyc_repository.dart';
 import '../repository/kyc_repository.dart';
-import '../repository/mock_kyc_repository.dart';
 import '../services/kyc_verification_service.dart';
 
 final kycRepositoryProvider = Provider<IKycRepository>((ref) {
-  return MockKycRepository();
+  return ApiKycRepository(ref.watch(apiClientProvider));
 });
 
 final kycServiceProvider = Provider<IKycVerificationService>((ref) {
-  return MockKycVerificationService();
+  return KycVerificationService();
 });
 
 final kycSearchQueryProvider = StateProvider<String>((ref) => '');

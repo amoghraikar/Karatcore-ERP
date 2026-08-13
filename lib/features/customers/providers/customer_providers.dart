@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../core/network/api_client.dart';
 import '../models/customer_model.dart';
+import '../repository/api_customer_repository.dart';
 import '../repository/customer_repository.dart';
-import '../repository/mock_customer_repository.dart';
 
 final customerRepositoryProvider = Provider<ICustomerRepository>((ref) {
-  return MockCustomerRepository();
+  return ApiCustomerRepository(ref.watch(apiClientProvider));
 });
 
 final customerSearchQueryProvider = StateProvider<String>((ref) => '');

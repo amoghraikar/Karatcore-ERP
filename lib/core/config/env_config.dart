@@ -6,6 +6,6 @@ class EnvConfig {
   static bool get isStaging => appEnv == 'staging';
   static bool get isDevelopment => appEnv == 'development';
 
-  static bool get enableMockFallback => !isProduction;
+  static bool get enableMockFallback => false;
   static bool get enableDebugLogs => !isProduction;
 }

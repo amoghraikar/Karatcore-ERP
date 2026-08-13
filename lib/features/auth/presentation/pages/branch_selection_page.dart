@@ -17,10 +17,31 @@ class BranchSelectionPage extends ConsumerStatefulWidget {
 }
 
 class _BranchSelectionPageState extends ConsumerState<BranchSelectionPage> {
-  BranchModel _selected = BranchModel.mockBranches[0];
+  BranchModel? _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBranches();
+  }
+
+  Future<void> _loadBranches() async {
+    try {
+      final branches = await ref.read(authRepositoryProvider).getAvailableBranches();
+      if (mounted && branches.isNotEmpty) {
+        setState(() => _selected = branches.first);
+      }
+    } catch (_) {
+      // Fall back to the store branch attached to the current session.
+      final sessionBranch = ref.read(authStateProvider).session?.branch;
+      if (mounted && sessionBranch != null) {
+        setState(() => _selected = sessionBranch);
+      }
+    }
+  }
 
   void _onConfirmBranch() {
-    ref.read(authStateProvider.notifier).selectBranch(_selected);
+    ref.read(authStateProvider.notifier).selectBranch(_selected!);
     context.go(AppRoutes.dashboard);
   }
 
@@ -29,6 +50,9 @@ class _BranchSelectionPageState extends ConsumerState<BranchSelectionPage> {
     final scheme = Theme.of(context).colorScheme;
     final authState = ref.watch(authStateProvider);
     final user = authState.session;
+    final branches = <BranchModel>[
+      if (_selected != null) _selected!,
+    ];
 
     return AuthSplitLayout(
       headline: 'Select Operational Store Branch',
@@ -86,8 +110,8 @@ class _BranchSelectionPageState extends ConsumerState<BranchSelectionPage> {
           const SizedBox(height: 20),
 
           // Branch List Cards
-          ...BranchModel.mockBranches.map((branch) {
-            final isSelected = _selected.id == branch.id;
+          ...branches.map((branch) {
+            final isSelected = _selected?.id == branch.id;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: KcCard(
@@ -172,12 +196,12 @@ class _BranchSelectionPageState extends ConsumerState<BranchSelectionPage> {
           }),
 
           const SizedBox(height: 16),
-          KcPrimaryButton(
-            label: 'Enter Store ERP (${_selected.name})',
-            fullWidth: true,
-            icon: Icons.arrow_forward_rounded,
-            onPressed: _onConfirmBranch,
-          ),
+KcPrimaryButton(
+              label: 'Enter Store ERP (${_selected?.name ?? 'Main Store'})',
+              fullWidth: true,
+              icon: Icons.arrow_forward_rounded,
+              onPressed: _selected != null ? _onConfirmBranch : null,
+            ),
         ],
       ),
     );

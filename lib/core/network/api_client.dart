@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_config.dart';
 
 class ApiException implements Exception {
@@ -11,7 +12,7 @@ class ApiException implements Exception {
   final dynamic details;
 
   @override
-  String toString() => 'ApiException [$statusCode | $code]: $message';
+  String toString() => message;
 }
 
 class ApiClient {
@@ -51,10 +52,40 @@ class ApiClient {
     return _parseResponse(response);
   }
 
+  Future<dynamic> put(String path, {Map<String, dynamic>? body}) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}$path');
+    final response = await _client.put(
+      url,
+      headers: _headers(),
+      body: body != null ? jsonEncode(body) : null,
+    );
+    return _parseResponse(response);
+  }
+
+  Future<dynamic> delete(String path) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}$path');
+    final response = await _client.delete(url, headers: _headers());
+    return _parseResponse(response);
+  }
+
   dynamic _parseResponse(http.Response response) {
-    final body = jsonDecode(response.body);
+    if (response.body.isEmpty) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return null;
+      }
+      throw ApiException(
+        statusCode: response.statusCode,
+        code: 'HTTP_ERROR',
+        message: 'Server returned HTTP ${response.statusCode}',
+      );
+    }
+
+    final dynamic body = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return body['data'];
+      if (body is Map<String, dynamic> && body.containsKey('data')) {
+        return body['data'];
+      }
+      return body;
     }
 
     if (body is Map<String, dynamic> && body.containsKey('error')) {
@@ -67,6 +98,14 @@ class ApiClient {
       );
     }
 
+    if (body is Map<String, dynamic> && body.containsKey('detail')) {
+      throw ApiException(
+        statusCode: response.statusCode,
+        code: 'HTTP_ERROR',
+        message: body['detail'].toString(),
+      );
+    }
+
     throw ApiException(
       statusCode: response.statusCode,
       code: 'HTTP_ERROR',
@@ -74,3 +113,7 @@ class ApiClient {
     );
   }
 }
+
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient();
+});

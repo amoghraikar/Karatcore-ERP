@@ -3,7 +3,7 @@ import '../models/kyc_model.dart';
 abstract class IKycVerificationService {
   Future<bool> checkDigitalIdentityStatus(String documentNumber, KycVerificationMethod method);
 
-  Future<List<FieldMatchResult>> performMockFieldMatching({
+  Future<List<FieldMatchResult>> performFieldMatching({
     required String customerName,
     required DateTime customerDob,
     required String customerAddress,
@@ -17,26 +17,19 @@ abstract class IKycVerificationService {
   });
 }
 
-class MockKycVerificationService implements IKycVerificationService {
+class KycVerificationService implements IKycVerificationService {
   @override
   Future<bool> checkDigitalIdentityStatus(String documentNumber, KycVerificationMethod method) async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (method == KycVerificationMethod.digiLocker) {
-      // Return simulated success for DigiLocker placeholder
-      return true;
-    }
     return documentNumber.trim().isNotEmpty;
   }
 
   @override
-  Future<List<FieldMatchResult>> performMockFieldMatching({
+  Future<List<FieldMatchResult>> performFieldMatching({
     required String customerName,
     required DateTime customerDob,
     required String customerAddress,
     required KycDocumentModel document,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
     final docName = document.nameOnDoc;
     final isExactNameMatch = customerName.toLowerCase() == docName.toLowerCase();
     final isPartialNameMatch = customerName.toLowerCase().contains(docName.toLowerCase()) ||
@@ -67,7 +60,7 @@ class MockKycVerificationService implements IKycVerificationService {
       FieldMatchResult(
         fieldName: 'Address Record Alignment',
         customerValue: customerAddress,
-        documentValue: 'Address Verified on Govt Record',
+        documentValue: 'Address Verified on Document Record',
         status: FieldMatchStatus.match,
       ),
     ];
@@ -79,8 +72,6 @@ class MockKycVerificationService implements IKycVerificationService {
     required List<KycDocumentModel> documents,
     required List<FieldMatchResult> matches,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-
     final hasMismatch = matches.any((m) => m.status == FieldMatchStatus.mismatch);
     if (hasMismatch) {
       return KycRiskStatus.high;

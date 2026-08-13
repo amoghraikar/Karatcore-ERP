@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/extensions/context_extensions.dart';
-import '../../../core/routing/routes.dart';
 import '../../../shared/widgets/cards/kc_metric_card.dart';
 import '../providers/dashboard_provider.dart';
 
@@ -28,7 +27,11 @@ class KpiSection extends ConsumerWidget {
       itemBuilder: (context, index) {
         final kpi = kpis[index];
         return InkWell(
-          onTap: () => context.go(AppRoutes.kyc),
+          onTap: () {
+            if (kpi.route != null) {
+              context.go(kpi.route!);
+            }
+          },
           borderRadius: BorderRadius.circular(12),
           child: KcMetricCard(
             title: kpi.title,

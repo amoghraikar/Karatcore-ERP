@@ -422,7 +422,7 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
                   children: [
                     Icon(_hasUploadedFront ? Icons.check_circle_rounded : Icons.cloud_upload_rounded, color: _hasUploadedFront ? Colors.green : Colors.white70, size: 36),
                     const SizedBox(height: 8),
-                    Text(_hasUploadedFront ? 'Front Side Uploaded (Mock)' : 'Upload Front Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    Text(_hasUploadedFront ? 'Front Side Uploaded' : 'Upload Front Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -451,7 +451,7 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
                   children: [
                     Icon(_hasUploadedBack ? Icons.check_circle_rounded : Icons.cloud_upload_rounded, color: _hasUploadedBack ? Colors.green : Colors.white70, size: 36),
                     const SizedBox(height: 8),
-                    Text(_hasUploadedBack ? 'Back Side Uploaded (Mock)' : 'Upload Back Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    Text(_hasUploadedBack ? 'Back Side Uploaded' : 'Upload Back Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,

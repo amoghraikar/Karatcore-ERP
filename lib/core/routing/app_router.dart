@@ -29,6 +29,7 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/lock_screen_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/otp_verification_page.dart';
+import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/providers/auth_provider.dart';
@@ -121,6 +122,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthRoute = currentPath == AppRoutes.splash ||
           currentPath == AppRoutes.login ||
+          currentPath == AppRoutes.register ||
           currentPath == AppRoutes.verify ||
           currentPath == AppRoutes.forgotPassword ||
           currentPath == AppRoutes.resetPassword;
@@ -174,6 +176,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: AppRoutes.verify,

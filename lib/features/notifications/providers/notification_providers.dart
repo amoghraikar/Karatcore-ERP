@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/api_client.dart';
 import '../../loans/providers/loan_providers.dart';
 import '../models/notification_models.dart';
+import '../repository/api_notification_repository.dart';
 import '../repository/notification_repository.dart';
 import '../services/communication_service.dart';
 import '../services/due_date_engine.dart';
 
 final notificationRepositoryProvider = Provider<INotificationRepository>((ref) {
-  return MockNotificationRepository();
+  return ApiNotificationRepository(ref.watch(apiClientProvider));
 });
 
 final communicationServiceProvider = Provider<ICommunicationService>((ref) {

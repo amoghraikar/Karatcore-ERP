@@ -1,3 +1,19 @@
+def test_owner_register_success(client):
+    res = client.post(
+        "/api/v1/auth/owner/register",
+        json={
+            "full_name": "New Operator",
+            "business_name": "Karat Jewellery Store",
+            "phone": "+91 99999 88888",
+            "email": "newoperator@karatcore.com",
+            "password": "SecurePassword123!",
+        },
+    )
+    assert res.status_code == 200
+    token = res.json()["data"]["access_token"]
+    assert token is not None
+
+
 def test_owner_login_success(client):
     res = client.post(
         "/api/v1/auth/owner/login",

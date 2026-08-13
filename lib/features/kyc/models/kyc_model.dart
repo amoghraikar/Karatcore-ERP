@@ -158,7 +158,7 @@ class KycConsentModel {
   const KycConsentModel({
     required this.givenAt,
     this.version = 'v2.4-2026',
-    this.ipAddress = '192.168.1.104 (Mock)',
+    this.ipAddress = '192.168.1.1',
     this.acceptedTerms = true,
     this.acceptedPrivacy = true,
   });

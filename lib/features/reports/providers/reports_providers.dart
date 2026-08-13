@@ -10,22 +10,23 @@ import '../../loans/providers/loan_providers.dart';
 import '../../ornaments/models/ornament_model.dart';
 import '../../ornaments/providers/inventory_providers.dart';
 
+import '../../../core/network/api_client.dart';
 import '../models/reports_model.dart';
-import '../repository/mock_reports_repository.dart';
+import '../repository/api_reports_repository.dart';
 import '../repository/reports_repository.dart';
 import '../services/export_service.dart';
 import '../services/reports_calculation_service.dart';
 
 final reportsRepositoryProvider = Provider<IReportsRepository>((ref) {
-  return MockReportsRepository();
+  return ApiReportsRepository(ref.watch(apiClientProvider));
 });
 
 final reportsCalculationServiceProvider = Provider<IReportsCalculationService>((ref) {
-  return MockReportsCalculationService();
+  return ReportsCalculationService();
 });
 
 final exportServiceProvider = Provider<IExportService>((ref) {
-  return MockExportService();
+  return ExportService();
 });
 
 // Centralized Date Filter State Provider

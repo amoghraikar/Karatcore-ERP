@@ -1,15 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/api_client.dart';
 import '../models/auth_state.dart';
 import '../models/branch_model.dart';
 import '../models/user_role.dart';
-import '../repository/mock_auth_repository.dart';
+import '../repository/api_auth_repository.dart';
 import '../services/auth_service.dart';
 import '../services/customer_data_isolation_service.dart';
 import '../services/owner_authorization_service.dart';
 import '../../../shared/models/user_session.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
-  return MockAuthRepository();
+  return ApiAuthRepository(ref.watch(apiClientProvider));
 });
 
 final ownerAuthorizationServiceProvider = Provider<IOwnerAuthorizationService>((ref) {
@@ -21,19 +22,34 @@ final customerDataIsolationServiceProvider = Provider<ICustomerDataIsolationServ
 });
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.watch(authRepositoryProvider));
+  return AuthNotifier(ref.watch(authRepositoryProvider), ref.watch(apiClientProvider));
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository) : super(const AuthState());
+  AuthNotifier(this._repository, this._apiClient) : super(const AuthState());
 
   final IAuthRepository _repository;
+  final ApiClient _apiClient;
 
   void checkInitialSession() async {
-    state = state.copyWith(status: AuthStatus.authenticating);
-    await Future.delayed(const Duration(milliseconds: 700));
-    // Default to initial unauthenticated state so full flow is testable
     state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  void forceAuthenticateAsRole(UserRole role) {
+    final session = UserSession(
+      id: 'OWN-101',
+      name: 'Demo Owner',
+      role: role,
+      email: 'owner@karatcore.com',
+      phone: '+91 98200 12345',
+      branch: BranchModel.defaultBranches[0],
+      is2faEnabled: false,
+    );
+    state = AuthState(
+      status: AuthStatus.authenticated,
+      session: session,
+      selectedBranch: session.branch,
+    );
   }
 
   void setRememberDevice(bool value) {
@@ -42,6 +58,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void setOtpMethod(String method) {
     state = state.copyWith(otpMethod: method);
+  }
+
+  void requireOtpStep(String emailOrPhone) {
+    state = state.copyWith(
+      status: AuthStatus.pendingOtp,
+      pendingEmailOrPhone: emailOrPhone.isNotEmpty ? emailOrPhone : '+91 98200 12345',
+      otpMethod: 'sms',
+    );
   }
 
   void selectRole(UserRole role) {
@@ -70,6 +94,48 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         status: AuthStatus.pendingOtp,
         session: session,
+        selectedBranch: session.branch,
+        pendingEmailOrPhone: emailOrPhone,
+        otpMethod: 'sms',
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> registerOwner({
+    required String fullName,
+    required String businessName,
+    required String email,
+    required String phone,
+    required String password,
+  }) async {
+    state = state.copyWith(
+      status: AuthStatus.authenticating,
+      errorMessage: null,
+      pendingEmailOrPhone: email,
+    );
+
+    try {
+      final session = await _repository.registerOwner(
+        fullName: fullName,
+        businessName: businessName,
+        email: email,
+        phone: phone,
+        password: password,
+      );
+
+      state = state.copyWith(
+        status: AuthStatus.pendingOtp,
+        session: session,
+        selectedBranch: session.branch,
+        pendingEmailOrPhone: email,
+        otpMethod: 'sms',
       );
       return true;
     } catch (e) {
@@ -87,7 +153,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _repository.verifyOtp(otpCode: code, method: state.otpMethod);
       state = state.copyWith(
-        status: AuthStatus.pendingBranch,
+        status: AuthStatus.authenticated,
       );
       return true;
     } catch (e) {
@@ -139,31 +205,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void logout() {
+    _apiClient.setToken(null);
     state = const AuthState(status: AuthStatus.unauthenticated);
-  }
-
-  void switchAccount(UserSession session) {
-    state = AuthState(
-      status: AuthStatus.authenticated,
-      session: session,
-      selectedBranch: session.branch ?? BranchModel.mockBranches[0],
-    );
-  }
-
-  void forceAuthenticateAsRole(UserRole role) {
-    final session = UserSession(
-      id: 'OWN-101',
-      name: 'Demo Owner',
-      role: UserRole.owner,
-      email: 'owner@karatcore.com',
-      phone: '+91 98200 12345',
-      branch: BranchModel.mockBranches[0],
-    );
-
-    state = AuthState(
-      status: AuthStatus.authenticated,
-      session: session,
-      selectedBranch: BranchModel.mockBranches[0],
-    );
   }
 }

@@ -22,7 +22,7 @@ abstract class ILoanCalculationService {
   double calculateSettlementAmount(LoanModel loan);
 }
 
-class MockLoanCalculationService implements ILoanCalculationService {
+class LoanCalculationService implements ILoanCalculationService {
   @override
   double calculateCollateralValue(List<OrnamentModel> ornaments) {
     double total = 0.0;

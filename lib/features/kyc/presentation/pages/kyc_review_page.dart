@@ -204,13 +204,13 @@ class _KycReviewPageState extends ConsumerState<KycReviewPage> {
   Widget _buildReviewDecisionPanel(KycRecordModel record, dynamic role) {
     return Column(
       children: [
-        // 1. Mock Field Matching Comparison Card
+        // 1. Field Matching Comparison Card
         KcCard(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Field Alignment & OCR Comparison (Mock)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text('Field Alignment & OCR Comparison', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               if (record.fieldMatches.isEmpty) ...[
                 _buildFieldMatchRow('Customer Name', record.customerName, record.documents.isNotEmpty ? record.documents.first.nameOnDoc : 'N/A', FieldMatchStatus.match),

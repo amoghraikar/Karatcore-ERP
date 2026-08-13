@@ -9,6 +9,14 @@ abstract class IAuthRepository {
     required UserRole role,
   });
 
+  Future<UserSession> registerOwner({
+    required String fullName,
+    required String businessName,
+    required String email,
+    required String phone,
+    required String password,
+  });
+
   Future<bool> verifyOtp({
     required String otpCode,
     required String method,
@@ -29,4 +37,12 @@ abstract class IAuthRepository {
   });
 
   Future<List<BranchModel>> getAvailableBranches();
+}
+
+class AuthException implements Exception {
+  AuthException({required this.message});
+  final String message;
+
+  @override
+  String toString() => message;
 }

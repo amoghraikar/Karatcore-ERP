@@ -48,7 +48,7 @@ abstract class IReportsCalculationService {
   List<InventoryValuationReportItem> calculateInventoryValuationReport(List<OrnamentModel> ornaments);
 }
 
-class MockReportsCalculationService implements IReportsCalculationService {
+class ReportsCalculationService implements IReportsCalculationService {
   @override
   ExecutiveDashboardMetrics calculateExecutiveMetrics({
     required List<CustomerModel> customers,
@@ -70,14 +70,13 @@ class MockReportsCalculationService implements IReportsCalculationService {
     final expenseAccs = accounts.where((a) => a.type == AccountType.expense).fold(0.0, (sum, a) => sum + a.currentBalance);
     final netProfit = revenueAccs - expenseAccs;
 
-    final cashAcc = accounts.firstWhere((a) => a.id == 'ACC-101', orElse: () => AccountModel(id: 'ACC-101', name: 'Cash', type: AccountType.asset, category: AccountCategory.cash, openingBalance: 0.0, currentBalance: 850000.0, createdAt: DateTime.now()));
-    final hdfcAcc = accounts.firstWhere((a) => a.id == 'ACC-102', orElse: () => AccountModel(id: 'ACC-102', name: 'HDFC Bank', type: AccountType.asset, category: AccountCategory.bankAccount, openingBalance: 0.0, currentBalance: 4200000.0, createdAt: DateTime.now()));
-    final sbiAcc = accounts.firstWhere((a) => a.id == 'ACC-103', orElse: () => AccountModel(id: 'ACC-103', name: 'SBI Bank', type: AccountType.asset, category: AccountCategory.bankAccount, openingBalance: 0.0, currentBalance: 1850000.0, createdAt: DateTime.now()));
+    final cashAccs = accounts.where((a) => a.category == AccountCategory.cash).fold(0.0, (sum, a) => sum + a.currentBalance);
+    final bankAccs = accounts.where((a) => a.category == AccountCategory.bankAccount).fold(0.0, (sum, a) => sum + a.currentBalance);
 
     return ExecutiveDashboardMetrics(
-      revenue: revenueAccs > 0 ? revenueAccs : 9765000.0,
-      expenses: expenseAccs > 0 ? expenseAccs : 1939000.0,
-      netProfit: netProfit != 0 ? netProfit : 7826000.0,
+      revenue: revenueAccs,
+      expenses: expenseAccs,
+      netProfit: netProfit,
       activeLoansCount: activeLoans.length,
       loanOutstanding: loanOutstanding,
       interestIncome: interestIncome,
@@ -85,8 +84,8 @@ class MockReportsCalculationService implements IReportsCalculationService {
       pledgedInventoryValue: pledgedInventoryValue,
       customerCount: customers.length,
       overdueLoansCount: overdueLoans.length,
-      cashBalance: cashAcc.currentBalance,
-      bankBalance: hdfcAcc.currentBalance + sbiAcc.currentBalance,
+      cashBalance: cashAccs,
+      bankBalance: bankAccs,
     );
   }
 

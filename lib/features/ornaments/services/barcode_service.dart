@@ -6,7 +6,7 @@ abstract class IBarcodeService {
   Future<String?> simulateCameraScan();
 }
 
-class MockBarcodeService implements IBarcodeService {
+class BarcodeService implements IBarcodeService {
   @override
   String generateBarcode(String ornamentId) {
     final clean = ornamentId.replaceAll(RegExp(r'[^0-9]'), '');
@@ -21,7 +21,6 @@ class MockBarcodeService implements IBarcodeService {
 
   @override
   Future<String?> simulateCameraScan() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return 'KC-ORN-000101';
+    return null;
   }
 }

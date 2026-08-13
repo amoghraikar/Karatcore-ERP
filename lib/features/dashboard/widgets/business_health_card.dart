@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/constants/color_tokens.dart';
 import '../../../shared/widgets/cards/kc_card.dart';
+import '../providers/dashboard_provider.dart';
 
-class BusinessHealthCard extends StatelessWidget {
+class BusinessHealthCard extends ConsumerWidget {
   const BusinessHealthCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
+    final health = ref.watch(storeBusinessHealthProvider);
 
     return KcCard(
       child: Column(
@@ -42,7 +46,7 @@ class BusinessHealthCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '96 / 100',
+                  '${health.overallScore} / 100',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: KcColors.signalGreen,
@@ -52,24 +56,24 @@ class BusinessHealthCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          const _HealthMetricProgress(
+          _HealthMetricProgress(
             label: 'LTV Safety Reserve Ratio (Collateral Protection)',
-            value: 0.92,
-            percentageStr: '92% Secure',
+            value: health.ltvSafetyRatio,
+            percentageStr: health.ltvSafetyLabel,
             color: KcColors.signalGreen,
           ),
           const SizedBox(height: 14),
-          const _HealthMetricProgress(
+          _HealthMetricProgress(
             label: 'Gold Bullion Reserve Liquidity',
-            value: 0.88,
-            percentageStr: '88% Optimal',
+            value: health.reserveLiquidityRatio,
+            percentageStr: health.reserveLiquidityLabel,
             color: KcColors.signalOrange,
           ),
           const SizedBox(height: 14),
-          const _HealthMetricProgress(
+          _HealthMetricProgress(
             label: 'BIS Hallmark Compliance Score',
-            value: 0.98,
-            percentageStr: '98% Audited',
+            value: health.complianceScore,
+            percentageStr: health.complianceLabel,
             color: KcColors.signalGreen,
           ),
         ],

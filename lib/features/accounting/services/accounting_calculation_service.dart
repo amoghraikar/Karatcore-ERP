@@ -55,7 +55,7 @@ abstract class IAccountingCalculationService {
   Map<String, double> calculateCashFlow(List<FinancialTransactionModel> transactions);
 }
 
-class MockAccountingCalculationService implements IAccountingCalculationService {
+class AccountingCalculationService implements IAccountingCalculationService {
   @override
   TrialBalanceResult calculateTrialBalance(List<AccountModel> accounts) {
     double debitSum = 0.0;

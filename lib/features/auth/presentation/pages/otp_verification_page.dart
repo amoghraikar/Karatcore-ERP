@@ -20,7 +20,7 @@ class OtpVerificationPage extends ConsumerStatefulWidget {
 
 class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   String _otpCode = '';
-  final _authenticatorController = TextEditingController(text: '482910');
+  final _authenticatorController = TextEditingController();
   final _backupCodeController = TextEditingController();
 
   int _countdown = 30;
@@ -62,7 +62,7 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
 
     final success = await ref.read(authStateProvider.notifier).verifyOtp(codeToVerify);
     if (success && mounted) {
-      context.go(AppRoutes.selectBranch);
+      context.go(AppRoutes.dashboard);
     }
   }
 
@@ -104,6 +104,27 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: scheme.outline.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, size: 16, color: KcColors.signalOrange),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Testing Mode: Enter 123456 (or any 6-digit code) to complete OTP verification.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -192,13 +213,6 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                     onPressed: _resendCode,
                     child: const Text('Resend OTP Code'),
                   ),
-                Text(
-                  'Mock OTP: 123456',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: KcColors.gold500,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
               ],
             ),
           ] else if (authState.otpMethod == 'authenticator') ...[

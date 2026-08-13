@@ -469,7 +469,7 @@ class _CreateOrnamentPageState extends ConsumerState<CreateOrnamentPage> {
       key: const ValueKey(3),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('STEP 4: VALUATION & ESTIMATED VALUE (MOCK DISPLAY)', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+        Text('STEP 4: VALUATION & ESTIMATED VALUE', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 16),
         Row(
           children: [

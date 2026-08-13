@@ -2,54 +2,51 @@
 
 [![Flutter Version](https://img.shields.io/badge/Flutter-3.24+-02569B?logo=flutter)](https://flutter.dev)
 [![Dart Version](https://img.shields.io/badge/Dart-3.5+-0175C2?logo=dart)](https://dart.dev)
-[![Architecture](https://img.shields.io/badge/Architecture-Feature--First%20Clean-emerald)](https://flutter.dev)
-[![Milestone](https://img.shields.io/badge/Milestone-Foundation%20Architecture%20v1.0.0-gold)](#-current-milestone-status)
-[![Platforms](https://img.shields.io/badge/Platforms-Android%20|%20iOS%20|%20Windows%20|%20macOS%20|%20Linux%20|%20Web-blue)](#-target-platforms)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python-009688?logo=fastapi)](https://fastapi.tiangolo.com)
+[![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20API--Wired-emerald)](https://flutter.dev)
 
-> **KaratCore ERP** is a modern, enterprise-grade jewellery business management system built with Flutter & Dart using a modular, feature-first clean architecture. Designed for jewellery retailers, wholesalers, and gold loan providers.
+> **KaratCore ERP** is a modern, enterprise-grade jewellery business management system built with Flutter & Dart (Frontend) and Python FastAPI (Backend). Designed for jewellery retailers, wholesalers, goldsmiths, and gold loan providers.
 
 ---
 
-## ✨ Implemented Features & Modules
+## ✨ Implemented Features & Production Capabilities
 
-### 🔐 1. Authentication & Security Domain
-- **Authentication Flows**: Splash screen, Multi-factor Login, OTP Verification, Forgot & Reset Password wizards.
-- **Session & Access Control**: Branch selection, screen lock timer, session expiry handling, and access-denied safeguards.
-- **Role-Based Authorization (`AuthorizationService`)**: Granular permission checking across routes and UI components based on active staff roles.
+### 🔐 1. Real Authentication & Security Gateway
+- **Production Store Owner Registration & Login**: Integrated with `ApiClient` REST repositories (`ApiAuthRepository`).
+- **2FA OTP Verification**: Mandatory 6-digit OTP verification flow on login/registration via **SMS / Email 6-digit OTP**, **Authenticator App (TOTP)**, or **Backup Emergency Codes**.
+- **Backend Notification Service**: Python `NotificationService` supporting real SMS delivery (Twilio / Fast2SMS) and real email delivery via SMTP.
+- **Session & Access Control**: Granular Role-Based Access Control (RBAC), branch selection, screen lock timer, and session expiry handling.
 
-### 📊 2. Dashboard & Executive Analytics
-- **KPI Metrics**: Real-time business revenue, active pledge loans, gold inventory weight, and customer growth cards.
-- **Interactive Charts**: Transaction trends and revenue breakdown powered by `fl_chart`.
-- **Quick Action Bar**: One-click shortcuts for creating customers, initiating loans, and logging ornaments.
+### 📊 2. Dynamic Executive Dashboard & Analytics
+- **Live Dynamic KPI Cards**: Real-time business revenue, outstanding pledge loans, interest collected, active customers, and overdue loan metrics derived directly from reactive state.
+- **Interactive Charts (`fl_chart`)**: Live weekly revenue trends, gold collateral purity distribution (24K, 22K, 18K), and monthly transaction volume.
+- **Store Business Health Score**: Automated collateral LTV protection index and liquidity safety ratio.
+- **Interactive Navigation**: Tapping any KPI card opens its target feature module (Customers, Loans, Accounting Ledger).
 
 ### 👥 3. Customer CRM & KYC Compliance
-- **Customer Directory**: Full-featured customer registry with status badges, multi-attribute searching, and filtering.
+- **Customer Directory**: Full-featured customer registry connected to `ApiCustomerRepository` with status badges, multi-attribute searching, and filtering.
 - **Customer 360° Profile**: Single-page view of customer info, transaction history, active loans, linked ornaments, and KYC status.
 - **KYC Verification Engine**: Multi-step KYC onboarding wizard, document verification card, identity audit trail, and compliance status tracking (Verified, Pending, Rejected, Expired).
 
 ### 💎 4. Ornaments & Stock Inventory
-- **Ornament Catalog**: Detailed item management with purity classification (24K, 22K, 18K), metal types (Gold, Silver, Platinum), weight (gross/net), and valuation.
-- **Inventory Logistics**: Category management, storage location tracking (safes, counters, vaults), and stock movement audit history.
+- **Ornament Catalog**: Detailed item management with purity classification (24K, 22K, 18K), metal types (Gold, Silver, Platinum), weight (gross/net), and valuation (`ValuationService`).
+- **Inventory Logistics**: Category management, storage location tracking (safes, counters, vaults), barcode generation (`BarcodeService`), and stock movement audit history.
 
 ### 💰 5. Gold & Pledge Loan Management
 - **Loan Lifecycle Engine**: End-to-end loan management (Active, Overdue, Closed, Liquidated).
-- **Loan Details & Schedule**: Interest calculation, collateral item association, payment schedule ledger, and audit history.
+- **Loan Details & Schedule**: Interest calculation (`LoanCalculationService`), collateral item association, payment schedule ledger, and audit history.
 - **Loan Operations**: Principal & interest payment recording, loan renewals, settlement calculation, and collateral release management.
 
 ### 📖 6. Double-Entry Accounting System
-- **Chart of Accounts**: Hierarchical account mapping with account detail ledgers.
+- **Chart of Accounts**: Hierarchical account mapping connected to `ApiAccountingRepository`.
 - **Financial Books & Ledgers**: Cash Book, Bank Book, General Ledger, Accounts Receivable, and Accounts Payable.
 - **Financial Statements**: Trial Balance, Profit & Loss (P&L) Statement, Balance Sheet, and Cash Flow Statement.
-- **Journal Entries & Periods**: Double-entry journal entry creation and accounting period closure controls.
+- **Journal Entries & Periods**: Double-entry journal entry creation and accounting period closure controls (`AccountingPeriodSelector`).
 
 ### 📑 7. Income, Expenses & Enterprise Reports
 - **Income & Expense Tracking**: Expense logging, income categorizations, and payment mode tracking.
 - **Reporting Hub**: Categorized report generation across Executive Overview, Customer, KYC, Inventory, Loan, Payment, Accounting, Profitability, Risk, Operational, and Audit domains.
-
-### 🛡️ 8. Staff Management, Security & Audit
-- **Staff Management**: Employee directory, staff profile, branch & department management, and role assignment.
-- **RBAC Matrix**: Interactive permission matrix editor and custom role builder.
-- **Audit & Security**: System-wide audit log trail, security event monitoring, active session overview.
 
 ---
 
@@ -59,47 +56,68 @@ KaratCore ERP features a luxury jewellery-tailored design system (`KcDesignSyste
 
 - **Palette**: Navy (`#0B1F3F`), Luxury Gold (`#E3B83B`), Emerald (`#059669`), Slate neutrals, and Dark mode adaptivity.
 - **Typography**: Google Fonts **Sora** (Headings) + **Inter** (Body text).
-- **Adaptive Shell (`_AppShell`)**:
-  - **Desktop (>1024px)**: Collapsible Sidebar + Top Navigation Bar + Dynamic Breadcrumbs.
-  - **Tablet (600px–1024px)**: Navigation Rail + Top Bar.
-  - **Mobile (<600px)**: Top Bar + Bottom Navigation.
-- **Atomic UI Component Library (`lib/shared/widgets/`)**:
-  - `KcPrimaryButton`, `KcSecondaryButton`, `KcOutlinedButton`
-  - `KcTextField`, `KcPasswordField`, `KcDropdown`, `KcDatePicker`, `KcSearchBarUI`, `KcFilters`
-  - `KcCard`, `KcMetricCard`, `KcDashboardCard`, `KcDocumentUploadCard`, `KcTimelineCard`, `KcProfileCard`
-  - `KcDataTable`, `KcPagination`, `KcStatusBadge`, `KcEmptyState`, `KcErrorState`, `KcSkeletonLoader`
+- **Adaptive Shell (`_AppShell`)**: Responsive drawer navigation across Desktop (>1024px), Tablet, and Mobile views.
+- **Atomic UI Component Library (`lib/shared/widgets/`)**: Standardized inputs, buttons, cards, data tables, search bars, filters, and status badges.
 
 ---
 
 ## 🏛 Architecture Overview
 
 ```
-lib/
-├── core/                  # Global Infrastructure
-│   ├── config/            # AppConfig, AppConstants, DesignTokens
-│   ├── constants/         # ColorTokens, SpacingTokens, RadiusTokens, ShadowTokens, Typography
-│   ├── theme/             # Light & Dark Theme Data, ThemeModeNotifier
-│   ├── routing/           # GoRouter Router, AppRoutes, BreadcrumbProvider
-│   ├── services/          # LoggerService, StorageService
-│   ├── utils/             # Formatters (INR currency, Dates), Validators
-│   └── errors/            # Failure, AppException hierarchy
-├── shared/                # Universal Design System Components & Models
-│   ├── components/        # KcBrandMark, KcAvatar, KcBreadcrumbBar
-│   ├── models/            # BreadcrumbItem, UserSession
-│   └── widgets/           # Reusable UI widgets (buttons, inputs, cards, feedback, dialogs, nav, tables)
-└── features/              # 18 Domain Feature Modules
-    ├── accounting/  ├── audit/       ├── auth/         ├── customers/
-    ├── dashboard/   ├── expenses/    ├── help/         ├── income/
-    ├── kyc/         ├── loans/       ├── notifications/├── ornaments/
-    ├── profile/     ├── reports/     ├── security/     ├── settings/
-    ├── showcase/    └── staff/
-        ├── presentation/  # Feature pages & screens
-        ├── widgets/       # Feature-specific components
-        ├── providers/     # State management (Riverpod)
-        ├── models/        # Data models & DTOs
-        ├── services/      # Service interfaces & logic
-        └── repository/    # Repository pattern implementations
+karatcore_erp/
+├── backend/                   # Python FastAPI REST API Backend
+│   ├── app/
+│   │   ├── api/routes/        # Auth, Customers, Loans, Inventory, Accounting routes
+│   │   ├── core/              # Config, Security, JWT Settings
+│   │   ├── models/            # SQLAlchemy Database Models
+│   │   ├── services/          # NotificationService, LoanService, KycService
+│   │   └── main.py            # FastAPI Entry Point
+│   ├── .env.example           # Environment Configuration Template
+│   └── requirements.txt       # Python Dependencies
+│
+└── lib/                       # Flutter Frontend Application
+    ├── core/                  # Global Infrastructure
+    │   ├── config/            # EnvConfig
+    │   ├── network/           # ApiClient, ApiEndpoints, ApiConfig
+    │   ├── theme/             # Theme Data
+    │   └── routing/           # AppRouter, AppRoutes
+    ├── shared/                # Universal Design System Components & Models
+    └── features/              # 18 Domain Feature Modules
+        ├── accounting/  ├── audit/       ├── auth/         ├── customers/
+        ├── dashboard/   ├── expenses/    ├── help/         ├── income/
+        ├── kyc/         ├── loans/       ├── notifications/├── ornaments/
+        ├── profile/     ├── reports/     ├── security/     ├── settings/
+        └── staff/
 ```
+
+---
+
+## ⚙️ Environment & API Setup
+
+1. **Backend Environment ([backend/.env](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/backend/.env.example))**:
+   Copy `.env.example` to `.env` and fill in your production credentials:
+   ```env
+   # Database (Supabase PostgreSQL)
+   DATABASE_URL=postgresql://postgres.[REF]:[PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:6543/postgres
+   SUPABASE_URL=https://[REF].supabase.co
+   SUPABASE_KEY=your_supabase_anon_key
+
+   # Real SMS Gateway (Twilio / Fast2SMS)
+   SMS_PROVIDER=twilio
+   TWILIO_ACCOUNT_SID=your_twilio_account_sid
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+
+   # Real Email SMTP Server (Gmail App Password)
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASSWORD=your_gmail_app_password
+   ```
+
+2. **Frontend API URL ([lib/core/network/api_config.dart](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/lib/core/network/api_config.dart))**:
+   ```bash
+   flutter run -d chrome --dart-define=API_URL=http://localhost:8000/api/v1
+   ```
 
 ---
 
@@ -122,35 +140,21 @@ flutter test
 
 ---
 
-## 📚 Technical Documentation Index
-
-Detailed architectural specs and developer guidelines are available in the [`docs/`](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/docs) directory:
-
-- 📐 [Folder Structure Guide](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/docs/folder_structure.md)
-- 🗺 [Routing Architecture](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/docs/routing_documentation.md)
-- 🎨 [Theme & Design System Documentation](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/docs/theme_documentation.md)
-- 🛠 [Local Developer Setup Guide](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/docs/setup_guide.md)
-
----
-
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- Flutter SDK `^3.5.0` (Recommended `3.24.0+`)
+- Flutter SDK `^3.24.0+`
 - Dart SDK `^3.5.0`
+- Python `3.10+` (for backend execution)
 
-### 2. Installation & Run
+### 2. Installation & Execution
 ```bash
-# Install dependencies
+# Frontend setup
 flutter pub get
 
-# Run on Web (Chrome)
+# Run Web App
 flutter run -d chrome
-
-# Run on macOS Desktop
-flutter run -d macos
 
 # Run Static Code Analysis
 flutter analyze
 ```
-

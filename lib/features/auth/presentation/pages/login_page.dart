@@ -20,8 +20,8 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'owner@karatcore.com');
-  final _passwordController = TextEditingController(text: 'Password123!');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -47,14 +47,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void _submitBiometric() async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Authenticating via TouchID / FaceID biometric scan...'),
-        duration: Duration(seconds: 1),
+        content: Text('Biometric authentication requires initial account login and setup in Security settings.'),
+        duration: Duration(seconds: 2),
       ),
     );
-    ref.read(authStateProvider.notifier).forceAuthenticateAsRole(UserRole.owner);
-    if (mounted) {
-      context.go(AppRoutes.dashboard);
-    }
   }
 
   @override
@@ -181,6 +177,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               fullWidth: true,
               icon: Icons.fingerprint_rounded,
               onPressed: _submitBiometric,
+            ),
+            const SizedBox(height: 12),
+            KcOutlinedButton(
+              label: 'Sign In via OTP Verification',
+              fullWidth: true,
+              icon: Icons.phonelink_ring_rounded,
+              onPressed: () {
+                ref.read(authStateProvider.notifier).requireOtpStep(_emailController.text.trim());
+                context.go(AppRoutes.verify);
+              },
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text('New Store Owner? ', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+                TextButton(
+                  onPressed: () => context.go(AppRoutes.register),
+                  child: const Text('Register Store Account', style: TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
 
