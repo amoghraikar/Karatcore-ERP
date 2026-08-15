@@ -76,3 +76,6 @@ jobs:
 
       - name: Run Flutter Static Analysis
         run: flutter analyze
+
+      - name: Run Flutter Unit & Widget Tests
+        run: flutter test
