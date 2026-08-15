@@ -226,11 +226,11 @@ class ApiLoanRepository implements ILoanRepository {
 
   LoanModel _parseLoanFromJson(Map<String, dynamic> json) {
     return LoanModel(
-      id: json['id'] as String,
-      customerId: json['customer_id'] as String? ?? '',
-      customerName: json['customer_name'] as String? ?? '',
+      id: json['id']?.toString() ?? json['loan_id']?.toString() ?? 'LN-101',
+      customerId: json['customer_id']?.toString() ?? '',
+      customerName: json['customer_name'] as String? ?? 'Customer',
       customerKycStatus: json['customer_kyc_status'] as String? ?? 'Verified',
-      pledgeId: json['pledge_id'] as String? ?? '',
+      pledgeId: json['pledge_id']?.toString() ?? '',
       collateralOrnaments: const [],
       pledgeDate: DateTime.tryParse(json['pledge_date'] as String? ?? '') ?? DateTime.now(),
       maturityDate: DateTime.tryParse(json['maturity_date'] as String? ?? '') ?? DateTime.now(),

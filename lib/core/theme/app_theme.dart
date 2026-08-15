@@ -12,9 +12,9 @@ abstract final class AppTheme {
 
   static ThemeData _build(ColorScheme scheme, Brightness brightness) {
     final isDark = brightness == Brightness.dark;
-    final cardContainer = isDark ? KcColors.carbon900 : KcColors.pureWhite;
-    final surfaceSoft = isDark ? KcColors.carbon950 : KcColors.pureWhite;
-    final hairlineBorder = isDark ? KcColors.carbon700 : KcColors.carbon200;
+    final cardContainer = isDark ? KcColors.slate800 : KcColors.pureWhite;
+    final surfaceSoft = isDark ? KcColors.slate900 : KcColors.slate50;
+    final hairlineBorder = isDark ? KcColors.slate700 : KcColors.slate200;
 
     final base = ThemeData(
       useMaterial3: true,

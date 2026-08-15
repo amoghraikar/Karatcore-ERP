@@ -82,9 +82,7 @@ class _KycPageState extends ConsumerState<KycPage> {
             const SizedBox(height: 24),
 
             // Top Dashboard Metrics Row
-            metricsAsync.when(
-              loading: () => const SizedBox(height: 100, child: KcSkeletonLoader()),
-              error: (err, st) => const SizedBox.shrink(),
+            metricsAsync.maybeWhen(
               data: (m) {
                 return LayoutBuilder(
                   builder: (context, constraints) {
@@ -151,6 +149,7 @@ class _KycPageState extends ConsumerState<KycPage> {
                   },
                 );
               },
+              orElse: () => const SizedBox.shrink(),
             ),
             const SizedBox(height: 24),
 
