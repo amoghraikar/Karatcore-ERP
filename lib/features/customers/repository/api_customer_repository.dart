@@ -154,34 +154,42 @@ class ApiCustomerRepository implements ICustomerRepository {
   }
 
   CustomerModel _parseCustomerFromJson(Map<String, dynamic> json) {
+    final fullName = json['full_name'] as String? ?? '';
+    final nameParts = fullName.trim().split(RegExp(r'\s+'));
+    final defaultFirst = nameParts.isNotEmpty ? nameParts.first : 'Customer';
+    final defaultLast = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
+    final rawFirst = json['first_name'] as String? ?? '';
+    final rawLast = json['last_name'] as String? ?? '';
+
     return CustomerModel(
-      id: json['id'] as String,
-      firstName: json['first_name'] as String? ?? '',
-      lastName: json['last_name'] as String? ?? '',
+      id: json['id'] as String? ?? json['customer_code'] as String? ?? 'CUST-${DateTime.now().millisecondsSinceEpoch}',
+      firstName: rawFirst.isNotEmpty ? rawFirst : defaultFirst,
+      lastName: rawLast.isNotEmpty ? rawLast : defaultLast,
       dateOfBirth: DateTime.tryParse(json['date_of_birth'] as String? ?? '') ?? DateTime.now(),
       gender: json['gender'] as String? ?? 'Male',
       customerType: CustomerType.values.firstWhere(
-        (e) => e.name == json['customer_type'],
+        (e) => e.name.toLowerCase() == (json['customer_type'] as String? ?? '').toLowerCase(),
         orElse: () => CustomerType.individual,
       ),
-      mobile: json['mobile'] as String? ?? '',
+      mobile: json['mobile'] as String? ?? json['phone'] as String? ?? '',
       email: json['email'] as String? ?? '',
-      addressLine: json['address_line'] as String? ?? '',
+      addressLine: json['address_line'] as String? ?? json['address'] as String? ?? '',
       city: json['city'] as String? ?? '',
       state: json['state'] as String? ?? '',
       pincode: json['pincode'] as String? ?? '',
       occupation: json['occupation'] as String? ?? '',
       annualIncome: json['annual_income'] as String? ?? '',
       kycStatus: CustomerKycStatus.values.firstWhere(
-        (e) => e.name == json['kyc_status'],
-        orElse: () => CustomerKycStatus.pending,
+        (e) => e.name.toLowerCase() == (json['kyc_status'] as String? ?? '').toLowerCase(),
+        orElse: () => CustomerKycStatus.verified,
       ),
       customerStatus: CustomerStatus.values.firstWhere(
-        (e) => e.name == json['customer_status'],
+        (e) => e.name.toLowerCase() == (json['customer_status'] as String? ?? json['status'] as String? ?? '').toLowerCase(),
         orElse: () => CustomerStatus.active,
       ),
       riskStatus: CustomerRiskLevel.values.firstWhere(
-        (e) => e.name == json['risk_status'],
+        (e) => e.name.toLowerCase() == (json['risk_status'] as String? ?? '').toLowerCase(),
         orElse: () => CustomerRiskLevel.low,
       ),
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),

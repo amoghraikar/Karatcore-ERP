@@ -242,11 +242,11 @@ class ApiLoanRepository implements ILoanRepository {
       collateralTotalValue: (json['collateral_total_value'] as num?)?.toDouble() ?? 0.0,
       collateralNetWeightGrams: (json['collateral_net_weight_grams'] as num?)?.toDouble() ?? 0.0,
       status: LoanStatus.values.firstWhere(
-        (e) => e.name == json['status'],
+        (e) => e.name.toLowerCase() == (json['status'] as String? ?? '').toLowerCase(),
         orElse: () => LoanStatus.active,
       ),
       riskStatus: LoanRiskStatus.values.firstWhere(
-        (e) => e.name == json['risk_status'],
+        (e) => e.name.toLowerCase() == (json['risk_status'] as String? ?? '').toLowerCase(),
         orElse: () => LoanRiskStatus.low,
       ),
       branch: json['branch'] as String? ?? 'Main Branch',
