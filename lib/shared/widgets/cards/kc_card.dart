@@ -42,12 +42,16 @@ class _KcCardState extends State<KcCard> {
     }
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: (_) {
+        if (widget.onTap != null && mounted) setState(() => _isHovered = true);
+      },
+      onExit: (_) {
+        if (widget.onTap != null && mounted) setState(() => _isHovered = false);
+      },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCubic,
-        transform: Matrix4.diagonal3Values(_isHovered && widget.onTap != null ? 1.015 : 1.0, _isHovered && widget.onTap != null ? 1.015 : 1.0, 1.0),
+        transform: Matrix4.diagonal3Values(_isHovered && widget.onTap != null ? 1.012 : 1.0, _isHovered && widget.onTap != null ? 1.012 : 1.0, 1.0),
         decoration: BoxDecoration(
           color: widget.color ?? scheme.surface,
           borderRadius: BorderRadius.circular(12),
@@ -61,10 +65,10 @@ class _KcCardState extends State<KcCard> {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: _isHovered ? 0.5 : 0.3)
-                  : scheme.shadow.withValues(alpha: _isHovered ? 0.12 : 0.06),
-              blurRadius: _isHovered ? 16 : 10,
-              offset: Offset(0, _isHovered ? 6 : 4),
+                  ? Colors.black.withValues(alpha: _isHovered && widget.onTap != null ? 0.4 : 0.25)
+                  : scheme.shadow.withValues(alpha: _isHovered && widget.onTap != null ? 0.10 : 0.04),
+              blurRadius: _isHovered && widget.onTap != null ? 12 : 8,
+              offset: Offset(0, _isHovered && widget.onTap != null ? 5 : 3),
             ),
           ],
         ),

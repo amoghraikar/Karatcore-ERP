@@ -47,6 +47,8 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(diagnostics_router, prefix=settings.API_V1_STR)
 
+from app.api.routes.notifications import router as notifications_router
+
 # Include API Routers under /api/v1
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(customer_router, prefix=settings.API_V1_STR)
@@ -57,6 +59,7 @@ app.include_router(owner_kyc_router, prefix=settings.API_V1_STR)
 app.include_router(export_router, prefix=settings.API_V1_STR)
 app.include_router(settings_router, prefix=settings.API_V1_STR)
 app.include_router(webhook_router, prefix=settings.API_V1_STR)
+app.include_router(notifications_router, prefix=settings.API_V1_STR)
 app.include_router(customer_portal_router, prefix=settings.API_V1_STR)
 app.include_router(customer_kyc_router, prefix=settings.API_V1_STR)
 app.include_router(customer_payments_router, prefix=settings.API_V1_STR)
