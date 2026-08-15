@@ -45,6 +45,35 @@ class UserSession extends Equatable {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'role': role.name,
+      'email': email,
+      'phone': phone,
+      'avatarUrl': avatarUrl,
+      'branchName': branch?.name,
+      'is2faEnabled': is2faEnabled,
+    };
+  }
+
+  factory UserSession.fromJson(Map<String, dynamic> json) {
+    return UserSession(
+      id: json['id'] as String? ?? 'OWN-101',
+      name: json['name'] as String? ?? 'Store Owner',
+      role: UserRole.values.firstWhere(
+        (r) => r.name == json['role'],
+        orElse: () => UserRole.owner,
+      ),
+      email: json['email'] as String? ?? 'owner@karatcore.com',
+      phone: json['phone'] as String? ?? '+91 98765 43210',
+      avatarUrl: json['avatarUrl'] as String?,
+      branch: BranchModel.defaultBranches[0],
+      is2faEnabled: json['is2faEnabled'] as bool? ?? false,
+    );
+  }
+
   @override
   List<Object?> get props => [id, name, role, email, phone, avatarUrl, branch, is2faEnabled];
 }

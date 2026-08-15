@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/storage/session_storage_service.dart';
+import '../../../shared/models/user_session.dart';
 import '../models/auth_state.dart';
 import '../models/branch_model.dart';
 import '../models/user_role.dart';
@@ -7,7 +9,6 @@ import '../repository/api_auth_repository.dart';
 import '../services/auth_service.dart';
 import '../services/customer_data_isolation_service.dart';
 import '../services/owner_authorization_service.dart';
-import '../../../shared/models/user_session.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   return ApiAuthRepository(ref.watch(apiClientProvider));
@@ -26,13 +27,25 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository, this._apiClient) : super(const AuthState());
+  AuthNotifier(this._repository, this._apiClient) : super(const AuthState()) {
+    checkInitialSession();
+  }
 
   final IAuthRepository _repository;
   final ApiClient _apiClient;
 
-  void checkInitialSession() async {
-    state = const AuthState(status: AuthStatus.unauthenticated);
+  Future<void> checkInitialSession() async {
+    state = state.copyWith(status: AuthStatus.authenticating);
+    final savedSession = await SessionStorageService.loadSession();
+    if (savedSession != null) {
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        session: savedSession,
+        selectedBranch: savedSession.branch,
+      );
+    } else {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    }
   }
 
   void forceAuthenticateAsRole(UserRole role) {
@@ -50,6 +63,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       session: session,
       selectedBranch: session.branch,
     );
+    SessionStorageService.saveSession(session);
   }
 
   void setRememberDevice(bool value) {
@@ -92,12 +106,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       state = state.copyWith(
-        status: AuthStatus.pendingOtp,
+        status: AuthStatus.authenticated,
         session: session,
         selectedBranch: session.branch,
         pendingEmailOrPhone: emailOrPhone,
-        otpMethod: 'sms',
       );
+      await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -131,12 +145,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       state = state.copyWith(
-        status: AuthStatus.pendingOtp,
+        status: AuthStatus.authenticated,
         session: session,
         selectedBranch: session.branch,
         pendingEmailOrPhone: email,
-        otpMethod: 'sms',
       );
+      await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -155,6 +169,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         status: AuthStatus.authenticated,
       );
+      if (state.session != null) {
+        await SessionStorageService.saveSession(state.session!);
+      }
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -181,6 +198,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       session: updatedSession,
       selectedBranch: branch,
     );
+    if (updatedSession != null) {
+      SessionStorageService.saveSession(updatedSession);
+    }
   }
 
   void lockSession() {
@@ -206,6 +226,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void logout() {
     _apiClient.setToken(null);
+    SessionStorageService.clearSession();
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 }
