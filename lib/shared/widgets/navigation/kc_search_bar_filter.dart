@@ -82,7 +82,7 @@ class KcSearchBarFilter extends StatelessWidget {
             const SizedBox(width: 12),
             filterButton,
             const SizedBox(width: 12),
-            sortDropdown,
+            SizedBox(width: 220, child: sortDropdown),
           ],
         ),
       ),

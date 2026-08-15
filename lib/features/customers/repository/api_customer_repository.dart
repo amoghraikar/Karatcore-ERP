@@ -163,7 +163,7 @@ class ApiCustomerRepository implements ICustomerRepository {
     final rawLast = json['last_name'] as String? ?? '';
 
     return CustomerModel(
-      id: json['id'] as String? ?? json['customer_code'] as String? ?? 'CUST-${DateTime.now().millisecondsSinceEpoch}',
+      id: json['id']?.toString() ?? json['customer_code']?.toString() ?? 'CUST-${DateTime.now().millisecondsSinceEpoch}',
       firstName: rawFirst.isNotEmpty ? rawFirst : defaultFirst,
       lastName: rawLast.isNotEmpty ? rawLast : defaultLast,
       dateOfBirth: DateTime.tryParse(json['date_of_birth'] as String? ?? '') ?? DateTime.now(),

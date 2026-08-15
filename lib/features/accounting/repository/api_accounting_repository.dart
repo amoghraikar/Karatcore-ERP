@@ -319,10 +319,10 @@ class ApiAccountingRepository implements IAccountingRepository {
 
   AccountModel _parseAccountFromJson(Map<String, dynamic> json) {
     return AccountModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? 'ACC-${DateTime.now().millisecondsSinceEpoch}',
       name: json['name'] as String? ?? '',
-      type: AccountType.values.firstWhere((e) => e.name == json['type'], orElse: () => AccountType.asset),
-      category: AccountCategory.values.firstWhere((e) => e.name == json['category'], orElse: () => AccountCategory.cash),
+      type: AccountType.values.firstWhere((e) => e.name.toLowerCase() == (json['type'] as String? ?? '').toLowerCase(), orElse: () => AccountType.asset),
+      category: AccountCategory.values.firstWhere((e) => e.name.toLowerCase() == (json['category'] as String? ?? '').toLowerCase(), orElse: () => AccountCategory.cash),
       openingBalance: (json['opening_balance'] as num? ?? 0.0).toDouble(),
       currentBalance: (json['current_balance'] as num? ?? 0.0).toDouble(),
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
@@ -339,13 +339,13 @@ class ApiAccountingRepository implements IAccountingRepository {
 
   JournalEntryModel _parseJournalFromJson(Map<String, dynamic> json) {
     return JournalEntryModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? 'JNL-${DateTime.now().millisecondsSinceEpoch}',
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
       reference: json['reference'] as String? ?? '',
       description: json['description'] as String? ?? '',
       lines: (json['lines'] as List? ?? []).map((i) => JournalLineModel(
-        lineId: i['line_id'] as String? ?? '',
-        accountId: i['account_id'] as String? ?? '',
+        lineId: i['line_id']?.toString() ?? '',
+        accountId: i['account_id']?.toString() ?? '',
         accountName: i['account_name'] as String? ?? '',
         debit: (i['debit'] as num? ?? 0.0).toDouble(),
         credit: (i['credit'] as num? ?? 0.0).toDouble(),
@@ -357,22 +357,22 @@ class ApiAccountingRepository implements IAccountingRepository {
 
   FinancialTransactionModel _parseTxFromJson(Map<String, dynamic> json) {
     return FinancialTransactionModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? 'TX-${DateTime.now().millisecondsSinceEpoch}',
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
       type: json['type'] as String? ?? 'Receipt',
       reference: json['reference'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      debitAccountId: json['debit_account_id'] as String? ?? '',
+      debitAccountId: json['debit_account_id']?.toString() ?? '',
       debitAccountName: json['debit_account_name'] as String? ?? '',
-      creditAccountId: json['credit_account_id'] as String? ?? '',
+      creditAccountId: json['credit_account_id']?.toString() ?? '',
       creditAccountName: json['credit_account_name'] as String? ?? '',
       amount: (json['amount'] as num? ?? 0.0).toDouble(),
-      sourceModule: SourceModule.values.firstWhere((e) => e.name == json['source_module'], orElse: () => SourceModule.loan),
-      sourceId: json['source_id'] as String? ?? '',
+      sourceModule: SourceModule.values.firstWhere((e) => e.name.toLowerCase() == (json['source_module'] as String? ?? '').toLowerCase(), orElse: () => SourceModule.loan),
+      sourceId: json['source_id']?.toString() ?? '',
       createdBy: json['created_by'] as String? ?? '',
       status: json['status'] as String? ?? 'Posted',
       isReversed: json['is_reversed'] as bool? ?? false,
-      reversalTransactionId: json['reversal_transaction_id'] as String?,
+      reversalTransactionId: json['reversal_transaction_id']?.toString(),
     );
   }
 
@@ -390,12 +390,12 @@ class ApiAccountingRepository implements IAccountingRepository {
 
   IncomeModel _parseIncomeFromJson(Map<String, dynamic> json) {
     return IncomeModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? 'INC-${DateTime.now().millisecondsSinceEpoch}',
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
-      category: AccountCategory.values.firstWhere((e) => e.name == json['category'], orElse: () => AccountCategory.interestIncome),
+      category: AccountCategory.values.firstWhere((e) => e.name.toLowerCase() == (json['category'] as String? ?? '').toLowerCase(), orElse: () => AccountCategory.interestIncome),
       amount: (json['amount'] as num? ?? 0.0).toDouble(),
       paymentMethod: json['payment_method'] as String? ?? 'Cash',
-      customerId: json['customer_id'] as String? ?? '',
+      customerId: json['customer_id']?.toString() ?? '',
       customerName: json['customer_name'] as String? ?? '',
       reference: json['reference'] as String? ?? '',
       description: json['description'] as String? ?? '',
@@ -405,9 +405,9 @@ class ApiAccountingRepository implements IAccountingRepository {
 
   ExpenseModel _parseExpenseFromJson(Map<String, dynamic> json) {
     return ExpenseModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? 'EXP-${DateTime.now().millisecondsSinceEpoch}',
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
-      category: AccountCategory.values.firstWhere((e) => e.name == json['category'], orElse: () => AccountCategory.rent),
+      category: AccountCategory.values.firstWhere((e) => e.name.toLowerCase() == (json['category'] as String? ?? '').toLowerCase(), orElse: () => AccountCategory.rent),
       amount: (json['amount'] as num? ?? 0.0).toDouble(),
       paymentMethod: json['payment_method'] as String? ?? 'Cash',
       vendorName: json['vendor_name'] as String? ?? '',
