@@ -126,6 +126,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           currentPath == AppRoutes.forgotPassword ||
           currentPath == AppRoutes.resetPassword;
 
+      if (authState.status == AuthStatus.authenticating) {
+        return null;
+      }
+
       if (authState.status == AuthStatus.unauthenticated) {
         if (!isAuthRoute) {
           return AppRoutes.login;
