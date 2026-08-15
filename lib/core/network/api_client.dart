@@ -38,7 +38,7 @@ class ApiClient {
 
   Future<dynamic> get(String path) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.get(url, headers: _headers());
+    final response = await _client.get(url, headers: _headers()).timeout(const Duration(seconds: 3));
     return _parseResponse(response);
   }
 
@@ -48,7 +48,7 @@ class ApiClient {
       url,
       headers: _headers(),
       body: body != null ? jsonEncode(body) : null,
-    );
+    ).timeout(const Duration(seconds: 3));
     return _parseResponse(response);
   }
 
@@ -58,13 +58,13 @@ class ApiClient {
       url,
       headers: _headers(),
       body: body != null ? jsonEncode(body) : null,
-    );
+    ).timeout(const Duration(seconds: 3));
     return _parseResponse(response);
   }
 
   Future<dynamic> delete(String path) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.delete(url, headers: _headers());
+    final response = await _client.delete(url, headers: _headers()).timeout(const Duration(seconds: 3));
     return _parseResponse(response);
   }
 

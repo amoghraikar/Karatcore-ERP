@@ -7,6 +7,7 @@ class ApiCustomerRepository implements ICustomerRepository {
   ApiCustomerRepository(this._api);
 
   final ApiClient _api;
+  final List<CustomerModel> _localCustomers = [];
 
   @override
   Future<List<CustomerModel>> getCustomers({
@@ -14,25 +15,47 @@ class ApiCustomerRepository implements ICustomerRepository {
     CustomerFilterParams? filters,
     CustomerSortOption? sortOption,
   }) async {
-    final dynamic data = await _api.get(
-      '${ApiEndpoints.customers}?search=${Uri.encodeComponent(searchQuery ?? '')}',
-    );
-    return _parseCustomersFromJson(data as List);
+    try {
+      final dynamic data = await _api.get(
+        '${ApiEndpoints.customers}?search=${Uri.encodeComponent(searchQuery ?? '')}',
+      );
+      final remote = _parseCustomersFromJson(data as List);
+      return [...remote, ..._localCustomers];
+    } catch (_) {
+      return List.from(_localCustomers);
+    }
   }
 
   @override
   Future<CustomerModel?> getCustomerById(String id) async {
-    final dynamic data = await _api.get('${ApiEndpoints.customerById}$id');
-    return _parseCustomerFromJson(data);
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.customerById}$id');
+      return _parseCustomerFromJson(data);
+    } catch (_) {
+      final found = _localCustomers.where((c) => c.id == id);
+      return found.isNotEmpty ? found.first : null;
+    }
   }
 
   @override
   Future<CustomerModel> createCustomer(CustomerModel newCustomer) async {
-    final dynamic data = await _api.post(
-      ApiEndpoints.customers,
-      body: _customerToJson(newCustomer),
-    );
-    return _parseCustomerFromJson(data);
+    final generatedId = newCustomer.id.isNotEmpty
+        ? newCustomer.id
+        : 'KC-CUS-${(100100 + _localCustomers.length + 1).toString()}';
+    final savedCust = newCustomer.copyWith(id: generatedId);
+
+    try {
+      final dynamic data = await _api.post(
+        ApiEndpoints.customers,
+        body: _customerToJson(savedCust),
+      );
+      final created = _parseCustomerFromJson(data);
+      _localCustomers.add(created);
+      return created;
+    } catch (_) {
+      _localCustomers.add(savedCust);
+      return savedCust;
+    }
   }
 
   @override

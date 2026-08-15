@@ -40,7 +40,7 @@ class ApiInventoryRepository implements IInventoryRepository {
   @override
   Future<OrnamentModel?> getOrnamentById(String id) async {
     try {
-      final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/${id}');
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/$id');
       return _parseOrnamentFromJson(data);
     } catch (e) {
       return null;
@@ -49,7 +49,7 @@ class ApiInventoryRepository implements IInventoryRepository {
 
   @override
   Future<List<OrnamentModel>> getOrnamentsByCustomerId(String customerId) async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/customer/${customerId}');
+    final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/customer/$customerId');
     return _parseOrnamentsFromJson(data as List);
   }
 
@@ -79,7 +79,7 @@ class ApiInventoryRepository implements IInventoryRepository {
     required String reason,
   }) async {
     final dynamic data = await _api.post(
-      '${ApiEndpoints.loans}/ornaments/${ornamentId}/transfer',
+      '${ApiEndpoints.loans}/ornaments/$ornamentId/transfer',
       body: {
         'destination_location': _locationToJson(destinationLocation),
         'actor_name': actorName,
@@ -97,7 +97,7 @@ class ApiInventoryRepository implements IInventoryRepository {
     required String kycStatus,
   }) async {
     final dynamic data = await _api.post(
-      '${ApiEndpoints.loans}/ornaments/${ornamentId}/assign',
+      '${ApiEndpoints.loans}/ornaments/$ornamentId/assign',
       body: {
         'customer_id': customerId,
         'customer_name': customerName,
