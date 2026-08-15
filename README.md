@@ -14,39 +14,46 @@
 
 ### 🔐 1. Real Authentication & Security Gateway
 - **Production Store Owner Registration & Login**: Integrated with `ApiClient` REST repositories (`ApiAuthRepository`).
+- **Dynamic Registered Store Profile**: Automatically links registered business names directly from PostgreSQL database records into System Settings, top bar, and digital receipts.
 - **2FA OTP Verification**: Mandatory 6-digit OTP verification flow on login/registration via **SMS / Email 6-digit OTP**, **Authenticator App (TOTP)**, or **Backup Emergency Codes**.
 - **Backend Notification Service**: Python `NotificationService` supporting real SMS delivery (Twilio / Fast2SMS) and real email delivery via SMTP.
 - **Session & Access Control**: Granular Role-Based Access Control (RBAC), branch selection, screen lock timer, and session expiry handling.
 
-### 📊 2. Dynamic Executive Dashboard & Analytics
+### 📱 2. Dynamic Mobile Responsive Layout Engine
+- **Universal Cross-Device Adaptivity**: 100% production-ready mobile responsive views (`context.isMobile`) for smartphones, Android Chrome browsers, tablets, and desktops.
+- **Responsive Atomic Components**: [`KcPageHeader`](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/lib/shared/widgets/navigation/kc_page_header.dart) (full-width wrapping title & action stack) and [`KcSearchBarFilter`](file:///Users/zeus/Documents/karatcore%20erp/karatcore_erp/lib/shared/widgets/navigation/kc_search_bar_filter.dart) (stacked mobile search & filter bar).
+- **Mobile Bottom Navigation & App Launcher**: Clean 4-tab mobile bottom navigation (`Home`, `Customers`, `Loans`, `All Apps`) and a 12-module launcher modal sheet (`KcMobileAppGridSheet`).
+- **Single-Column Form & Metric Stacks**: Multi-field form wizards and 10-card metric rows stack cleanly on screens `<600px`.
+
+### 📊 3. Dynamic Executive Dashboard & Analytics
 - **Live Dynamic KPI Cards**: Real-time business revenue, outstanding pledge loans, interest collected, active customers, and overdue loan metrics derived directly from reactive state.
 - **Interactive Charts (`fl_chart`)**: Live weekly revenue trends, gold collateral purity distribution (24K, 22K, 18K), and monthly transaction volume.
 - **Store Business Health Score**: Automated collateral LTV protection index and liquidity safety ratio.
 - **Interactive Navigation**: Tapping any KPI card opens its target feature module (Customers, Loans, Accounting Ledger).
 
-### 👥 3. Customer CRM & KYC Compliance
+### 👥 4. Customer CRM & KYC Compliance
 - **Customer Directory**: Full-featured customer registry connected to `ApiCustomerRepository` with status badges, multi-attribute searching, and filtering.
 - **Customer 360° Profile**: Single-page view of customer info, transaction history, active loans, linked ornaments, and KYC status.
 - **KYC Verification Engine**: Multi-step KYC onboarding wizard, document verification card, identity audit trail, and compliance status tracking (Verified, Pending, Rejected, Expired).
 
-### 💎 4. Ornaments & Stock Inventory
+### 💎 5. Ornaments & Stock Inventory
 - **Ornament Catalog**: Detailed item management with purity classification (24K, 22K, 18K), metal types (Gold, Silver, Platinum), weight (gross/net), and valuation (`ValuationService`).
 - **Inventory Logistics**: Category management, storage location tracking (safes, counters, vaults), barcode generation (`BarcodeService`), and stock movement audit history.
 
-### 💰 5. Gold & Pledge Loan Management
+### 💰 6. Gold & Pledge Loan Management
 - **Loan Lifecycle Engine**: End-to-end loan management (Active, Overdue, Closed, Liquidated).
 - **Loan Details & Schedule**: Interest calculation (`LoanCalculationService`), collateral item association, payment schedule ledger, and audit history.
 - **Loan Operations**: Principal & interest payment recording, loan renewals, settlement calculation, and collateral release management.
 
-### 📖 6. Double-Entry Accounting System
+### 📖 7. Double-Entry Accounting System
 - **Chart of Accounts**: Hierarchical account mapping connected to `ApiAccountingRepository`.
 - **Financial Books & Ledgers**: Cash Book, Bank Book, General Ledger, Accounts Receivable, and Accounts Payable.
 - **Financial Statements**: Trial Balance, Profit & Loss (P&L) Statement, Balance Sheet, and Cash Flow Statement.
 - **Journal Entries & Periods**: Double-entry journal entry creation and accounting period closure controls (`AccountingPeriodSelector`).
 
-### 📑 7. Income, Expenses & Enterprise Reports
+### 📑 8. Income, Expenses & Enterprise Reports
 - **Income & Expense Tracking**: Expense logging, income categorizations, and payment mode tracking.
-- **Reporting Hub**: Categorized report generation across Executive Overview, Customer, KYC, Inventory, Loan, Payment, Accounting, Profitability, Risk, Operational, and Audit domains.
+- **Reporting Hub**: Categorized report generation across Executive Overview, Customer, KYC, Inventory, Loan, Payment, Accounting, Profitability, Risk, Operational, and Audit domains.tional, and Audit domains.
 
 ---
 
