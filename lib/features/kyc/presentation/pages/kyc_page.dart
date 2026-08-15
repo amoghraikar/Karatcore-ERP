@@ -202,50 +202,44 @@ class _KycPageState extends ConsumerState<KycPage> {
                           Text('Active Queue Filters:', style: Theme.of(context).textTheme.labelSmall),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  if (activeFilters.status != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Status: ${activeFilters.status!.label}'),
-                                        onDeleted: () {
-                                          ref.read(kycQueueProvider.notifier).updateFilters(
-                                                KycFilterParams(
-                                                  status: null,
-                                                  level: activeFilters.level,
-                                                  riskStatus: activeFilters.riskStatus,
-                                                  method: activeFilters.method,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  if (activeFilters.riskStatus != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Risk: ${activeFilters.riskStatus!.label}'),
-                                        onDeleted: () {
-                                          ref.read(kycQueueProvider.notifier).updateFilters(
-                                                KycFilterParams(
-                                                  status: activeFilters.status,
-                                                  level: activeFilters.level,
-                                                  riskStatus: null,
-                                                  method: activeFilters.method,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  TextButton(
-                                    onPressed: () => ref.read(kycQueueProvider.notifier).clearFilters(),
-                                    child: const Text('Clear All'),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (activeFilters.status != null)
+                                  Chip(
+                                    label: Text('Status: ${activeFilters.status!.label}'),
+                                    onDeleted: () {
+                                      ref.read(kycQueueProvider.notifier).updateFilters(
+                                            KycFilterParams(
+                                              status: null,
+                                              level: activeFilters.level,
+                                              riskStatus: activeFilters.riskStatus,
+                                              method: activeFilters.method,
+                                            ),
+                                          );
+                                    },
                                   ),
-                                ],
-                              ),
+                                if (activeFilters.riskStatus != null)
+                                  Chip(
+                                    label: Text('Risk: ${activeFilters.riskStatus!.label}'),
+                                    onDeleted: () {
+                                      ref.read(kycQueueProvider.notifier).updateFilters(
+                                            KycFilterParams(
+                                              status: activeFilters.status,
+                                              level: activeFilters.level,
+                                              riskStatus: null,
+                                              method: activeFilters.method,
+                                            ),
+                                          );
+                                    },
+                                  ),
+                                TextButton(
+                                  onPressed: () => ref.read(kycQueueProvider.notifier).clearFilters(),
+                                  child: const Text('Clear All'),
+                                ),
+                              ],
                             ),
                           ),
                         ],

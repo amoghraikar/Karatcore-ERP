@@ -9,6 +9,7 @@ class UserSession extends Equatable {
     required this.role,
     required this.email,
     required this.phone,
+    this.token,
     this.storeName,
     this.avatarUrl,
     this.branch,
@@ -20,6 +21,7 @@ class UserSession extends Equatable {
   final UserRole role;
   final String email;
   final String phone;
+  final String? token;
   final String? storeName;
   final String? avatarUrl;
   final BranchModel? branch;
@@ -31,6 +33,7 @@ class UserSession extends Equatable {
     UserRole? role,
     String? email,
     String? phone,
+    String? token,
     String? storeName,
     String? avatarUrl,
     BranchModel? branch,
@@ -42,6 +45,7 @@ class UserSession extends Equatable {
       role: role ?? this.role,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      token: token ?? this.token,
       storeName: storeName ?? this.storeName,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       branch: branch ?? this.branch,
@@ -56,6 +60,7 @@ class UserSession extends Equatable {
       'role': role.name,
       'email': email,
       'phone': phone,
+      'token': token,
       'storeName': storeName,
       'avatarUrl': avatarUrl,
       'branchName': branch?.name,
@@ -73,6 +78,7 @@ class UserSession extends Equatable {
       ),
       email: json['email'] as String? ?? 'owner@karatcore.com',
       phone: json['phone'] as String? ?? '+91 98765 43210',
+      token: json['token'] as String?,
       storeName: json['storeName'] as String?,
       avatarUrl: json['avatarUrl'] as String?,
       branch: BranchModel.defaultBranches[0],
@@ -81,5 +87,5 @@ class UserSession extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, role, email, phone, storeName, avatarUrl, branch, is2faEnabled];
+  List<Object?> get props => [id, name, role, email, phone, token, storeName, avatarUrl, branch, is2faEnabled];
 }

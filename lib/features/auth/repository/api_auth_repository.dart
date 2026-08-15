@@ -32,12 +32,15 @@ class ApiAuthRepository implements IAuthRepository {
 
     final storeTitle = rawStoreName.isNotEmpty ? rawStoreName : _defaultStoreName;
 
+    final token = data['access_token']?.toString();
+
     return UserSession(
       id: id.isNotEmpty ? id : 'OWN-101',
       name: displayName,
       role: role,
       email: sub.contains('@') ? sub : '',
       phone: phone.isNotEmpty ? phone : (sub.contains('@') ? '' : sub),
+      token: token,
       storeName: rawStoreName.isNotEmpty ? rawStoreName : null,
       is2faEnabled: false,
       branch: BranchModel(

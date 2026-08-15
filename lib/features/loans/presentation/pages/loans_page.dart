@@ -338,50 +338,44 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                           Text('Active Filters:', style: Theme.of(context).textTheme.labelSmall),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  if (activeFilters.status != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Status: ${activeFilters.status!.label}'),
-                                        onDeleted: () {
-                                          ref.read(loanListProvider.notifier).updateFilters(
-                                                LoanFilterParams(
-                                                  status: null,
-                                                  riskStatus: activeFilters.riskStatus,
-                                                  metalType: activeFilters.metalType,
-                                                  branch: activeFilters.branch,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  if (activeFilters.riskStatus != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Risk: ${activeFilters.riskStatus!.label}'),
-                                        onDeleted: () {
-                                          ref.read(loanListProvider.notifier).updateFilters(
-                                                LoanFilterParams(
-                                                  status: activeFilters.status,
-                                                  riskStatus: null,
-                                                  metalType: activeFilters.metalType,
-                                                  branch: activeFilters.branch,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  TextButton(
-                                    onPressed: () => ref.read(loanListProvider.notifier).clearFilters(),
-                                    child: const Text('Clear All'),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (activeFilters.status != null)
+                                  Chip(
+                                    label: Text('Status: ${activeFilters.status!.label}'),
+                                    onDeleted: () {
+                                      ref.read(loanListProvider.notifier).updateFilters(
+                                            LoanFilterParams(
+                                              status: null,
+                                              riskStatus: activeFilters.riskStatus,
+                                              metalType: activeFilters.metalType,
+                                              branch: activeFilters.branch,
+                                            ),
+                                          );
+                                    },
                                   ),
-                                ],
-                              ),
+                                if (activeFilters.riskStatus != null)
+                                  Chip(
+                                    label: Text('Risk: ${activeFilters.riskStatus!.label}'),
+                                    onDeleted: () {
+                                      ref.read(loanListProvider.notifier).updateFilters(
+                                            LoanFilterParams(
+                                              status: activeFilters.status,
+                                              riskStatus: null,
+                                              metalType: activeFilters.metalType,
+                                              branch: activeFilters.branch,
+                                            ),
+                                          );
+                                    },
+                                  ),
+                                TextButton(
+                                  onPressed: () => ref.read(loanListProvider.notifier).clearFilters(),
+                                  child: const Text('Clear All'),
+                                ),
+                              ],
                             ),
                           ),
                         ],

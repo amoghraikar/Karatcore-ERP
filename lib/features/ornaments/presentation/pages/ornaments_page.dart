@@ -209,52 +209,46 @@ class _OrnamentsPageState extends ConsumerState<OrnamentsPage> {
                           Text('Active Filters:', style: Theme.of(context).textTheme.labelSmall),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  if (activeFilters.metalType != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Metal: ${activeFilters.metalType!.label}'),
-                                        onDeleted: () {
-                                          ref.read(ornamentListProvider.notifier).updateFilters(
-                                                InventoryFilterParams(
-                                                  metalType: null,
-                                                  purity: activeFilters.purity,
-                                                  category: activeFilters.category,
-                                                  status: activeFilters.status,
-                                                  ownershipType: activeFilters.ownershipType,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  if (activeFilters.status != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Status: ${activeFilters.status!.label}'),
-                                        onDeleted: () {
-                                          ref.read(ornamentListProvider.notifier).updateFilters(
-                                                InventoryFilterParams(
-                                                  metalType: activeFilters.metalType,
-                                                  purity: activeFilters.purity,
-                                                  category: activeFilters.category,
-                                                  status: null,
-                                                  ownershipType: activeFilters.ownershipType,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  TextButton(
-                                    onPressed: () => ref.read(ornamentListProvider.notifier).clearFilters(),
-                                    child: const Text('Clear All'),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (activeFilters.metalType != null)
+                                  Chip(
+                                    label: Text('Metal: ${activeFilters.metalType!.label}'),
+                                    onDeleted: () {
+                                      ref.read(ornamentListProvider.notifier).updateFilters(
+                                            InventoryFilterParams(
+                                              metalType: null,
+                                              purity: activeFilters.purity,
+                                              category: activeFilters.category,
+                                              status: activeFilters.status,
+                                              ownershipType: activeFilters.ownershipType,
+                                            ),
+                                          );
+                                    },
                                   ),
-                                ],
-                              ),
+                                if (activeFilters.status != null)
+                                  Chip(
+                                    label: Text('Status: ${activeFilters.status!.label}'),
+                                    onDeleted: () {
+                                      ref.read(ornamentListProvider.notifier).updateFilters(
+                                            InventoryFilterParams(
+                                              metalType: activeFilters.metalType,
+                                              purity: activeFilters.purity,
+                                              category: activeFilters.category,
+                                              status: null,
+                                              ownershipType: activeFilters.ownershipType,
+                                            ),
+                                          );
+                                    },
+                                  ),
+                                TextButton(
+                                  onPressed: () => ref.read(ornamentListProvider.notifier).clearFilters(),
+                                  child: const Text('Clear All'),
+                                ),
+                              ],
                             ),
                           ),
                         ],

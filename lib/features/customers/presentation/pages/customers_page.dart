@@ -214,52 +214,46 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                           Text('Active Filters:', style: Theme.of(context).textTheme.labelSmall),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  if (activeFilters.kycStatus != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('KYC: ${activeFilters.kycStatus!.label}'),
-                                        onDeleted: () {
-                                          ref.read(customerListProvider.notifier).updateFilters(
-                                                CustomerFilterParams(
-                                                  kycStatus: null,
-                                                  customerStatus: activeFilters.customerStatus,
-                                                  customerType: activeFilters.customerType,
-                                                  riskLevel: activeFilters.riskLevel,
-                                                  hasActiveLoans: activeFilters.hasActiveLoans,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  if (activeFilters.customerStatus != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: Chip(
-                                        label: Text('Status: ${activeFilters.customerStatus!.label}'),
-                                        onDeleted: () {
-                                          ref.read(customerListProvider.notifier).updateFilters(
-                                                CustomerFilterParams(
-                                                  kycStatus: activeFilters.kycStatus,
-                                                  customerStatus: null,
-                                                  customerType: activeFilters.customerType,
-                                                  riskLevel: activeFilters.riskLevel,
-                                                  hasActiveLoans: activeFilters.hasActiveLoans,
-                                                ),
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                  TextButton(
-                                    onPressed: () => ref.read(customerListProvider.notifier).clearFilters(),
-                                    child: const Text('Clear All'),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (activeFilters.kycStatus != null)
+                                  Chip(
+                                    label: Text('KYC: ${activeFilters.kycStatus!.label}'),
+                                    onDeleted: () {
+                                      ref.read(customerListProvider.notifier).updateFilters(
+                                            CustomerFilterParams(
+                                              kycStatus: null,
+                                              customerStatus: activeFilters.customerStatus,
+                                              customerType: activeFilters.customerType,
+                                              riskLevel: activeFilters.riskLevel,
+                                              hasActiveLoans: activeFilters.hasActiveLoans,
+                                            ),
+                                          );
+                                    },
                                   ),
-                                ],
-                              ),
+                                if (activeFilters.customerStatus != null)
+                                  Chip(
+                                    label: Text('Status: ${activeFilters.customerStatus!.label}'),
+                                    onDeleted: () {
+                                      ref.read(customerListProvider.notifier).updateFilters(
+                                            CustomerFilterParams(
+                                              kycStatus: activeFilters.kycStatus,
+                                              customerStatus: null,
+                                              customerType: activeFilters.customerType,
+                                              riskLevel: activeFilters.riskLevel,
+                                              hasActiveLoans: activeFilters.hasActiveLoans,
+                                            ),
+                                          );
+                                    },
+                                  ),
+                                TextButton(
+                                  onPressed: () => ref.read(customerListProvider.notifier).clearFilters(),
+                                  child: const Text('Clear All'),
+                                ),
+                              ],
                             ),
                           ),
                         ],

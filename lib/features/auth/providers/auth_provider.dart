@@ -38,6 +38,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.authenticating);
     final savedSession = await SessionStorageService.loadSession();
     if (savedSession != null) {
+      if (savedSession.token != null) {
+        _apiClient.setToken(savedSession.token);
+      }
       state = AuthState(
         status: AuthStatus.authenticated,
         session: savedSession,
