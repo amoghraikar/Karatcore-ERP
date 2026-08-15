@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class KcCard extends StatelessWidget {
+class KcCard extends StatefulWidget {
   const KcCard({
     super.key,
     required this.child,
@@ -17,40 +17,62 @@ class KcCard extends StatelessWidget {
   final BoxBorder? border;
 
   @override
+  State<KcCard> createState() => _KcCardState();
+}
+
+class _KcCardState extends State<KcCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
+
     Widget content = Padding(
-      padding: padding,
-      child: child,
+      padding: widget.padding,
+      child: widget.child,
     );
 
-    if (onTap != null) {
+    if (widget.onTap != null) {
       content = InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(12),
         child: content,
       );
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: color ?? scheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: border ?? Border.all(color: scheme.outline.withValues(alpha: isDark ? 0.3 : 0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: isDark ? Colors.black.withValues(alpha: 0.3) : scheme.shadow.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        child: content,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.diagonal3Values(_isHovered && widget.onTap != null ? 1.015 : 1.0, _isHovered && widget.onTap != null ? 1.015 : 1.0, 1.0),
+        decoration: BoxDecoration(
+          color: widget.color ?? scheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: widget.border ??
+              Border.all(
+                color: _isHovered && widget.onTap != null
+                    ? scheme.primary.withValues(alpha: 0.5)
+                    : scheme.outline.withValues(alpha: isDark ? 0.3 : 0.15),
+                width: _isHovered && widget.onTap != null ? 1.2 : 1.0,
+              ),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: _isHovered ? 0.5 : 0.3)
+                  : scheme.shadow.withValues(alpha: _isHovered ? 0.12 : 0.06),
+              blurRadius: _isHovered ? 16 : 10,
+              offset: Offset(0, _isHovered ? 6 : 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          child: content,
+        ),
       ),
     );
   }
