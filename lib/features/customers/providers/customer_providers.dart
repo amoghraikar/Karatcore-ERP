@@ -74,6 +74,13 @@ class CustomerListNotifier extends StateNotifier<AsyncValue<List<CustomerModel>>
     await loadCustomers();
   }
 
+  Future<void> updateKycStatus(String id, CustomerKycStatus status) async {
+    final repo = ref.read(customerRepositoryProvider);
+    await repo.updateCustomerKycStatus(id, status);
+    await loadCustomers();
+    ref.invalidate(customerDetailProvider(id));
+  }
+
   Future<void> archiveCustomer(String id) async {
     final repo = ref.read(customerRepositoryProvider);
     await repo.archiveCustomer(id);

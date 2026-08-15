@@ -10,6 +10,8 @@ import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
+import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 
 import '../../providers/inventory_providers.dart';
 import '../../repository/inventory_repository.dart';
@@ -62,47 +64,24 @@ class _OrnamentsPageState extends ConsumerState<OrnamentsPage> {
           padding: EdgeInsets.all(context.pageGutter),
           children: [
             // Page Header
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ornaments & Inventory',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Gold & Silver stock, purity tracking, weight breakdown (Gross - Stone = Net Metal Wt), vault lockers, and customer pledges.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
+            KcPageHeader(
+              title: 'Ornaments & Inventory',
+              subtitle: 'Gold & Silver stock, purity tracking, weight breakdown (Gross - Stone = Net Metal Wt), vault lockers, and customer pledges.',
+              actions: [
+                KcOutlinedButton(
+                  label: 'Movements Log',
+                  icon: Icons.history_rounded,
+                  onPressed: () => context.go('/inventory/movements'),
                 ),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    KcOutlinedButton(
-                      label: 'Movements Log',
-                      icon: Icons.history_rounded,
-                      onPressed: () => context.go('/inventory/movements'),
-                    ),
-                    KcOutlinedButton(
-                      label: 'Inventory Reports',
-                      icon: Icons.bar_chart_rounded,
-                      onPressed: () => context.go('/reports/inventory'),
-                    ),
-                    KcPrimaryButton(
-                      label: 'Add Ornament',
-                      icon: Icons.add_rounded,
-                      onPressed: () => context.go('/inventory/create'),
-                    ),
-                  ],
+                KcOutlinedButton(
+                  label: 'Reports',
+                  icon: Icons.bar_chart_rounded,
+                  onPressed: () => context.go('/reports/inventory'),
+                ),
+                KcPrimaryButton(
+                  label: 'Add Ornament',
+                  icon: Icons.add_rounded,
+                  onPressed: () => context.go('/inventory/create'),
                 ),
               ],
             ),
@@ -182,83 +161,45 @@ class _OrnamentsPageState extends ConsumerState<OrnamentsPage> {
             const SizedBox(height: 24),
 
             // Search Bar & Filter Controls
-            Card(
-              elevation: 0,
-              color: scheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _onSearchChanged,
-                            decoration: InputDecoration(
-                              hintText: 'Search Inventory by Ornament ID, Name, Barcode, Customer, Category, or Metal...',
-                              prefixIcon: const Icon(Icons.search_rounded),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _onSearchChanged('');
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: scheme.surface,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Filter Button
-                        Badge(
-                          isLabelVisible: !activeFilters.isEmpty,
-                          label: const Text('•'),
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
-                            icon: const Icon(Icons.filter_list_rounded, size: 18),
-                            label: Text(context.isMobile ? 'Filter' : 'Filters'),
-                            onPressed: () => showOrnamentFilterSheet(context),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Sort Dropdown
-                        DropdownButtonHideUnderline(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
-                            ),
-                            child: DropdownButton<InventorySortOption>(
-                              value: currentSort,
-                              icon: const Icon(Icons.sort_rounded, size: 18),
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              onChanged: (sort) {
-                                if (sort != null) {
-                                  ref.read(ornamentListProvider.notifier).updateSort(sort);
-                                }
-                              },
-                              items: InventorySortOption.values.map((sort) {
-                                return DropdownMenuItem(value: sort, child: Text(sort.label));
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            KcSearchBarFilter(
+              searchController: _searchController,
+              hintText: 'Search Inventory by Ornament ID, Name, Barcode, Category...',
+              onSearchChanged: _onSearchChanged,
+              filterButton: Badge(
+                isLabelVisible: !activeFilters.isEmpty,
+                label: const Text('•'),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+                  icon: const Icon(Icons.filter_list_rounded, size: 18),
+                  label: const Text('Filters'),
+                  onPressed: () => showOrnamentFilterSheet(context),
+                ),
+              ),
+              sortDropdown: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
+                  ),
+                  child: DropdownButton<InventorySortOption>(
+                    value: currentSort,
+                    isExpanded: true,
+                    icon: const Icon(Icons.sort_rounded, size: 18),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    onChanged: (sort) {
+                      if (sort != null) {
+                        ref.read(ornamentListProvider.notifier).updateSort(sort);
+                      }
+                    },
+                    items: InventorySortOption.values.map((sort) {
+                      return DropdownMenuItem(value: sort, child: Text(sort.label, overflow: TextOverflow.ellipsis));
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
 
                     // Filter Chips
                     if (!activeFilters.isEmpty) ...[
@@ -319,10 +260,6 @@ class _OrnamentsPageState extends ConsumerState<OrnamentsPage> {
                         ],
                       ),
                     ],
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Ornament Directory List/Table

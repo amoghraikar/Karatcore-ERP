@@ -49,7 +49,7 @@ class AccountingPeriodSelector extends ConsumerWidget {
               const SizedBox(width: 8),
               DropdownButtonHideUnderline(
                 child: DropdownButton<AccountingPeriodModel>(
-                  value: periods.contains(active) ? active : periods.first,
+                  value: periods.contains(active) ? active : (periods.isNotEmpty ? periods.first : null),
                   isDense: true,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
                   onChanged: (p) {

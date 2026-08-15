@@ -1,87 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
-import '../../../notifications/models/notification_models.dart';
-import '../../../notifications/providers/notification_providers.dart';
+import '../../../../shared/widgets/inputs/kc_text_field.dart';
 
-class SettingsSecurityPage extends StatelessWidget {
-  const SettingsSecurityPage({super.key});
+import '../../providers/settings_providers.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.all(context.pageGutter),
-        children: [
-          Text('Security Settings', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          Text('Owner authentication, PIN lock, and biometric verification parameters', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          const SizedBox(height: 24),
-          const KcCard(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Owner Authentication & App Lock', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                SizedBox(height: 12),
-                SwitchListTile(
-                  title: Text('Require TouchID / FaceID Biometric Lock'),
-                  subtitle: Text('Prompt for biometric verification when app is opened'),
-                  value: true,
-                  onChanged: null,
-                ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Sensitive Action Confirmation'),
-                  subtitle: Text('Prompt for owner confirmation before loan disburse / settlement'),
-                  value: true,
-                  onChanged: null,
-                ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Auto-Lock Inactive Session'),
-                  subtitle: Text('Lock screen after 15 minutes of inactivity'),
-                  value: true,
-                  onChanged: null,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SettingsBusinessPage extends StatefulWidget {
+/// 1. Business Profile Settings Subpage
+class SettingsBusinessPage extends ConsumerStatefulWidget {
   const SettingsBusinessPage({super.key});
 
   @override
-  State<SettingsBusinessPage> createState() => _SettingsBusinessPageState();
+  ConsumerState<SettingsBusinessPage> createState() => _SettingsBusinessPageState();
 }
 
-class _SettingsBusinessPageState extends State<SettingsBusinessPage> {
+class _SettingsBusinessPageState extends ConsumerState<SettingsBusinessPage> {
   late final TextEditingController _nameCtrl;
+  late final TextEditingController _taglineCtrl;
   late final TextEditingController _bisCtrl;
   late final TextEditingController _gstCtrl;
+  late final TextEditingController _ownerCtrl;
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _phoneCtrl;
+  late final TextEditingController _addressCtrl;
+
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: 'Verma Jewellery & Gold Loan Pvt Ltd');
-    _bisCtrl = TextEditingController(text: 'BIS-HM-MH-400002-9812');
-    _gstCtrl = TextEditingController(text: '27AAACV9812A1Z4');
+    final biz = ref.read(businessProfileProvider);
+    _nameCtrl = TextEditingController(text: biz.storeName);
+    _taglineCtrl = TextEditingController(text: biz.tagline);
+    _bisCtrl = TextEditingController(text: biz.bisRegistrationNo);
+    _gstCtrl = TextEditingController(text: biz.gstin);
+    _ownerCtrl = TextEditingController(text: biz.ownerName);
+    _emailCtrl = TextEditingController(text: biz.contactEmail);
+    _phoneCtrl = TextEditingController(text: biz.contactPhone);
+    _addressCtrl = TextEditingController(text: biz.address);
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
+    _taglineCtrl.dispose();
     _bisCtrl.dispose();
     _gstCtrl.dispose();
+    _ownerCtrl.dispose();
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
+    _addressCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveBusinessProfile() async {
+    setState(() => _isSaving = true);
+    final current = ref.read(businessProfileProvider);
+
+    final updated = current.copyWith(
+      storeName: _nameCtrl.text.trim(),
+      tagline: _taglineCtrl.text.trim(),
+      bisRegistrationNo: _bisCtrl.text.trim(),
+      gstin: _gstCtrl.text.trim(),
+      ownerName: _ownerCtrl.text.trim(),
+      contactEmail: _emailCtrl.text.trim(),
+      contactPhone: _phoneCtrl.text.trim(),
+      address: _addressCtrl.text.trim(),
+    );
+
+    await ref.read(systemSettingsProvider.notifier).updateBusinessProfile(updated);
+
+    if (mounted) {
+      setState(() => _isSaving = false);
+      KcToast.show(context, message: 'Business Profile updated successfully!', type: KcToastType.success);
+    }
   }
 
   @override
@@ -90,31 +88,104 @@ class _SettingsBusinessPageState extends State<SettingsBusinessPage> {
       body: ListView(
         padding: EdgeInsets.all(context.pageGutter),
         children: [
-          Text('Business Profile Settings', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => context.go(AppRoutes.settings),
+              ),
+              const SizedBox(width: 8),
+              Text('Business Profile Settings', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+            ],
+          ),
           const SizedBox(height: 4),
           Text('Store legal identity, BIS registration & GSTIN details', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 24),
+
           KcCard(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Legal Proprietorship Entity', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                Text('Legal Entity & Store Information', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Store Legal Name', border: OutlineInputBorder()),
-                  controller: _nameCtrl,
-                ),
+                KcTextField(controller: _nameCtrl, label: 'Store Registered Trade Name *'),
                 const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'BIS Hallmarking Registration Number', border: OutlineInputBorder()),
-                  controller: _bisCtrl,
-                ),
+                KcTextField(controller: _taglineCtrl, label: 'Store Tagline / Slogan'),
                 const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'GSTIN Registration', border: OutlineInputBorder()),
-                  controller: _gstCtrl,
-                ),
+                if (context.isMobile) ...[
+                  KcTextField(controller: _gstCtrl, label: 'GSTIN Registration Number *'),
+                  const SizedBox(height: 16),
+                  KcTextField(controller: _bisCtrl, label: 'BIS Hallmarking Registration No *'),
+                ] else ...[
+                  Row(
+                    children: [
+                      Expanded(child: KcTextField(controller: _gstCtrl, label: 'GSTIN Registration Number *')),
+                      const SizedBox(width: 16),
+                      Expanded(child: KcTextField(controller: _bisCtrl, label: 'BIS Hallmarking Registration No *')),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                Text('Owner & Contact Details', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+                KcTextField(controller: _ownerCtrl, label: 'Owner / Proprietor Name *'),
+                const SizedBox(height: 16),
+                if (context.isMobile) ...[
+                  KcTextField(controller: _phoneCtrl, label: 'Contact Phone Number *'),
+                  const SizedBox(height: 16),
+                  KcTextField(controller: _emailCtrl, label: 'Contact Email Address *'),
+                ] else ...[
+                  Row(
+                    children: [
+                      Expanded(child: KcTextField(controller: _phoneCtrl, label: 'Contact Phone Number *')),
+                      const SizedBox(width: 16),
+                      Expanded(child: KcTextField(controller: _emailCtrl, label: 'Contact Email Address *')),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
+                KcTextField(controller: _addressCtrl, label: 'Full Store Physical Address *', maxLines: 2),
+                const SizedBox(height: 28),
+
+                if (context.isMobile) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: KcPrimaryButton(
+                      label: 'Save Business Profile',
+                      icon: Icons.check_circle_rounded,
+                      isLoading: _isSaving,
+                      onPressed: _saveBusinessProfile,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: KcOutlinedButton(
+                      label: 'Back to Settings',
+                      onPressed: () => context.go(AppRoutes.settings),
+                    ),
+                  ),
+                ] else ...[
+                  Row(
+                    children: [
+                      KcOutlinedButton(
+                        label: 'Back to Settings',
+                        onPressed: () => context.go(AppRoutes.settings),
+                      ),
+                      const Spacer(),
+                      KcPrimaryButton(
+                        label: 'Save Business Profile',
+                        icon: Icons.check_circle_rounded,
+                        isLoading: _isSaving,
+                        onPressed: _saveBusinessProfile,
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -124,29 +195,50 @@ class _SettingsBusinessPageState extends State<SettingsBusinessPage> {
   }
 }
 
-class SettingsFinancialPage extends StatefulWidget {
-  const SettingsFinancialPage({super.key});
+/// 2. Security & Access Control Settings Subpage
+class SettingsSecurityPage extends ConsumerStatefulWidget {
+  const SettingsSecurityPage({super.key});
 
   @override
-  State<SettingsFinancialPage> createState() => _SettingsFinancialPageState();
+  ConsumerState<SettingsSecurityPage> createState() => _SettingsSecurityPageState();
 }
 
-class _SettingsFinancialPageState extends State<SettingsFinancialPage> {
-  late final TextEditingController _rateCtrl;
-  late final TextEditingController _ltvCtrl;
+class _SettingsSecurityPageState extends ConsumerState<SettingsSecurityPage> {
+  late bool _biometrics;
+  late bool _pinActions;
+  late bool _twoFactor;
+  late int _timeoutMins;
+  late int _retentionDays;
+
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _rateCtrl = TextEditingController(text: '12.0% p.a.');
-    _ltvCtrl = TextEditingController(text: '75.0% LTV (RBI Benchmark)');
+    final sec = ref.read(securitySettingsProvider);
+    _biometrics = sec.requireBiometricLock;
+    _pinActions = sec.requireOwnerPinForActions;
+    _twoFactor = sec.twoFactorAuthEnabled;
+    _timeoutMins = sec.sessionTimeoutMinutes;
+    _retentionDays = sec.auditLogRetentionDays;
   }
 
-  @override
-  void dispose() {
-    _rateCtrl.dispose();
-    _ltvCtrl.dispose();
-    super.dispose();
+  Future<void> _saveSecurity() async {
+    setState(() => _isSaving = true);
+    final sec = ref.read(securitySettingsProvider).copyWith(
+      requireBiometricLock: _biometrics,
+      requireOwnerPinForActions: _pinActions,
+      twoFactorAuthEnabled: _twoFactor,
+      sessionTimeoutMinutes: _timeoutMins,
+      auditLogRetentionDays: _retentionDays,
+    );
+
+    await ref.read(systemSettingsProvider.notifier).updateSecuritySettings(sec);
+
+    if (mounted) {
+      setState(() => _isSaving = false);
+      KcToast.show(context, message: 'Security parameters updated successfully!', type: KcToastType.success);
+    }
   }
 
   @override
@@ -155,25 +247,106 @@ class _SettingsFinancialPageState extends State<SettingsFinancialPage> {
       body: ListView(
         padding: EdgeInsets.all(context.pageGutter),
         children: [
-          Text('Financial Parameters', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => context.go(AppRoutes.settings),
+              ),
+              const SizedBox(width: 8),
+              Text('Security & Access Controls', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+            ],
+          ),
           const SizedBox(height: 4),
-          Text('Interest rate rules, LTV limits & pawn broking terms', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          Text('Owner authentication, PIN lock, and biometric verification parameters', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 24),
+
           KcCard(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Default Gold Loan Rate Terms', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Standard Annual Interest Rate (%)', border: OutlineInputBorder()),
-                  controller: _rateCtrl,
+                Text('Authentication & Access Locks', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 12),
+
+                SwitchListTile(
+                  title: const Text('Require TouchID / FaceID Biometric Lock'),
+                  subtitle: const Text('Prompt for biometric verification when opening application'),
+                  value: _biometrics,
+                  onChanged: (val) => setState(() => _biometrics = val),
                 ),
+                const Divider(),
+                SwitchListTile(
+                  title: const Text('Sensitive Action Confirmation'),
+                  subtitle: const Text('Require owner PIN authorization before loan disburse, renewal or settlement'),
+                  value: _pinActions,
+                  onChanged: (val) => setState(() => _pinActions = val),
+                ),
+                const Divider(),
+                SwitchListTile(
+                  title: const Text('Two-Factor Authentication (2FA)'),
+                  subtitle: const Text('Require SMS OTP code during owner login'),
+                  value: _twoFactor,
+                  onChanged: (val) => setState(() => _twoFactor = val),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
                 const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Maximum Loan-To-Value (LTV Cap %)', border: OutlineInputBorder()),
-                  controller: _ltvCtrl,
+
+                Text('Session & Audit Parameters', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _timeoutMins,
+                        decoration: const InputDecoration(labelText: 'Auto-Lock Session Timeout', border: OutlineInputBorder()),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _timeoutMins = val);
+                        },
+                        items: const [
+                          DropdownMenuItem(value: 5, child: Text('5 minutes')),
+                          DropdownMenuItem(value: 15, child: Text('15 minutes (Recommended)')),
+                          DropdownMenuItem(value: 30, child: Text('30 minutes')),
+                          DropdownMenuItem(value: 60, child: Text('1 hour')),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _retentionDays,
+                        decoration: const InputDecoration(labelText: 'Audit Log Retention Policy', border: OutlineInputBorder()),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _retentionDays = val);
+                        },
+                        items: const [
+                          DropdownMenuItem(value: 90, child: Text('90 Days')),
+                          DropdownMenuItem(value: 180, child: Text('180 Days')),
+                          DropdownMenuItem(value: 365, child: Text('1 Year (Compliance Standard)')),
+                          DropdownMenuItem(value: 730, child: Text('2 Years')),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+
+                Row(
+                  children: [
+                    KcOutlinedButton(
+                      label: 'Back to Settings',
+                      onPressed: () => context.go(AppRoutes.settings),
+                    ),
+                    const Spacer(),
+                    KcPrimaryButton(
+                      label: 'Save Security Controls',
+                      icon: Icons.check_circle_rounded,
+                      isLoading: _isSaving,
+                      onPressed: _saveSecurity,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -184,6 +357,156 @@ class _SettingsFinancialPageState extends State<SettingsFinancialPage> {
   }
 }
 
+/// 3. Financial & Rate Parameters Subpage
+class SettingsFinancialPage extends ConsumerStatefulWidget {
+  const SettingsFinancialPage({super.key});
+
+  @override
+  ConsumerState<SettingsFinancialPage> createState() => _SettingsFinancialPageState();
+}
+
+class _SettingsFinancialPageState extends ConsumerState<SettingsFinancialPage> {
+  late final TextEditingController _gold24kCtrl;
+  late final TextEditingController _gold22kCtrl;
+  late final TextEditingController _gold18kCtrl;
+  late final TextEditingController _silverCtrl;
+  late final TextEditingController _ltvCtrl;
+  late final TextEditingController _interestCtrl;
+  late final TextEditingController _penaltyCtrl;
+
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final fin = ref.read(financialSettingsProvider);
+    _gold24kCtrl = TextEditingController(text: fin.gold24kRatePerGram.toString());
+    _gold22kCtrl = TextEditingController(text: fin.gold22kRatePerGram.toString());
+    _gold18kCtrl = TextEditingController(text: fin.gold18kRatePerGram.toString());
+    _silverCtrl = TextEditingController(text: fin.silverRatePerGram.toString());
+    _ltvCtrl = TextEditingController(text: fin.maxLtvPercentage.toString());
+    _interestCtrl = TextEditingController(text: fin.defaultMonthlyInterestRate.toString());
+    _penaltyCtrl = TextEditingController(text: fin.penaltyInterestRate.toString());
+  }
+
+  @override
+  void dispose() {
+    _gold24kCtrl.dispose();
+    _gold22kCtrl.dispose();
+    _gold18kCtrl.dispose();
+    _silverCtrl.dispose();
+    _ltvCtrl.dispose();
+    _interestCtrl.dispose();
+    _penaltyCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveFinancial() async {
+    setState(() => _isSaving = true);
+    final fin = ref.read(financialSettingsProvider).copyWith(
+      gold24kRatePerGram: double.tryParse(_gold24kCtrl.text) ?? 7450.0,
+      gold22kRatePerGram: double.tryParse(_gold22kCtrl.text) ?? 6830.0,
+      gold18kRatePerGram: double.tryParse(_gold18kCtrl.text) ?? 5580.0,
+      silverRatePerGram: double.tryParse(_silverCtrl.text) ?? 88.0,
+      maxLtvPercentage: double.tryParse(_ltvCtrl.text) ?? 75.0,
+      defaultMonthlyInterestRate: double.tryParse(_interestCtrl.text) ?? 1.5,
+      penaltyInterestRate: double.tryParse(_penaltyCtrl.text) ?? 2.0,
+    );
+
+    await ref.read(systemSettingsProvider.notifier).updateFinancialSettings(fin);
+
+    if (mounted) {
+      setState(() => _isSaving = false);
+      KcToast.show(context, message: 'Financial rates & LTV parameters updated successfully!', type: KcToastType.success);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        padding: EdgeInsets.all(context.pageGutter),
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => context.go(AppRoutes.settings),
+              ),
+              const SizedBox(width: 8),
+              Text('Financial & Rate Parameters', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('Configure gold/silver market benchmark rates, LTV caps & loan interest matrices', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          const SizedBox(height: 24),
+
+          KcCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Bullion Market Benchmark Rates (per gram in ₹)', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(child: KcTextField(controller: _gold24kCtrl, label: 'Gold 24K Rate (₹/g) *', keyboardType: TextInputType.number)),
+                    const SizedBox(width: 16),
+                    Expanded(child: KcTextField(controller: _gold22kCtrl, label: 'Gold 22K Rate (₹/g) *', keyboardType: TextInputType.number)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(child: KcTextField(controller: _gold18kCtrl, label: 'Gold 18K Rate (₹/g) *', keyboardType: TextInputType.number)),
+                    const SizedBox(width: 16),
+                    Expanded(child: KcTextField(controller: _silverCtrl, label: 'Silver 99.9 Rate (₹/g) *', keyboardType: TextInputType.number)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                Text('Loan-to-Value (LTV) & Interest Rate Policy', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(child: KcTextField(controller: _ltvCtrl, label: 'Max LTV Ceiling Ratio (%) *', keyboardType: TextInputType.number)),
+                    const SizedBox(width: 16),
+                    Expanded(child: KcTextField(controller: _interestCtrl, label: 'Standard Monthly Interest Rate (%) *', keyboardType: TextInputType.number)),
+                    const SizedBox(width: 16),
+                    Expanded(child: KcTextField(controller: _penaltyCtrl, label: 'Overdue Penalty Interest Rate (%) *', keyboardType: TextInputType.number)),
+                  ],
+                ),
+                const SizedBox(height: 28),
+
+                Row(
+                  children: [
+                    KcOutlinedButton(
+                      label: 'Back to Settings',
+                      onPressed: () => context.go(AppRoutes.settings),
+                    ),
+                    const Spacer(),
+                    KcPrimaryButton(
+                      label: 'Save Financial Rates',
+                      icon: Icons.check_circle_rounded,
+                      isLoading: _isSaving,
+                      onPressed: _saveFinancial,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 4. Notifications & Alert Settings Subpage
 class SettingsNotificationsPage extends ConsumerStatefulWidget {
   const SettingsNotificationsPage({super.key});
 
@@ -192,199 +515,152 @@ class SettingsNotificationsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsNotificationsPageState extends ConsumerState<SettingsNotificationsPage> {
-  late NotificationPreferencesModel _prefs;
-  bool _initialized = false;
+  late bool _sms;
+  late bool _whatsapp;
+  late bool _email;
+  late int _dueDays;
+  late int _repeatDays;
+
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final notif = ref.read(notificationSettingsProvider);
+    _sms = notif.enableSmsAlerts;
+    _whatsapp = notif.enableWhatsappReminders;
+    _email = notif.enableEmailNotifications;
+    _dueDays = notif.dueReminderDaysBefore;
+    _repeatDays = notif.overdueRepeatIntervalDays;
+  }
+
+  Future<void> _saveNotifications() async {
+    setState(() => _isSaving = true);
+    final notif = ref.read(notificationSettingsProvider).copyWith(
+      enableSmsAlerts: _sms,
+      enableWhatsappReminders: _whatsapp,
+      enableEmailNotifications: _email,
+      dueReminderDaysBefore: _dueDays,
+      overdueRepeatIntervalDays: _repeatDays,
+    );
+
+    await ref.read(systemSettingsProvider.notifier).updateNotificationSettings(notif);
+
+    if (mounted) {
+      setState(() => _isSaving = false);
+      KcToast.show(context, message: 'Notification preferences updated successfully!', type: KcToastType.success);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final prefsAsync = ref.watch(notificationPreferencesNotifierProvider);
-
     return Scaffold(
-      body: prefsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, st) => Center(child: Text('Error loading preferences: $err')),
-        data: (savedPrefs) {
-          if (!_initialized) {
-            _prefs = savedPrefs;
-            _initialized = true;
-          }
-
-          return ListView(
-            padding: EdgeInsets.all(context.pageGutter),
+      body: ListView(
+        padding: EdgeInsets.all(context.pageGutter),
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Notification & Communication Preferences', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 4),
-                        Text('Store Owner alert rules, Quiet Hours parameters & customer channel dispatch controls', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  KcPrimaryButton(
-                    label: 'Save Preferences',
-                    icon: Icons.save_rounded,
-                    onPressed: () async {
-                      await ref.read(notificationPreferencesNotifierProvider.notifier).updatePreferences(_prefs);
-                      if (context.mounted) {
-                        KcToast.success(context, 'Notification and alert preferences saved successfully.', title: 'Preferences Saved');
-                      }
-                    },
-                  ),
-                ],
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => context.go(AppRoutes.settings),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(width: 8),
+              Text('Notifications & Alert Settings', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('Automated SMS/WhatsApp payment reminders & system alerts configuration', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          const SizedBox(height: 24),
 
-              // Owner Business Alerts
-              KcCard(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Owner Alert Category Subscriptions', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                    const SizedBox(height: 12),
-                    SwitchListTile(
-                      title: const Text('Pledge & Loan Due Alerts'),
-                      subtitle: const Text('Notify 30, 7, and 1 days before loan installment due dates'),
-                      value: _prefs.loanAlertsEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(loanAlertsEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('Payment & Receipt Confirmations'),
-                      subtitle: const Text('Notify upon payment recording and digital receipt generation'),
-                      value: _prefs.paymentAlertsEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(paymentAlertsEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('KYC Verification Review Requests'),
-                      subtitle: const Text('Notify when new customer KYC documents require Store Owner review'),
-                      value: _prefs.kycAlertsEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(kycAlertsEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('Security & Device Monitor Alerts'),
-                      subtitle: const Text('Notify on web terminal logins, session locks & biometric actions'),
-                      value: _prefs.securityAlertsEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(securityAlertsEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('Accounting & System Engine Alerts'),
-                      subtitle: const Text('Notify on monthly ledger period closes & database backup reminders'),
-                      value: _prefs.systemAlertsEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(systemAlertsEnabled: val)),
-                    ),
-                  ],
+          KcCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Messaging Channels & Gateways', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 12),
+
+                SwitchListTile(
+                  title: const Text('Enable SMS Payment Reminders'),
+                  subtitle: const Text('Send automated SMS reminders for upcoming interest due dates'),
+                  value: _sms,
+                  onChanged: (val) => setState(() => _sms = val),
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              // Communication Channel Settings
-              KcCard(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Communication Delivery Channels', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                    const SizedBox(height: 4),
-                    const Text('In-App delivery is active. External channels are placeholder architecture.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    SwitchListTile(
-                      title: const Text('In-App Notification Center'),
-                      subtitle: const Text('Active internal notification feed (Always Recommended)'),
-                      value: _prefs.inAppChannelEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(inAppChannelEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('Email Gateway (Placeholder Architecture)'),
-                      subtitle: const Text('Simulated email dispatch for reports and ledger statements'),
-                      value: _prefs.emailChannelEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(emailChannelEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('SMS Gateway (Placeholder Architecture)'),
-                      subtitle: const Text('Simulated SMS dispatch for loan due reminders'),
-                      value: _prefs.smsChannelEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(smsChannelEnabled: val)),
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('WhatsApp Business API (Placeholder Architecture)'),
-                      subtitle: const Text('Simulated WhatsApp receipt & pledge updates'),
-                      value: _prefs.whatsappChannelEnabled,
-                      onChanged: (val) => setState(() => _prefs = _prefs.copyWith(whatsappChannelEnabled: val)),
-                    ),
-                  ],
+                const Divider(),
+                SwitchListTile(
+                  title: const Text('Enable WhatsApp Business Reminders'),
+                  subtitle: const Text('Send rich WhatsApp payment receipts & due date alerts'),
+                  value: _whatsapp,
+                  onChanged: (val) => setState(() => _whatsapp = val),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const Divider(),
+                SwitchListTile(
+                  title: const Text('Enable Email Digest Reports'),
+                  subtitle: const Text('Send daily executive summary & closing cash reports via email'),
+                  value: _email,
+                  onChanged: (val) => setState(() => _email = val),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
 
-              // Quiet Hours Configuration
-              KcCard(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Text('Trigger Schedule & Frequency', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+
+                Row(
                   children: [
-                    const Text('Store Quiet Hours Configuration', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                    const SizedBox(height: 12),
-                    SwitchListTile(
-                      title: const Text('Enable Store Quiet Hours'),
-                      subtitle: const Text('Suppress non-urgent notifications during off-business hours'),
-                      value: _prefs.quietHours.isEnabled,
-                      onChanged: (val) => setState(() {
-                        _prefs = _prefs.copyWith(
-                          quietHours: _prefs.quietHours.copyWith(isEnabled: val),
-                        );
-                      }),
-                    ),
-                    if (_prefs.quietHours.isEnabled) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(labelText: 'Start Time (e.g. 22:00)', border: OutlineInputBorder()),
-                              controller: TextEditingController(text: _prefs.quietHours.startTime),
-                              onChanged: (v) => _prefs = _prefs.copyWith(quietHours: _prefs.quietHours.copyWith(startTime: v)),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(labelText: 'End Time (e.g. 08:00)', border: OutlineInputBorder()),
-                              controller: TextEditingController(text: _prefs.quietHours.endTime),
-                              onChanged: (v) => _prefs = _prefs.copyWith(quietHours: _prefs.quietHours.copyWith(endTime: v)),
-                            ),
-                          ),
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _dueDays,
+                        decoration: const InputDecoration(labelText: 'Pre-Due Reminder Trigger', border: OutlineInputBorder()),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _dueDays = val);
+                        },
+                        items: const [
+                          DropdownMenuItem(value: 1, child: Text('1 Day Before Due Date')),
+                          DropdownMenuItem(value: 3, child: Text('3 Days Before Due Date')),
+                          DropdownMenuItem(value: 7, child: Text('7 Days Before Due Date')),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      SwitchListTile(
-                        title: const Text('Allow Critical Security Exceptions'),
-                        subtitle: const Text('Deliver urgent security and high-value overdue alerts during quiet hours'),
-                        value: _prefs.quietHours.allowCriticalExceptions,
-                        onChanged: (val) => setState(() {
-                          _prefs = _prefs.copyWith(
-                            quietHours: _prefs.quietHours.copyWith(allowCriticalExceptions: val),
-                          );
-                        }),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _repeatDays,
+                        decoration: const InputDecoration(labelText: 'Overdue Repeat Alert Interval', border: OutlineInputBorder()),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _repeatDays = val);
+                        },
+                        items: const [
+                          DropdownMenuItem(value: 3, child: Text('Every 3 Days')),
+                          DropdownMenuItem(value: 7, child: Text('Every 7 Days (Weekly)')),
+                          DropdownMenuItem(value: 14, child: Text('Every 14 Days')),
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
-              ),
-            ],
-          );
-        },
+                const SizedBox(height: 28),
+
+                Row(
+                  children: [
+                    KcOutlinedButton(
+                      label: 'Back to Settings',
+                      onPressed: () => context.go(AppRoutes.settings),
+                    ),
+                    const Spacer(),
+                    KcPrimaryButton(
+                      label: 'Save Notification Settings',
+                      icon: Icons.check_circle_rounded,
+                      isLoading: _isSaving,
+                      onPressed: _saveNotifications,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

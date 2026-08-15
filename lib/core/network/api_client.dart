@@ -90,11 +90,18 @@ class ApiClient {
 
     if (body is Map<String, dynamic> && body.containsKey('error')) {
       final err = body['error'];
+      if (err is Map<String, dynamic>) {
+        throw ApiException(
+          statusCode: response.statusCode,
+          code: (err['code'] ?? 'UNKNOWN_ERROR').toString(),
+          message: (err['message'] ?? 'An API error occurred').toString(),
+          details: err['details'],
+        );
+      }
       throw ApiException(
         statusCode: response.statusCode,
-        code: err['code'] ?? 'UNKNOWN_ERROR',
-        message: err['message'] ?? 'An API error occurred',
-        details: err['details'],
+        code: 'ERROR',
+        message: err.toString(),
       );
     }
 

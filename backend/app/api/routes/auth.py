@@ -12,14 +12,31 @@ from app.schemas.response import APIResponse
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+def normalize_phone(phone_str: str) -> str:
+    if not phone_str:
+        return ""
+    digits = "".join(c for c in str(phone_str) if c.isdigit())
+    if len(digits) == 12 and digits.startswith("91"):
+        return digits[2:]
+    if len(digits) == 11 and digits.startswith("0"):
+        return digits[1:]
+    return digits
+
+
 @router.post("/owner/register", response_model=APIResponse[TokenResponse])
 def owner_register(req: OwnerRegisterRequest, db: Session = Depends(get_db)):
-    existing_owner = db.query(Owner).filter((Owner.email == req.email) | (Owner.phone == req.phone)).first()
-    if existing_owner:
-        raise BusinessRuleError("An Owner account with this email or mobile number already exists.")
+    norm_phone = normalize_phone(req.phone)
+    owners = db.query(Owner).all()
+
+    for candidate in owners:
+        if candidate.email.strip().lower() == req.email.strip().lower():
+            raise BusinessRuleError("An Owner account with this email address already exists.")
+        if candidate.phone and (candidate.phone.strip() == req.phone.strip() or (norm_phone and normalize_phone(candidate.phone) == norm_phone)):
+            raise BusinessRuleError("An Owner account with this mobile number already exists.")
 
     new_owner = Owner(
         full_name=req.full_name,
+        store_name=req.business_name.strip() if req.business_name else None,
         email=req.email,
         phone=req.phone,
         password_hash=hash_password(req.password),
@@ -36,6 +53,7 @@ def owner_register(req: OwnerRegisterRequest, db: Session = Depends(get_db)):
             user_type="owner",
             sub=new_owner.email,
             full_name=new_owner.full_name,
+            store_name=new_owner.store_name,
             phone=new_owner.phone,
         ),
         message="Store Owner account successfully registered!",
@@ -44,7 +62,20 @@ def owner_register(req: OwnerRegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/owner/login", response_model=APIResponse[TokenResponse])
 def owner_login(req: LoginRequest, db: Session = Depends(get_db)):
-    owner = db.query(Owner).filter((Owner.email == req.username) | (Owner.phone == req.username)).first()
+    username_input = req.username.strip()
+    norm_input = normalize_phone(username_input)
+
+    owners = db.query(Owner).all()
+    owner = None
+
+    for candidate in owners:
+        if candidate.email.strip().lower() == username_input.lower():
+            owner = candidate
+            break
+        if candidate.phone and (candidate.phone.strip() == username_input or (norm_input and normalize_phone(candidate.phone) == norm_input)):
+            owner = candidate
+            break
+
     if not owner or not verify_password(req.password, owner.password_hash):
         raise AuthenticationError("Invalid email/phone or password for Owner account")
 
@@ -55,6 +86,7 @@ def owner_login(req: LoginRequest, db: Session = Depends(get_db)):
             user_type="owner",
             sub=owner.email,
             full_name=owner.full_name,
+            store_name=owner.store_name,
             phone=owner.phone,
         ),
         message="Owner login successful",

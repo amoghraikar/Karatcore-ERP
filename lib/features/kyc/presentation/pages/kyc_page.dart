@@ -9,6 +9,8 @@ import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
+import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 
 import '../../providers/kyc_providers.dart';
 import '../../repository/kyc_repository.dart';
@@ -61,34 +63,15 @@ class _KycPageState extends ConsumerState<KycPage> {
           padding: EdgeInsets.all(context.pageGutter),
           children: [
             // Page Title Header
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'KYC & Trust Layer',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Identity verification, government document audit queue, risk classification, and immutable audit logs.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+            KcPageHeader(
+              title: 'KYC & Trust Layer',
+              subtitle: 'Identity verification, government document audit queue, risk classification, and immutable audit logs.',
+              actions: [
                 KcPrimaryButton(
                   label: 'Initiate KYC',
                   icon: Icons.verified_user_rounded,
                   onPressed: () => context.go('/kyc/KC-CUS-000101/start'),
                 ),
-                const SizedBox(width: 10),
                 KcOutlinedButton(
                   label: 'KYC Reports',
                   icon: Icons.bar_chart_rounded,
@@ -172,83 +155,45 @@ class _KycPageState extends ConsumerState<KycPage> {
             const SizedBox(height: 24),
 
             // Search Bar & Filter Controls Row
-            Card(
-              elevation: 0,
-              color: scheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _onSearchChanged,
-                            decoration: InputDecoration(
-                              hintText: 'Search KYC Queue by Customer Name, ID, Mobile, or Record ID...',
-                              prefixIcon: const Icon(Icons.search_rounded),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _onSearchChanged('');
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: scheme.surface,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Filter Button
-                        Badge(
-                          isLabelVisible: !activeFilters.isEmpty,
-                          label: const Text('•'),
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
-                            icon: const Icon(Icons.filter_list_rounded, size: 18),
-                            label: Text(context.isMobile ? 'Filter' : 'Filters'),
-                            onPressed: () => showKycFilterSheet(context),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Sort Selector
-                        DropdownButtonHideUnderline(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
-                            ),
-                            child: DropdownButton<KycSortOption>(
-                              value: currentSort,
-                              icon: const Icon(Icons.sort_rounded, size: 18),
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              onChanged: (sort) {
-                                if (sort != null) {
-                                  ref.read(kycQueueProvider.notifier).updateSort(sort);
-                                }
-                              },
-                              items: KycSortOption.values.map((sort) {
-                                return DropdownMenuItem(value: sort, child: Text(sort.label));
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            KcSearchBarFilter(
+              searchController: _searchController,
+              hintText: 'Search KYC Queue by Customer Name, ID, Mobile, or Record ID...',
+              onSearchChanged: _onSearchChanged,
+              filterButton: Badge(
+                isLabelVisible: !activeFilters.isEmpty,
+                label: const Text('•'),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+                  icon: const Icon(Icons.filter_list_rounded, size: 18),
+                  label: const Text('Filters'),
+                  onPressed: () => showKycFilterSheet(context),
+                ),
+              ),
+              sortDropdown: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
+                  ),
+                  child: DropdownButton<KycSortOption>(
+                    value: currentSort,
+                    isExpanded: true,
+                    icon: const Icon(Icons.sort_rounded, size: 18),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    onChanged: (sort) {
+                      if (sort != null) {
+                        ref.read(kycQueueProvider.notifier).updateSort(sort);
+                      }
+                    },
+                    items: KycSortOption.values.map((sort) {
+                      return DropdownMenuItem(value: sort, child: Text(sort.label, overflow: TextOverflow.ellipsis));
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
 
                     // Active Filter Chips
                     if (!activeFilters.isEmpty) ...[
@@ -307,10 +252,6 @@ class _KycPageState extends ConsumerState<KycPage> {
                         ],
                       ),
                     ],
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Queue Table Content

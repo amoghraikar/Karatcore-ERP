@@ -145,6 +145,7 @@ class CustomerDocument {
     required this.status,
     required this.isVerified,
     this.fileSize = '1.2 MB',
+    this.documentNumber = 'XXXX-XXXX-8821',
   });
 
   final String id;
@@ -154,6 +155,7 @@ class CustomerDocument {
   final String status;
   final bool isVerified;
   final String fileSize;
+  final String documentNumber;
 }
 
 class CustomerActivityItem {

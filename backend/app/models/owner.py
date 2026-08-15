@@ -7,6 +7,7 @@ class Owner(BaseModel):
 
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String(255), nullable=False)
+    store_name = Column(String(255), nullable=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     phone = Column(String(50), nullable=False)
     password_hash = Column(String(255), nullable=False)

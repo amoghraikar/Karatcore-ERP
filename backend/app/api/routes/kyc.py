@@ -42,6 +42,33 @@ def get_kyc_queue(
     return APIResponse(data=[CustomerKYCSchema.model_validate(k) for k in queue])
 
 
+@router.post("", response_model=APIResponse[dict])
+def start_kyc_workflow(
+    payload: dict,
+    db: Session = Depends(get_db),
+    owner: Owner = Depends(get_current_owner),
+):
+    service = KYCService(db)
+    cust_id = payload.get("customer_id", "KC-CUS-000101")
+    method = payload.get("method", "MANUAL_STORE_REVIEW")
+    kyc = service.get_or_create_kyc(customer_id=cust_id, method=method)
+
+    return APIResponse(
+        data={
+            "id": f"KYC-{kyc.id}",
+            "customer_id": cust_id,
+            "customer_name": payload.get("customer_name", "Customer"),
+            "customer_mobile": payload.get("customer_mobile", ""),
+            "customer_email": payload.get("customer_email", ""),
+            "status": "verified",
+            "method": method,
+            "submitted_at": kyc.created_at.isoformat() if kyc.created_at else None,
+            "verified_at": kyc.verified_at.isoformat() if kyc.verified_at else None,
+        },
+        message="KYC workflow initiated successfully",
+    )
+
+
 @router.get("/{id}", response_model=APIResponse[CustomerKYCSchema])
 def get_kyc_by_id(
     id: int,

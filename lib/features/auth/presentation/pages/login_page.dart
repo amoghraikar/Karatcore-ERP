@@ -82,29 +82,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             if (authState.errorMessage != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: KcColors.signalRed.withValues(alpha: 0.1),
+                  color: const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: KcColors.signalRed.withValues(alpha: 0.3)),
+                  border: Border.all(color: const Color(0xFFFCA5A5)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: KcColors.signalRed, size: 20),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 20),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         authState.errorMessage!,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: KcColors.signalRed,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: const TextStyle(
+                          color: Color(0xFF991B1B),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
             ],
 
             // Input Fields

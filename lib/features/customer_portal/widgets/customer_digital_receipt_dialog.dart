@@ -43,7 +43,7 @@ class CustomerDigitalReceiptDialog extends StatelessWidget {
                         child: const Text('KARATCORE ERP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10)),
                       ),
                       const SizedBox(height: 4),
-                      const Text('Verma Jewellery & Gold Loan', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                      const Text('Karatcore Jewellery & Gold Loans', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
                       const Text('M.G. Road Branch, Mumbai • BIS Reg: BIS-MH-4002', style: TextStyle(fontSize: 10, color: Colors.grey)),
                     ],
                   ),

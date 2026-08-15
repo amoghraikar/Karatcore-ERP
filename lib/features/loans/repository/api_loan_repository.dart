@@ -10,18 +10,32 @@ class ApiLoanRepository implements ILoanRepository {
 
   @override
   Future<LoanDashboardMetrics> getDashboardMetrics() async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/metrics');
-    return LoanDashboardMetrics(
-      activeLoansCount: data['active_loans_count'] as int,
-      totalOutstandingPrincipal: (data['total_outstanding_principal'] as num).toDouble(),
-      totalInterestDue: (data['total_interest_due'] as num).toDouble(),
-      totalInterestCollected: (data['total_interest_collected'] as num).toDouble(),
-      overdueLoansCount: data['overdue_loans_count'] as int,
-      loansDueSoonCount: data['loans_due_soon_count'] as int,
-      loansClosedThisMonthCount: data['loans_closed_this_month_count'] as int,
-      totalCollateralValue: (data['total_collateral_value'] as num).toDouble(),
-      totalPledgedWeightGrams: (data['total_pledged_weight_grams'] as num).toDouble(),
-    );
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/metrics');
+      return LoanDashboardMetrics(
+        activeLoansCount: (data['active_loans_count'] as int?) ?? 0,
+        totalOutstandingPrincipal: (data['total_outstanding_principal'] as num?)?.toDouble() ?? 0.0,
+        totalInterestDue: (data['total_interest_due'] as num?)?.toDouble() ?? 0.0,
+        totalInterestCollected: (data['total_interest_collected'] as num?)?.toDouble() ?? 0.0,
+        overdueLoansCount: (data['overdue_loans_count'] as int?) ?? 0,
+        loansDueSoonCount: (data['loans_due_soon_count'] as int?) ?? 0,
+        loansClosedThisMonthCount: (data['loans_closed_this_month_count'] as int?) ?? 0,
+        totalCollateralValue: (data['total_collateral_value'] as num?)?.toDouble() ?? 0.0,
+        totalPledgedWeightGrams: (data['total_pledged_weight_grams'] as num?)?.toDouble() ?? 0.0,
+      );
+    } catch (_) {
+      return const LoanDashboardMetrics(
+        activeLoansCount: 0,
+        totalOutstandingPrincipal: 0.0,
+        totalInterestDue: 0.0,
+        totalInterestCollected: 0.0,
+        overdueLoansCount: 0,
+        loansDueSoonCount: 0,
+        loansClosedThisMonthCount: 0,
+        totalCollateralValue: 0.0,
+        totalPledgedWeightGrams: 0.0,
+      );
+    }
   }
 
   @override
@@ -30,10 +44,17 @@ class ApiLoanRepository implements ILoanRepository {
     LoanFilterParams? filters,
     LoanSortOption? sortOption,
   }) async {
-    final dynamic data = await _api.get(
-      '${ApiEndpoints.loans}?search=${Uri.encodeComponent(searchQuery ?? '')}',
-    );
-    return _parseLoansFromJson(data as List);
+    try {
+      final dynamic data = await _api.get(
+        '${ApiEndpoints.loans}?search=${Uri.encodeComponent(searchQuery ?? '')}',
+      );
+      if (data is List) {
+        return _parseLoansFromJson(data);
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
   }
 
   @override
@@ -48,8 +69,15 @@ class ApiLoanRepository implements ILoanRepository {
 
   @override
   Future<List<LoanModel>> getLoansByCustomerId(String customerId) async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/customer/$customerId');
-    return _parseLoansFromJson(data as List);
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/customer/$customerId');
+      if (data is List) {
+        return _parseLoansFromJson(data);
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
   }
 
   @override

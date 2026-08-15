@@ -10,6 +10,7 @@ import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
 
 import '../../providers/accounting_providers.dart';
 import '../../widgets/accounting_period_selector.dart';
@@ -31,36 +32,16 @@ class AccountingPage extends ConsumerWidget {
           padding: EdgeInsets.all(context.pageGutter),
           children: [
             // Page Header & Accounting Period Selector
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Accounting & Financial Bookkeeping',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Internal financial source of truth: Chart of accounts, double-entry journals, cash/bank books, income, expenses, receivables, payables, and trial balance.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+            KcPageHeader(
+              title: 'Accounting & Financial Bookkeeping',
+              subtitle: 'Internal financial source of truth: Chart of accounts, double-entry journals, cash/bank books, income, expenses, receivables, payables, and trial balance.',
+              actions: [
                 const AccountingPeriodSelector(),
-                const SizedBox(width: 12),
                 KcOutlinedButton(
                   label: 'Accounting Reports',
                   icon: Icons.bar_chart_rounded,
                   onPressed: () => context.go(AppRoutes.reportsAccounting),
                 ),
-                const SizedBox(width: 12),
                 KcPrimaryButton(
                   label: 'New Journal Entry',
                   icon: Icons.edit_note_rounded,
@@ -75,6 +56,32 @@ class AccountingPage extends ConsumerWidget {
               loading: () => const SizedBox(height: 120, child: KcSkeletonLoader()),
               error: (err, st) => Text('Error: $err'),
               data: (m) {
+                if (context.isMobile) {
+                  return Column(
+                    children: [
+                      KcMetricCard(title: 'Cash Vault Balance', value: KcFormatters.inr(m.cashBalance), trend: 'Vault Physical Funds', icon: Icons.payments_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Bank Accounts Total', value: KcFormatters.inr(m.bankBalance), trend: 'HDFC + SBI Accounts', icon: Icons.account_balance_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Total Revenue Income', value: KcFormatters.inr(m.totalIncome), trend: 'Interest + Sales', icon: Icons.trending_up_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Operating Expenses', value: KcFormatters.inr(m.totalExpenses), trend: 'Rent, Salaries, Utilities', icon: Icons.trending_down_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Net Profit / Loss', value: KcFormatters.inr(m.netProfit), trend: 'Income - Expenses', icon: Icons.savings_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Customer Receivables', value: KcFormatters.inr(m.receivablesTotal), trend: 'Pledges & Sales Due', icon: Icons.call_made_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Trade Payables', value: KcFormatters.inr(m.payablesTotal), trend: 'Bullion Suppliers Due', icon: Icons.call_received_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Loan Principal Active', value: KcFormatters.inr(m.loanOutstandingTotal), trend: 'Pledge Assets Book', icon: Icons.folder_shared_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Pledge Interest Income', value: KcFormatters.inr(m.interestIncomeTotal), trend: 'Gold Interest Collected', icon: Icons.monetization_on_rounded),
+                      const SizedBox(height: 10),
+                      KcMetricCard(title: 'Inventory Book Value', value: KcFormatters.inr(m.inventoryValueTotal), trend: 'Gold & Silver Assets', icon: Icons.diamond_rounded),
+                    ],
+                  );
+                }
+
                 return Column(
                   children: [
                     Row(
@@ -214,67 +221,122 @@ class AccountingPage extends ConsumerWidget {
                 children: [
                   Text('Financial Performance & Cash Flow Trends (Mock Analytics)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  if (context.isMobile) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Revenue vs Expense Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Revenue vs Expense Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Interest & Sales Revenue', style: TextStyle(fontSize: 13)),
-                                  Text('₹97.65 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Operating Expenses', style: TextStyle(fontSize: 13)),
-                                  Text('₹19.39 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
-                                ],
-                              ),
+                              Text('Interest & Sales Revenue', style: TextStyle(fontSize: 13)),
+                              Text('₹97.65 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
                             ],
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Loan Portfolio vs Deposit Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Gold Loan Receivables', style: TextStyle(fontSize: 13)),
-                                  Text('₹142.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Customer Security Deposits', style: TextStyle(fontSize: 13)),
-                                  Text('₹9.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF2563EB))),
-                                ],
-                              ),
+                              Text('Operating Expenses', style: TextStyle(fontSize: 13)),
+                              Text('₹19.39 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
                             ],
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Loan Portfolio vs Deposit Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Gold Loan Receivables', style: TextStyle(fontSize: 13)),
+                              Text('₹142.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Customer Security Deposits', style: TextStyle(fontSize: 13)),
+                              Text('₹9.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF2563EB))),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Revenue vs Expense Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Interest & Sales Revenue', style: TextStyle(fontSize: 13)),
+                                    Text('₹97.65 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Operating Expenses', style: TextStyle(fontSize: 13)),
+                                    Text('₹19.39 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Loan Portfolio vs Deposit Ratio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Gold Loan Receivables', style: TextStyle(fontSize: 13)),
+                                    Text('₹142.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Customer Security Deposits', style: TextStyle(fontSize: 13)),
+                                    Text('₹9.50 Lakhs', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF2563EB))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

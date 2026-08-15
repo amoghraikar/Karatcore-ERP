@@ -9,6 +9,7 @@ class UserSession extends Equatable {
     required this.role,
     required this.email,
     required this.phone,
+    this.storeName,
     this.avatarUrl,
     this.branch,
     this.is2faEnabled = false,
@@ -19,6 +20,7 @@ class UserSession extends Equatable {
   final UserRole role;
   final String email;
   final String phone;
+  final String? storeName;
   final String? avatarUrl;
   final BranchModel? branch;
   final bool is2faEnabled;
@@ -29,6 +31,7 @@ class UserSession extends Equatable {
     UserRole? role,
     String? email,
     String? phone,
+    String? storeName,
     String? avatarUrl,
     BranchModel? branch,
     bool? is2faEnabled,
@@ -39,6 +42,7 @@ class UserSession extends Equatable {
       role: role ?? this.role,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      storeName: storeName ?? this.storeName,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       branch: branch ?? this.branch,
       is2faEnabled: is2faEnabled ?? this.is2faEnabled,
@@ -52,6 +56,7 @@ class UserSession extends Equatable {
       'role': role.name,
       'email': email,
       'phone': phone,
+      'storeName': storeName,
       'avatarUrl': avatarUrl,
       'branchName': branch?.name,
       'is2faEnabled': is2faEnabled,
@@ -68,6 +73,7 @@ class UserSession extends Equatable {
       ),
       email: json['email'] as String? ?? 'owner@karatcore.com',
       phone: json['phone'] as String? ?? '+91 98765 43210',
+      storeName: json['storeName'] as String?,
       avatarUrl: json['avatarUrl'] as String?,
       branch: BranchModel.defaultBranches[0],
       is2faEnabled: json['is2faEnabled'] as bool? ?? false,
@@ -75,5 +81,5 @@ class UserSession extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, role, email, phone, avatarUrl, branch, is2faEnabled];
+  List<Object?> get props => [id, name, role, email, phone, storeName, avatarUrl, branch, is2faEnabled];
 }

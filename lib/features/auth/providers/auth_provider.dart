@@ -114,9 +114,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
+      String cleanMsg = 'Invalid email/phone or password. Please check your credentials or register a new Store Owner account.';
+      if (e is ApiException) {
+        if (e.statusCode == 401 || e.code == 'AUTHENTICATION_FAILED') {
+          cleanMsg = 'Invalid email/phone or password. Please verify your credentials or register a new account.';
+        } else if (e.message.isNotEmpty && !e.message.contains('{')) {
+          cleanMsg = e.message;
+        }
+      }
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
-        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        errorMessage: cleanMsg,
       );
       return false;
     }
@@ -153,9 +161,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
+      String cleanMsg = 'Account creation failed. Please check your details and try again.';
+      if (e is ApiException && e.message.isNotEmpty && !e.message.contains('{')) {
+        cleanMsg = e.message;
+      }
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
-        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        errorMessage: cleanMsg,
       );
       return false;
     }

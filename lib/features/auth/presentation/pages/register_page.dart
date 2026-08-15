@@ -135,7 +135,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _storeNameController,
                     label: 'Jewellery Store / Business Name *',
-                    hintText: 'e.g. Verma Jewellery Store',
+                    hintText: 'e.g. Royal Gold Jewellers',
                     validator: (val) => val == null || val.trim().isEmpty ? 'Business name is required' : null,
                   ),
                   const SizedBox(height: 16),
@@ -143,7 +143,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _fullNameController,
                     label: 'Owner Full Name *',
-                    hintText: 'e.g. Ramesh Verma',
+                    hintText: 'e.g. Rajesh Sharma',
                     validator: (val) => val == null || val.trim().isEmpty ? 'Full name is required' : null,
                   ),
                   const SizedBox(height: 16),
@@ -151,7 +151,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _emailController,
                     label: 'Owner Email Address *',
-                    hintText: 'e.g. ramesh@vermajewellers.com',
+                    hintText: 'e.g. rajesh@royalgold.com',
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) => val == null || !val.contains('@') ? 'Valid email required' : null,
                   ),

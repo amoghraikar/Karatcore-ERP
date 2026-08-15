@@ -52,6 +52,8 @@ abstract class ICustomerRepository {
 
   Future<CustomerModel> updateCustomerStatus(String id, CustomerStatus status);
 
+  Future<CustomerModel> updateCustomerKycStatus(String id, CustomerKycStatus status);
+
   Future<CustomerModel> archiveCustomer(String id);
 
   Future<CustomerModel> restoreCustomer(String id);

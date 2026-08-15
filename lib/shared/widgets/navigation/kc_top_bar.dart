@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/color_tokens.dart';
+import '../../../core/extensions/context_extensions.dart';
 import '../../../core/routing/breadcrumbs.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/theme_provider.dart';
@@ -32,6 +33,60 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
         .map((e) => e.isNotEmpty ? e[0] : '')
         .join()
         .toUpperCase();
+
+    if (context.isMobile) {
+      return Container(
+        height: preferredSize.height,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          border: Border(
+            bottom: BorderSide(
+              color: isDark ? Colors.white.withValues(alpha: 0.08) : KcColors.slate200,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Builder(
+              builder: (ctx) => IconButton(
+                icon: const Icon(Icons.menu_rounded),
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
+                tooltip: 'Open Menu',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'KaratCore',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+            ),
+            const Spacer(),
+            IconButton(
+              onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+              icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+              tooltip: 'Toggle Theme',
+            ),
+            Consumer(
+              builder: (context, ref, _) {
+                final unreadCount = ref.watch(unreadCountProvider);
+                return Badge(
+                  isLabelVisible: unreadCount > 0,
+                  label: Text('$unreadCount'),
+                  child: IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () => context.go(AppRoutes.notifications),
+                    tooltip: 'Store Notifications',
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    }
 
     return Container(
       height: preferredSize.height,

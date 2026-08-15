@@ -9,6 +9,8 @@ import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
+
 import '../../models/reports_model.dart';
 import '../../providers/reports_providers.dart';
 import '../../widgets/attention_panel.dart';
@@ -29,29 +31,9 @@ class ReportsPage extends ConsumerWidget {
       padding: EdgeInsets.all(context.pageGutter),
       children: [
         // Header
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Reports & Business Intelligence Center',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Executive dashboards, operational analytics, risk indicators & exportable financial statements',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        const KcPageHeader(
+          title: 'Reports & Business Intelligence Center',
+          subtitle: 'Executive dashboards, operational analytics, risk indicators & exportable financial statements',
         ),
         const SizedBox(height: 20),
 
@@ -74,12 +56,12 @@ class ReportsPage extends ConsumerWidget {
             final isComparison = filter.comparisonMode != ComparisonMode.none;
 
             return GridView.count(
-              crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 4 : (MediaQuery.of(context).size.width > 768 ? 3 : 2),
+              crossAxisCount: context.isMobile ? 1 : (MediaQuery.of(context).size.width > 1200 ? 4 : 3),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: 14,
               mainAxisSpacing: 14,
-              mainAxisExtent: 120,
+              mainAxisExtent: 110,
               children: [
                 KcMetricCard(
                   title: 'Revenue',

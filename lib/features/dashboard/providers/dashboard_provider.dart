@@ -85,9 +85,9 @@ final dashboardKpisProvider = Provider<List<DashboardKpi>>((ref) {
   final loansAsync = ref.watch(loanListProvider);
   final accountingMetricsAsync = ref.watch(accountingDashboardMetricsProvider);
 
-  final customers = customersAsync.value ?? [];
-  final loans = loansAsync.value ?? [];
-  final acctMetrics = accountingMetricsAsync.value;
+  final customers = customersAsync.valueOrNull ?? [];
+  final loans = loansAsync.valueOrNull ?? [];
+  final acctMetrics = accountingMetricsAsync.valueOrNull;
 
   final activeCustomerCount = customers.where((c) => c.customerStatus == CustomerStatus.active).length;
 
@@ -166,7 +166,7 @@ final dashboardKpisProvider = Provider<List<DashboardKpi>>((ref) {
 
 final revenueChartDataProvider = Provider<List<KcChartDataPoint>>((ref) {
   final loansAsync = ref.watch(loanListProvider);
-  final loans = loansAsync.value ?? [];
+  final loans = loansAsync.valueOrNull ?? [];
   final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   final now = DateTime.now();
 
@@ -190,7 +190,7 @@ final revenueChartDataProvider = Provider<List<KcChartDataPoint>>((ref) {
 
 final loanDistributionChartProvider = Provider<List<KcDonutDataPoint>>((ref) {
   final ornamentsAsync = ref.watch(ornamentListProvider);
-  final ornaments = ornamentsAsync.value ?? [];
+  final ornaments = ornamentsAsync.valueOrNull ?? [];
 
   int k24Count = 0;
   int k22Count = 0;
@@ -228,7 +228,7 @@ final loanDistributionChartProvider = Provider<List<KcDonutDataPoint>>((ref) {
 
 final monthlyTransactionsChartProvider = Provider<List<KcChartDataPoint>>((ref) {
   final loansAsync = ref.watch(loanListProvider);
-  final loans = loansAsync.value ?? [];
+  final loans = loansAsync.valueOrNull ?? [];
   final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   final Map<int, int> monthlyCounts = {for (var i = 1; i <= 12; i++) i: 0};
@@ -254,8 +254,8 @@ final dashboardActivitiesProvider = Provider<List<DashboardActivity>>((ref) {
   final loansAsync = ref.watch(loanListProvider);
   final customersAsync = ref.watch(customerListProvider);
 
-  final loans = loansAsync.value ?? [];
-  final customers = customersAsync.value ?? [];
+  final loans = loansAsync.valueOrNull ?? [];
+  final customers = customersAsync.valueOrNull ?? [];
   final List<DashboardActivity> activities = [];
 
   for (final l in loans) {
@@ -302,8 +302,8 @@ final storeBusinessHealthProvider = Provider<StoreBusinessHealth>((ref) {
   final loansAsync = ref.watch(loanListProvider);
   final ornamentsAsync = ref.watch(ornamentListProvider);
 
-  final loans = loansAsync.value ?? [];
-  final ornaments = ornamentsAsync.value ?? [];
+  final loans = loansAsync.valueOrNull ?? [];
+  final ornaments = ornamentsAsync.valueOrNull ?? [];
 
   if (loans.isEmpty && ornaments.isEmpty) {
     return const StoreBusinessHealth(
@@ -348,8 +348,8 @@ class DashboardTasksNotifier extends StateNotifier<List<DashboardTask>> {
   final Ref ref;
 
   void loadTasks() {
-    final loans = ref.read(loanListProvider).value ?? [];
-    final customers = ref.read(customerListProvider).value ?? [];
+    final loans = ref.read(loanListProvider).valueOrNull ?? [];
+    final customers = ref.read(customerListProvider).valueOrNull ?? [];
     final pendingKyc = customers.where((c) => c.kycStatus == CustomerKycStatus.pending).length;
     final overdueCount = loans.where((l) => l.status == LoanStatus.overdue).length;
 

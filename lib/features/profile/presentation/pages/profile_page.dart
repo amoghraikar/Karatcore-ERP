@@ -63,68 +63,126 @@ class _ProfilePageState extends ConsumerState<ProfilePage> with SingleTickerProv
         // Profile Header Card
         KcCard(
           padding: const EdgeInsets.all(24),
-          child: Row(
-            children: [
-              KcAvatar(initials: initials, size: 72),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
+          child: context.isMobile
+              ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Text(
-                          user?.name ?? 'Arjun Rathore',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
+                        KcAvatar(initials: initials, size: 64),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user?.name ?? 'Arjun Rathore',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                               ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: KcColors.gold500.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: KcColors.gold500.withValues(alpha: 0.3)),
-                          ),
-                          child: Text(
-                            user?.role.label.toUpperCase() ?? 'OWNER',
-                            style: const TextStyle(
-                              color: KcColors.gold500,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                            ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: KcColors.gold500.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: KcColors.gold500.withValues(alpha: 0.3)),
+                                ),
+                                child: Text(
+                                  user?.role.label.toUpperCase() ?? 'OWNER',
+                                  style: const TextStyle(color: KcColors.gold500, fontSize: 10, fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
                     Text(
                       '${user?.email ?? "arjun@karatcore.com"} • ${user?.phone ?? "+91 98200 12345"}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Assigned Branch: ${user?.branch?.name ?? "Main Branch (Bandra)"}',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: KcOutlinedButton(
+                        label: 'Lock Session',
+                        icon: Icons.lock_outline_rounded,
+                        onPressed: () {
+                          ref.read(authStateProvider.notifier).lockSession();
+                          context.go(AppRoutes.locked);
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    KcAvatar(initials: initials, size: 72),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                user?.name ?? 'Arjun Rathore',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: KcColors.gold500.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: KcColors.gold500.withValues(alpha: 0.3)),
+                                ),
+                                child: Text(
+                                  user?.role.label.toUpperCase() ?? 'OWNER',
+                                  style: const TextStyle(
+                                    color: KcColors.gold500,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${user?.email ?? "arjun@karatcore.com"} • ${user?.phone ?? "+91 98200 12345"}',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Assigned Branch: ${user?.branch?.name ?? "Main Branch (Bandra)"}',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    KcOutlinedButton(
+                      label: 'Lock Session',
+                      icon: Icons.lock_outline_rounded,
+                      onPressed: () {
+                        ref.read(authStateProvider.notifier).lockSession();
+                        context.go(AppRoutes.locked);
+                      },
                     ),
                   ],
                 ),
-              ),
-              KcOutlinedButton(
-                label: 'Lock Session',
-                icon: Icons.lock_outline_rounded,
-                onPressed: () {
-                  ref.read(authStateProvider.notifier).lockSession();
-                  context.go(AppRoutes.locked);
-                },
-              ),
-            ],
-          ),
         ),
         const SizedBox(height: 20),
 
@@ -142,7 +200,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> with SingleTickerProv
         const SizedBox(height: 20),
 
         SizedBox(
-          height: 600,
+          height: 650,
           child: TabBarView(
             controller: _tabController,
             children: [
@@ -159,21 +217,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> with SingleTickerProv
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(child: KcTextField(label: 'Full Name', hintText: user?.name ?? 'Arjun Rathore')),
-                            const SizedBox(width: 16),
-                            Expanded(child: KcTextField(label: 'Email Address', hintText: user?.email ?? 'arjun@karatcore.com')),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(child: KcTextField(label: 'Mobile Phone', hintText: user?.phone ?? '+91 98200 12345')),
-                            const SizedBox(width: 16),
-                            Expanded(child: KcTextField(label: 'Role Scope', hintText: user?.role.label ?? 'Owner')),
-                          ],
-                        ),
+                        if (context.isMobile) ...[
+                          KcTextField(label: 'Full Name', hintText: user?.name ?? 'Arjun Rathore'),
+                          const SizedBox(height: 14),
+                          KcTextField(label: 'Email Address', hintText: user?.email ?? 'arjun@karatcore.com'),
+                          const SizedBox(height: 14),
+                          KcTextField(label: 'Mobile Phone', hintText: user?.phone ?? '+91 98200 12345'),
+                          const SizedBox(height: 14),
+                          KcTextField(label: 'Role Scope', hintText: user?.role.label ?? 'Owner'),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Expanded(child: KcTextField(label: 'Full Name', hintText: user?.name ?? 'Arjun Rathore')),
+                              const SizedBox(width: 16),
+                              Expanded(child: KcTextField(label: 'Email Address', hintText: user?.email ?? 'arjun@karatcore.com')),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(child: KcTextField(label: 'Mobile Phone', hintText: user?.phone ?? '+91 98200 12345')),
+                              const SizedBox(width: 16),
+                              Expanded(child: KcTextField(label: 'Role Scope', hintText: user?.role.label ?? 'Owner')),
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: 24),
                         KcPrimaryButton(
                           label: 'Save Profile Changes',

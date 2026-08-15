@@ -12,7 +12,9 @@ from app.api.routes.health import router as health_router
 from app.api.routes.kyc import router as owner_kyc_router
 from app.api.routes.loans import router as loan_router
 from app.api.routes.payments import router as payment_router
+from app.api.routes.settings import router as settings_router
 from app.api.routes.webhooks import router as webhook_router
+
 from app.core.config import settings
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 import app.models  # Register all declarative models
@@ -53,6 +55,7 @@ app.include_router(payment_router, prefix=settings.API_V1_STR)
 app.include_router(accounting_router, prefix=settings.API_V1_STR)
 app.include_router(owner_kyc_router, prefix=settings.API_V1_STR)
 app.include_router(export_router, prefix=settings.API_V1_STR)
+app.include_router(settings_router, prefix=settings.API_V1_STR)
 app.include_router(webhook_router, prefix=settings.API_V1_STR)
 app.include_router(customer_portal_router, prefix=settings.API_V1_STR)
 app.include_router(customer_kyc_router, prefix=settings.API_V1_STR)

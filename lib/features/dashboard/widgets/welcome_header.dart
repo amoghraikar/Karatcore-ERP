@@ -12,7 +12,7 @@ class WelcomeHeader extends ConsumerWidget {
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
     final authState = ref.watch(authStateProvider);
-    final userName = authState.session?.name;
+    final userName = authState.session?.name ?? 'Store Owner';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +24,7 @@ class WelcomeHeader extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userName != null ? 'Welcome back, $userName' : 'Welcome to KaratCore',
+                    'Welcome back, $userName',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,

@@ -627,6 +627,12 @@ class _AppShellState extends ConsumerState<_AppShell> {
     // Mobile layout
     return Scaffold(
       appBar: const KcTopBar(),
+      drawer: Drawer(
+        child: KcSidebar(
+          currentPath: widget.currentPath,
+          isCollapsed: false,
+        ),
+      ),
       body: widget.child,
       bottomNavigationBar: KcBottomNavigation(currentPath: widget.currentPath),
     );

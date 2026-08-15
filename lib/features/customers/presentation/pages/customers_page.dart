@@ -11,6 +11,8 @@ import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
+import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 import '../../models/customer_model.dart';
 import '../../providers/customer_providers.dart';
 import '../../repository/customer_repository.dart';
@@ -60,34 +62,15 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
           padding: EdgeInsets.all(context.pageGutter),
           children: [
             // Page Header Row
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Customer Management & CRM',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Central customer directory, KYC compliance, pledged portfolio, and audit records.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+            KcPageHeader(
+              title: 'Customer Management & CRM',
+              subtitle: 'Central customer directory, KYC compliance, pledged portfolio, and audit records.',
+              actions: [
                 KcPrimaryButton(
                   label: 'Add Customer',
                   icon: Icons.person_add_alt_1_rounded,
                   onPressed: () => context.go(AppRoutes.customerCreate),
                 ),
-                const SizedBox(width: 10),
                 KcOutlinedButton(
                   label: 'Customer Reports',
                   icon: Icons.bar_chart_rounded,
@@ -177,88 +160,50 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
             const SizedBox(height: 24),
 
             // Search Bar & Filter Bar
-            Card(
-              elevation: 0,
-              color: scheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _onSearchChanged,
-                            decoration: InputDecoration(
-                              hintText: 'Search by Name, Mobile, Customer ID, Email, PAN, Aadhaar, Loan ID...',
-                              prefixIcon: const Icon(Icons.search_rounded),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _onSearchChanged('');
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: scheme.surface,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Filter Action Button
-                        Badge(
-                          isLabelVisible: !activeFilters.isEmpty,
-                          label: const Text('•'),
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            ),
-                            icon: const Icon(Icons.filter_list_rounded, size: 18),
-                            label: Text(context.isMobile ? 'Filter' : 'Filters'),
-                            onPressed: () => showCustomerFilterSheet(context),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Sort Dropdown
-                        DropdownButtonHideUnderline(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
-                            ),
-                            child: DropdownButton<CustomerSortOption>(
-                              value: currentSort,
-                              icon: const Icon(Icons.sort_rounded, size: 18),
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              onChanged: (sort) {
-                                if (sort != null) {
-                                  ref.read(customerListProvider.notifier).updateSort(sort);
-                                }
-                              },
-                              items: CustomerSortOption.values.map((sort) {
-                                return DropdownMenuItem(
-                                  value: sort,
-                                  child: Text(sort.label),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            KcSearchBarFilter(
+              searchController: _searchController,
+              hintText: 'Search by Name, Mobile, ID, Email, PAN, Aadhaar...',
+              onSearchChanged: _onSearchChanged,
+              filterButton: Badge(
+                isLabelVisible: !activeFilters.isEmpty,
+                label: const Text('•'),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  ),
+                  icon: const Icon(Icons.filter_list_rounded, size: 18),
+                  label: const Text('Filters'),
+                  onPressed: () => showCustomerFilterSheet(context),
+                ),
+              ),
+              sortDropdown: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
+                  ),
+                  child: DropdownButton<CustomerSortOption>(
+                    value: currentSort,
+                    isExpanded: true,
+                    icon: const Icon(Icons.sort_rounded, size: 18),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    onChanged: (sort) {
+                      if (sort != null) {
+                        ref.read(customerListProvider.notifier).updateSort(sort);
+                      }
+                    },
+                    items: CustomerSortOption.values.map((sort) {
+                      return DropdownMenuItem(
+                        value: sort,
+                        child: Text(sort.label, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
 
                     // Quick Filter Chips Row
                     if (!activeFilters.isEmpty) ...[
@@ -319,10 +264,6 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                         ],
                       ),
                     ],
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Main Data List / Table Content

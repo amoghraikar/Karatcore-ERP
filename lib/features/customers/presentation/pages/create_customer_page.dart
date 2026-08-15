@@ -336,80 +336,127 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
       children: [
         Text('STEP 1: BASIC CUSTOMER INFORMATION', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: 0.5)),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: KcTextField(
-                controller: _firstNameController,
-                label: 'First Name *',
-                hintText: 'e.g. Rahul',
-                prefixIcon: const Icon(Icons.person_rounded),
+        if (context.isMobile) ...[
+          KcTextField(controller: _firstNameController, label: 'First Name *', hintText: 'e.g. Rahul', prefixIcon: const Icon(Icons.person_rounded)),
+          const SizedBox(height: 14),
+          KcTextField(controller: _middleNameController, label: 'Middle Name', hintText: 'e.g. Kumar'),
+          const SizedBox(height: 14),
+          KcTextField(controller: _lastNameController, label: 'Last Name *', hintText: 'e.g. Sharma'),
+        ] else ...[
+          Row(
+            children: [
+              Expanded(
+                child: KcTextField(
+                  controller: _firstNameController,
+                  label: 'First Name *',
+                  hintText: 'e.g. Rahul',
+                  prefixIcon: const Icon(Icons.person_rounded),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: KcTextField(
-                controller: _middleNameController,
-                label: 'Middle Name',
-                hintText: 'e.g. Kumar',
+              const SizedBox(width: 12),
+              Expanded(
+                child: KcTextField(
+                  controller: _middleNameController,
+                  label: 'Middle Name',
+                  hintText: 'e.g. Kumar',
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: KcTextField(
-                controller: _lastNameController,
-                label: 'Last Name *',
-                hintText: 'e.g. Sharma',
+              const SizedBox(width: 12),
+              Expanded(
+                child: KcTextField(
+                  controller: _lastNameController,
+                  label: 'Last Name *',
+                  hintText: 'e.g. Sharma',
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Customer Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: CustomerType.values.map((type) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: ChoiceChip(
-                          avatar: Icon(type.icon, size: 16),
-                          label: Text(type.label),
-                          selected: _customerType == type,
-                          onSelected: (val) => setState(() => _customerType = type),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+        if (context.isMobile) ...[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Customer Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: CustomerType.values.map((type) {
+                  return ChoiceChip(
+                    avatar: Icon(type.icon, size: 16),
+                    label: Text(type.label),
+                    selected: _customerType == type,
+                    onSelected: (val) => setState(() => _customerType = type),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Gender', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: _gender,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                onChanged: (val) => setState(() => _gender = val ?? 'Male'),
+                items: const [
+                  DropdownMenuItem(value: 'Male', child: Text('Male')),
+                  DropdownMenuItem(value: 'Female', child: Text('Female')),
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
                 ],
               ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Gender', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    initialValue: _gender,
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
-                    onChanged: (val) => setState(() => _gender = val ?? 'Male'),
-                    items: const [
-                      DropdownMenuItem(value: 'Male', child: Text('Male')),
-                      DropdownMenuItem(value: 'Female', child: Text('Female')),
-                      DropdownMenuItem(value: 'Other', child: Text('Other')),
-                    ],
-                  ),
-                ],
+            ],
+          ),
+        ] else ...[
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Customer Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: CustomerType.values.map((type) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: ChoiceChip(
+                            avatar: Icon(type.icon, size: 16),
+                            label: Text(type.label),
+                            selected: _customerType == type,
+                            onSelected: (val) => setState(() => _customerType = type),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      initialValue: _gender,
+                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      onChanged: (val) => setState(() => _gender = val ?? 'Male'),
+                      items: const [
+                        DropdownMenuItem(value: 'Male', child: Text('Male')),
+                        DropdownMenuItem(value: 'Female', child: Text('Female')),
+                        DropdownMenuItem(value: 'Other', child: Text('Other')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
         const SizedBox(height: 24),
         _buildNavigationButtons(),
       ],
@@ -615,8 +662,8 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
               label: 'Back to Customer Directory',
               onPressed: () => context.go(AppRoutes.customers),
             ),
-            const SizedBox(width: 16),
-            KcPrimaryButton(
+            const SizedBox(width: 12),
+            KcOutlinedButton(
               label: 'View Customer Profile',
               icon: Icons.visibility_rounded,
               onPressed: () {
@@ -624,6 +671,18 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
                   context.go('/customers/${_createdCustomer!.id}');
                 } else {
                   context.go(AppRoutes.customers);
+                }
+              },
+            ),
+            const SizedBox(width: 12),
+            KcPrimaryButton(
+              label: 'Proceed to KYC Verification',
+              icon: Icons.verified_user_rounded,
+              onPressed: () {
+                if (_createdCustomer != null) {
+                  context.go('/kyc/${_createdCustomer!.id}/start');
+                } else {
+                  context.go(AppRoutes.kyc);
                 }
               },
             ),

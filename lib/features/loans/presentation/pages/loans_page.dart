@@ -11,6 +11,8 @@ import '../../../../shared/widgets/cards/kc_metric_card.dart';
 import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
+import '../../../../shared/widgets/navigation/kc_page_header.dart';
+import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 
 import '../../providers/loan_providers.dart';
 import '../../repository/loan_repository.dart';
@@ -63,34 +65,15 @@ class _LoansPageState extends ConsumerState<LoansPage> {
           padding: EdgeInsets.all(context.pageGutter),
           children: [
             // Page Header
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Pledge & Gold/Silver Loans',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Secured precious-metal lending, KYC verified customer pledges, interest accruals, repayments, full settlements, and collateral releases.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+            KcPageHeader(
+              title: 'Pledge & Gold/Silver Loans',
+              subtitle: 'Secured precious-metal lending, KYC verified customer pledges, interest accruals, repayments, full settlements, and collateral releases.',
+              actions: [
                 KcPrimaryButton(
                   label: 'New Loan & Pledge',
                   icon: Icons.add_rounded,
                   onPressed: () => context.go('/loans/create'),
                 ),
-                const SizedBox(width: 10),
                 KcOutlinedButton(
                   label: 'Loan Reports',
                   icon: Icons.bar_chart_rounded,
@@ -185,150 +168,167 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                 children: [
                   Text('Loan Portfolio & Collateral Analytics (Mock Summary)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  if (context.isMobile) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Collateral Distribution', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Collateral Distribution', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Gold Collateral Loans', style: TextStyle(fontSize: 13)),
-                                  Text('83.4%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Silver Collateral Loans', style: TextStyle(fontSize: 13)),
-                                  Text('16.6%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
-                                ],
-                              ),
+                              Text('Gold Collateral Loans', style: TextStyle(fontSize: 13)),
+                              Text('83.4%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
                             ],
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Loan Health Performance', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Current On-Time Loans', style: TextStyle(fontSize: 13)),
-                                  Text('92.1%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Overdue Interest Accounts', style: TextStyle(fontSize: 13)),
-                                  Text('7.9%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
-                                ],
-                              ),
+                              Text('Silver Collateral Loans', style: TextStyle(fontSize: 13)),
+                              Text('16.6%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
                             ],
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Loan Health Performance', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Current On-Time Loans', style: TextStyle(fontSize: 13)),
+                              Text('92.1%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Overdue Interest Accounts', style: TextStyle(fontSize: 13)),
+                              Text('7.9%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Collateral Distribution', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Gold Collateral Loans', style: TextStyle(fontSize: 13)),
+                                    Text('83.4%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Silver Collateral Loans', style: TextStyle(fontSize: 13)),
+                                    Text('16.6%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Loan Health Performance', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Current On-Time Loans', style: TextStyle(fontSize: 13)),
+                                    Text('92.1%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Overdue Interest Accounts', style: TextStyle(fontSize: 13)),
+                                    Text('7.9%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // Search Bar & Filter Controls
-            Card(
-              elevation: 0,
-              color: scheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _onSearchChanged,
-                            decoration: InputDecoration(
-                              hintText: 'Search Loans by Loan ID (KC-LN-xxx), Customer Name, Customer ID, Mobile, or Pledge ID...',
-                              prefixIcon: const Icon(Icons.search_rounded),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _onSearchChanged('');
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: scheme.surface,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Filter Button
-                        Badge(
-                          isLabelVisible: !activeFilters.isEmpty,
-                          label: const Text('•'),
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
-                            icon: const Icon(Icons.filter_list_rounded, size: 18),
-                            label: Text(context.isMobile ? 'Filter' : 'Filters'),
-                            onPressed: () => showLoanFilterSheet(context),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Sort Dropdown
-                        DropdownButtonHideUnderline(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
-                            ),
-                            child: DropdownButton<LoanSortOption>(
-                              value: currentSort,
-                              icon: const Icon(Icons.sort_rounded, size: 18),
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              onChanged: (sort) {
-                                if (sort != null) {
-                                  ref.read(loanListProvider.notifier).updateSort(sort);
-                                }
-                              },
-                              items: LoanSortOption.values.map((sort) {
-                                return DropdownMenuItem(value: sort, child: Text(sort.label));
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            KcSearchBarFilter(
+              searchController: _searchController,
+              hintText: 'Search Loans by Loan ID, Customer Name, Mobile, or Pledge ID...',
+              onSearchChanged: _onSearchChanged,
+              filterButton: Badge(
+                isLabelVisible: !activeFilters.isEmpty,
+                label: const Text('•'),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+                  icon: const Icon(Icons.filter_list_rounded, size: 18),
+                  label: const Text('Filters'),
+                  onPressed: () => showLoanFilterSheet(context),
+                ),
+              ),
+              sortDropdown: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outline.withValues(alpha: 0.4)),
+                  ),
+                  child: DropdownButton<LoanSortOption>(
+                    value: currentSort,
+                    isExpanded: true,
+                    icon: const Icon(Icons.sort_rounded, size: 18),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    onChanged: (sort) {
+                      if (sort != null) {
+                        ref.read(loanListProvider.notifier).updateSort(sort);
+                      }
+                    },
+                    items: LoanSortOption.values.map((sort) {
+                      return DropdownMenuItem(value: sort, child: Text(sort.label, overflow: TextOverflow.ellipsis));
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
 
                     // Filter Chips
                     if (!activeFilters.isEmpty) ...[
@@ -387,10 +387,6 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                         ],
                       ),
                     ],
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Loan List / Table

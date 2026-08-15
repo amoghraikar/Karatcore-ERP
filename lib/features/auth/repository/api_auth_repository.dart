@@ -17,26 +17,34 @@ class ApiAuthRepository implements IAuthRepository {
     required UserRole role,
   }) {
     final sub = (data['sub'] ?? '').toString();
-    final name = (data['full_name'] ?? sub).toString();
+    final rawName = (data['full_name'] ?? data['name'] ?? '').toString().trim();
+    final rawStoreName = (data['store_name'] ?? data['business_name'] ?? '').toString().trim();
     final phone = (data['phone'] ?? '').toString();
     final customerId = data['customer_id']?.toString();
+
+    final displayName = rawName.isNotEmpty
+        ? rawName
+        : (phone.isNotEmpty ? phone : (sub.isNotEmpty ? sub : 'Store Owner'));
 
     final id = role == UserRole.customer
         ? (customerId ?? sub)
         : (customerId ?? sub);
 
+    final storeTitle = rawStoreName.isNotEmpty ? rawStoreName : _defaultStoreName;
+
     return UserSession(
-      id: id,
-      name: name,
+      id: id.isNotEmpty ? id : 'OWN-101',
+      name: displayName,
       role: role,
-      email: sub,
-      phone: phone,
+      email: sub.contains('@') ? sub : '',
+      phone: phone.isNotEmpty ? phone : (sub.contains('@') ? '' : sub),
+      storeName: rawStoreName.isNotEmpty ? rawStoreName : null,
       is2faEnabled: false,
-      branch: const BranchModel(
+      branch: BranchModel(
         id: 'MAIN-STORE',
-        name: _defaultStoreName,
-        location: '',
-        city: '',
+        name: storeTitle,
+        location: 'Main Market',
+        city: 'Headquarters',
         status: 'Active',
         lastAccessed: 'Just now',
         isMainBranch: true,
@@ -58,37 +66,16 @@ class ApiAuthRepository implements IAuthRepository {
       );
     }
 
-    try {
-      final dynamic data = await _api.post(
-        ApiEndpoints.ownerLogin,
-        body: {'username': emailOrPhone.trim(), 'password': password},
-      );
+    final dynamic data = await _api.post(
+      ApiEndpoints.ownerLogin,
+      body: {'username': emailOrPhone.trim(), 'password': password},
+    );
 
-      _api.setToken(data['access_token']?.toString() ?? 'local_token');
-      return _sessionFromResponse(
-        Map<String, dynamic>.from(data as Map),
-        role: role,
-      );
-    } catch (_) {
-      _api.setToken('local_owner_token_${DateTime.now().millisecondsSinceEpoch}');
-      return UserSession(
-        id: 'OWN-101',
-        name: emailOrPhone.contains('@') ? emailOrPhone.split('@').first : emailOrPhone,
-        role: role,
-        email: emailOrPhone,
-        phone: '',
-        is2faEnabled: false,
-        branch: const BranchModel(
-          id: 'MAIN-STORE',
-          name: _defaultStoreName,
-          location: 'Main Market',
-          city: 'Headquarters',
-          status: 'Active',
-          lastAccessed: 'Just now',
-          isMainBranch: true,
-        ),
-      );
-    }
+    _api.setToken(data['access_token']?.toString() ?? '');
+    return _sessionFromResponse(
+      Map<String, dynamic>.from(data as Map),
+      role: role,
+    );
   }
 
   @override
@@ -99,43 +86,22 @@ class ApiAuthRepository implements IAuthRepository {
     required String phone,
     required String password,
   }) async {
-    try {
-      final data = await _api.post(
-        ApiEndpoints.ownerRegister,
-        body: {
-          'full_name': fullName,
-          'business_name': businessName,
-          'email': email,
-          'phone': phone,
-          'password': password,
-        },
-      );
+    final dynamic data = await _api.post(
+      ApiEndpoints.ownerRegister,
+      body: {
+        'full_name': fullName,
+        'business_name': businessName,
+        'email': email,
+        'phone': phone,
+        'password': password,
+      },
+    );
 
-      _api.setToken(data['access_token']?.toString() ?? 'local_owner_token_${DateTime.now().millisecondsSinceEpoch}');
-      return _sessionFromResponse(
-        Map<String, dynamic>.from(data as Map),
-        role: UserRole.owner,
-      );
-    } catch (_) {
-      _api.setToken('local_owner_token_${DateTime.now().millisecondsSinceEpoch}');
-      return UserSession(
-        id: 'OWN-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-        name: fullName.trim().isNotEmpty ? fullName.trim() : 'Store Owner',
-        role: UserRole.owner,
-        email: email.trim(),
-        phone: phone.trim(),
-        is2faEnabled: false,
-        branch: BranchModel(
-          id: 'MAIN-STORE',
-          name: businessName.trim().isNotEmpty ? businessName.trim() : _defaultStoreName,
-          location: 'Main Market',
-          city: 'Headquarters',
-          status: 'Active',
-          lastAccessed: 'Just now',
-          isMainBranch: true,
-        ),
-      );
-    }
+    _api.setToken(data['access_token']?.toString() ?? '');
+    return _sessionFromResponse(
+      Map<String, dynamic>.from(data as Map),
+      role: UserRole.owner,
+    );
   }
 
   @override

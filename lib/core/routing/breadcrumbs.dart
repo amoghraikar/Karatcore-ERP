@@ -114,7 +114,16 @@ void updateBreadcrumbsForPath(WidgetRef ref, String path) {
   } else if (path.startsWith(AppRoutes.notifications)) {
     items.add(const BreadcrumbItem(label: 'Notifications'));
   } else if (path.startsWith(AppRoutes.settings)) {
-    items.add(const BreadcrumbItem(label: 'Settings'));
+    items.add(const BreadcrumbItem(label: 'Store Settings', path: AppRoutes.settings));
+    if (path.contains('/business')) {
+      items.add(const BreadcrumbItem(label: 'Business Profile'));
+    } else if (path.contains('/security')) {
+      items.add(const BreadcrumbItem(label: 'Security & Access'));
+    } else if (path.contains('/financial')) {
+      items.add(const BreadcrumbItem(label: 'Financial Rates & LTV'));
+    } else if (path.contains('/notifications')) {
+      items.add(const BreadcrumbItem(label: 'Notifications & Alerts'));
+    }
   } else if (path.startsWith(AppRoutes.profile)) {
     items.add(const BreadcrumbItem(label: 'User Profile'));
   } else if (path.startsWith(AppRoutes.help)) {

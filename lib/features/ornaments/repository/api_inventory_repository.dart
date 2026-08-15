@@ -10,19 +10,34 @@ class ApiInventoryRepository implements IInventoryRepository {
 
   @override
   Future<InventoryDashboardMetrics> getDashboardMetrics() async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/inventory/metrics');
-    return InventoryDashboardMetrics(
-      totalOrnamentsCount: data['total_ornaments_count'] as int,
-      totalGoldWeightGrams: (data['total_gold_weight_grams'] as num).toDouble(),
-      totalSilverWeightGrams: (data['total_silver_weight_grams'] as num).toDouble(),
-      totalGrossWeightGrams: (data['total_gross_weight_grams'] as num).toDouble(),
-      totalNetMetalWeightGrams: (data['total_net_metal_weight_grams'] as num).toDouble(),
-      availableStockCount: data['available_stock_count'] as int,
-      pledgedStockCount: data['pledged_stock_count'] as int,
-      soldReleasedCount: data['sold_released_count'] as int,
-      totalEstimatedValue: (data['total_estimated_value'] as num).toDouble(),
-      attentionItemsCount: data['attention_items_count'] as int,
-    );
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/inventory/metrics');
+      return InventoryDashboardMetrics(
+        totalOrnamentsCount: (data['total_ornaments_count'] as int?) ?? 0,
+        totalGoldWeightGrams: (data['total_gold_weight_grams'] as num?)?.toDouble() ?? 0.0,
+        totalSilverWeightGrams: (data['total_silver_weight_grams'] as num?)?.toDouble() ?? 0.0,
+        totalGrossWeightGrams: (data['total_gross_weight_grams'] as num?)?.toDouble() ?? 0.0,
+        totalNetMetalWeightGrams: (data['total_net_metal_weight_grams'] as num?)?.toDouble() ?? 0.0,
+        availableStockCount: (data['available_stock_count'] as int?) ?? 0,
+        pledgedStockCount: (data['pledged_stock_count'] as int?) ?? 0,
+        soldReleasedCount: (data['sold_released_count'] as int?) ?? 0,
+        totalEstimatedValue: (data['total_estimated_value'] as num?)?.toDouble() ?? 0.0,
+        attentionItemsCount: (data['attention_items_count'] as int?) ?? 0,
+      );
+    } catch (_) {
+      return const InventoryDashboardMetrics(
+        totalOrnamentsCount: 0,
+        totalGoldWeightGrams: 0.0,
+        totalSilverWeightGrams: 0.0,
+        totalGrossWeightGrams: 0.0,
+        totalNetMetalWeightGrams: 0.0,
+        availableStockCount: 0,
+        pledgedStockCount: 0,
+        soldReleasedCount: 0,
+        totalEstimatedValue: 0.0,
+        attentionItemsCount: 0,
+      );
+    }
   }
 
   @override
@@ -31,10 +46,17 @@ class ApiInventoryRepository implements IInventoryRepository {
     InventoryFilterParams? filters,
     InventorySortOption? sortOption,
   }) async {
-    final dynamic data = await _api.get(
-      '${ApiEndpoints.loans}/ornaments?search=${Uri.encodeComponent(searchQuery ?? '')}',
-    );
-    return _parseOrnamentsFromJson(data as List);
+    try {
+      final dynamic data = await _api.get(
+        '${ApiEndpoints.loans}/ornaments?search=${Uri.encodeComponent(searchQuery ?? '')}',
+      );
+      if (data is List) {
+        return _parseOrnamentsFromJson(data);
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
   }
 
   @override
@@ -49,8 +71,15 @@ class ApiInventoryRepository implements IInventoryRepository {
 
   @override
   Future<List<OrnamentModel>> getOrnamentsByCustomerId(String customerId) async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/customer/$customerId');
-    return _parseOrnamentsFromJson(data as List);
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/ornaments/customer/$customerId');
+      if (data is List) {
+        return _parseOrnamentsFromJson(data);
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
   }
 
   @override

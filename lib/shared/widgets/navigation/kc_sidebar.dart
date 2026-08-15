@@ -115,7 +115,12 @@ class KcSidebar extends ConsumerWidget {
                           item: item,
                           selected: currentPath.startsWith(item.path),
                           isCollapsed: isCollapsed,
-                          onTap: () => context.go(item.path),
+                          onTap: () {
+                            if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+                              Navigator.pop(context);
+                            }
+                            context.go(item.path);
+                          },
                         ),
                   ],
                 ],

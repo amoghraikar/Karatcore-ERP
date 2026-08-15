@@ -61,7 +61,10 @@ class _ChartOfAccountsPageState extends ConsumerState<ChartOfAccountsPage> with 
                   if (val != null) {
                     setState(() {
                       selectedType = val;
-                      selectedCategory = AccountCategory.values.firstWhere((c) => c.type == val);
+                      selectedCategory = AccountCategory.values.firstWhere(
+                        (c) => c.type == val,
+                        orElse: () => AccountCategory.cash,
+                      );
                     });
                   }
                 },

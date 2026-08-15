@@ -21,6 +21,7 @@ class TokenResponse(BaseModel):
     user_type: str
     sub: str
     full_name: Optional[str] = None
+    store_name: Optional[str] = None
     phone: Optional[str] = None
     customer_id: Optional[str] = None
 

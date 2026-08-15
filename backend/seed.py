@@ -18,21 +18,23 @@ from app.models.pledge import Pledge
 
 def seed_database():
     print("🌱 Initializing KaratCore Database Seed Data...")
-    Base.metadata.create_all(bind=engine)
+    from app.core.config import settings
+    if settings.DATABASE_URL.startswith("sqlite"):
+        Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     try:
         # 1. Seed Owner
         if not db.query(Owner).filter(Owner.email == "owner@karatcore.com").first():
             owner = Owner(
-                full_name="Rajesh Verma (Store Owner)",
+                full_name="Store Owner",
                 email="owner@karatcore.com",
                 phone="+91 98200 00000",
                 password_hash=hash_password("password123"),
                 status="ACTIVE",
             )
             db.add(owner)
-            print("  ✓ Created Owner: Rajesh Verma (owner@karatcore.com / password123)")
+            print("  ✓ Created Owner: Store Owner (owner@karatcore.com / password123)")
 
         # 2. Seed Customers (Customer A & Customer B)
         cust_a = db.query(Customer).filter(Customer.id == "KC-CUS-000101").first()

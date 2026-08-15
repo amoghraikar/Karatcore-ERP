@@ -267,10 +267,23 @@ class _CreateJournalEntryPageState extends ConsumerState<CreateJournalEntryPage>
           loading: () => const KcSkeletonLoader(height: 200),
           error: (err, st) => Text('Error loading accounts: $err'),
           data: (accounts) {
+            if (accounts.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text('No accounts available in Chart of Accounts. Please create accounts first.'),
+                ),
+              );
+            }
+
             return Column(
               children: _lines.asMap().entries.map((entry) {
                 final idx = entry.key;
                 final line = entry.value;
+
+                final String? selectedAccountId = accounts.any((a) => a.id == line.accountId)
+                    ? line.accountId
+                    : (accounts.isNotEmpty ? accounts.first.id : null);
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -290,11 +303,11 @@ class _CreateJournalEntryPageState extends ConsumerState<CreateJournalEntryPage>
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          initialValue: accounts.any((a) => a.id == line.accountId) ? line.accountId : accounts.first.id,
+                          initialValue: selectedAccountId,
                           decoration: const InputDecoration(labelText: 'Target Account', border: OutlineInputBorder()),
                           onChanged: (val) {
-                            if (val != null) {
-                              final acc = accounts.firstWhere((a) => a.id == val);
+                            if (val != null && accounts.isNotEmpty) {
+                              final acc = accounts.firstWhere((a) => a.id == val, orElse: () => accounts.first);
                               setState(() {
                                 line.accountId = acc.id;
                                 line.accountName = acc.name;

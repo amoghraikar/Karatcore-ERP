@@ -69,11 +69,40 @@ class ApiCustomerRepository implements ICustomerRepository {
 
   @override
   Future<CustomerModel> updateCustomerStatus(String id, CustomerStatus status) async {
-    final dynamic data = await _api.post(
-      '${ApiEndpoints.customerById}$id/status',
-      body: {'status': status.name},
-    );
-    return _parseCustomerFromJson(data);
+    try {
+      final dynamic data = await _api.post(
+        '${ApiEndpoints.customerById}$id/status',
+        body: {'status': status.name},
+      );
+      return _parseCustomerFromJson(data);
+    } catch (_) {
+      final index = _localCustomers.indexWhere((c) => c.id == id);
+      if (index != -1) {
+        final updated = _localCustomers[index].copyWith(customerStatus: status);
+        _localCustomers[index] = updated;
+        return updated;
+      }
+      throw Exception('Customer not found');
+    }
+  }
+
+  @override
+  Future<CustomerModel> updateCustomerKycStatus(String id, CustomerKycStatus status) async {
+    try {
+      final dynamic data = await _api.post(
+        '${ApiEndpoints.customerById}$id/kyc-status',
+        body: {'kyc_status': status.name},
+      );
+      return _parseCustomerFromJson(data);
+    } catch (_) {
+      final index = _localCustomers.indexWhere((c) => c.id == id);
+      if (index != -1) {
+        final updated = _localCustomers[index].copyWith(kycStatus: status);
+        _localCustomers[index] = updated;
+        return updated;
+      }
+      throw Exception('Customer not found');
+    }
   }
 
   @override

@@ -44,3 +44,22 @@ def get_customer_by_id(
     if not customer:
         raise NotFoundError(f"Customer #{id} not found.")
     return APIResponse(data=CustomerResponse.model_validate(customer))
+
+
+@router.post("/{id}/kyc-status", response_model=APIResponse[CustomerResponse])
+def update_customer_kyc_status(
+    id: str,
+    payload: dict,
+    db: Session = Depends(get_db),
+    owner: Owner = Depends(get_current_owner),
+):
+    service = CustomerService(db)
+    customer = service.repo.get_by_id(id)
+    if not customer:
+        raise NotFoundError(f"Customer #{id} not found.")
+
+    status_str = payload.get("kyc_status", "VERIFIED").upper()
+    customer.kyc_status = status_str
+    db.commit()
+    db.refresh(customer)
+    return APIResponse(data=CustomerResponse.model_validate(customer), message="Customer KYC status updated successfully")
