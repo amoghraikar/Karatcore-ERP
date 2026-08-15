@@ -87,7 +87,6 @@ import '../../features/reports/presentation/pages/saved_report_detail_page.dart'
 import '../../features/security/presentation/pages/security_dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/settings_subpages.dart';
-import '../../features/showcase/presentation/pages/showcase_page.dart';
 
 import '../../shared/widgets/navigation/kc_bottom_navigation.dart';
 import '../../shared/widgets/navigation/kc_navigation_rail.dart';
@@ -213,10 +212,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.dashboard,
             builder: (context, state) => const DashboardPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.showcase,
-            builder: (context, state) => const ShowcasePage(),
           ),
           GoRoute(
             path: AppRoutes.customers,

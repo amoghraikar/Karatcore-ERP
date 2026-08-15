@@ -17,7 +17,6 @@ abstract final class KcIcons {
   static const IconData settings = Icons.settings_outlined;
   static const IconData profile = Icons.person_outline_rounded;
   static const IconData help = Icons.help_outline_rounded;
-  static const IconData showcase = Icons.widgets_outlined;
 
   // Actions
   static const IconData add = Icons.add_rounded;

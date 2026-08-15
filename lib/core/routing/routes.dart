@@ -106,7 +106,6 @@ abstract final class AppRoutes {
   static const security = '/security';
   static const profile = '/profile';
   static const help = '/help';
-  static const showcase = '/showcase';
 
   // Customer Portal Routes
   static const customerHome = '/customer';
@@ -156,7 +155,6 @@ abstract final class AppRoutes {
       items: [
         NavItem(label: 'Owner Profile', path: profile, icon: Icons.person_outline_rounded, selectedIcon: Icons.person_rounded),
         NavItem(label: 'Store Settings', path: settings, icon: Icons.settings_outlined, selectedIcon: Icons.settings_rounded),
-        NavItem(label: 'UI Kit Showcase', path: showcase, icon: Icons.widgets_outlined, selectedIcon: Icons.widgets_rounded),
         NavItem(label: 'Help & Docs', path: help, icon: Icons.help_outline_rounded, selectedIcon: Icons.help_rounded),
       ],
     ),
