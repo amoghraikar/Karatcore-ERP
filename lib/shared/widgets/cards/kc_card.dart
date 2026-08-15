@@ -31,24 +31,27 @@ class KcCard extends StatelessWidget {
       );
     }
 
-    if (border != null || color != null) {
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      return Container(
-        decoration: BoxDecoration(
-          color: color ?? (isDark ? Theme.of(context).colorScheme.surface : Colors.white),
-          borderRadius: BorderRadius.circular(12),
-          border: border ?? Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3)),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: content,
-        ),
-      );
-    }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
 
-    return Card(
-      color: color,
-      child: content,
+    return Container(
+      decoration: BoxDecoration(
+        color: color ?? scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: border ?? Border.all(color: scheme.outline.withValues(alpha: isDark ? 0.3 : 0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black.withValues(alpha: 0.3) : scheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: content,
+      ),
     );
   }
 }

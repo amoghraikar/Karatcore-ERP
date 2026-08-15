@@ -56,14 +56,17 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              'KaratCore',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
+            Expanded(
+              child: Text(
+                user?.storeName ?? user?.branch?.name ?? 'KaratCore ERP',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            const Spacer(),
             IconButton(
               onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
               icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
