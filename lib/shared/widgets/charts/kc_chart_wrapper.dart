@@ -23,7 +23,7 @@ abstract final class KcChartWrapper {
     double height = 220,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = lineColor ?? (isDark ? KcColors.pureWhite : KcColors.pitchBlack);
+    final primaryColor = lineColor ?? KcColors.emerald600;
 
     return SizedBox(
       height: height,
@@ -33,7 +33,7 @@ abstract final class KcChartWrapper {
             show: true,
             drawVerticalLine: false,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: isDark ? KcColors.carbon700 : KcColors.carbon200,
+              color: isDark ? KcColors.navy700.withValues(alpha: 0.5) : KcColors.slate200,
               strokeWidth: 1,
             ),
           ),
@@ -50,7 +50,10 @@ abstract final class KcChartWrapper {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         data[index].xLabel,
-                        style: Theme.of(context).textTheme.labelSmall,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: isDark ? KcColors.slate400 : KcColors.slate600,
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                     );
                   }
@@ -66,12 +69,27 @@ abstract final class KcChartWrapper {
                 for (int i = 0; i < data.length; i++) FlSpot(i.toDouble(), data[i].value),
               ],
               isCurved: true,
-              color: color,
-              barWidth: 2.5,
-              dotData: const FlDotData(show: false),
+              color: primaryColor,
+              barWidth: 3,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                  radius: 4,
+                  color: primaryColor,
+                  strokeWidth: 2,
+                  strokeColor: Colors.white,
+                ),
+              ),
               belowBarData: BarAreaData(
                 show: true,
-                color: color.withValues(alpha: 0.12),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    primaryColor.withValues(alpha: 0.28),
+                    primaryColor.withValues(alpha: 0.0),
+                  ],
+                ),
               ),
             ),
           ],
@@ -87,7 +105,7 @@ abstract final class KcChartWrapper {
     double height = 220,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = barColor ?? (isDark ? KcColors.pureWhite : KcColors.pitchBlack);
+    final primaryColor = barColor ?? KcColors.gold600;
 
     return SizedBox(
       height: height,
@@ -108,7 +126,10 @@ abstract final class KcChartWrapper {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         data[index].xLabel,
-                        style: Theme.of(context).textTheme.labelSmall,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: isDark ? KcColors.slate400 : KcColors.slate600,
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                     );
                   }
@@ -125,9 +146,16 @@ abstract final class KcChartWrapper {
                 barRods: [
                   BarChartRodData(
                     toY: data[i].value,
-                    color: color,
-                    width: 14,
-                    borderRadius: BorderRadius.circular(3),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        primaryColor,
+                        primaryColor.withValues(alpha: 0.6),
+                      ],
+                    ),
+                    width: 16,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                   ),
                 ],
               ),
