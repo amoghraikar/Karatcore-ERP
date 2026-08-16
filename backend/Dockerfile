@@ -35,7 +35,6 @@ RUN groupadd -g 10001 appgroup && \
 COPY --chown=appuser:appgroup app /app/app
 COPY --chown=appuser:appgroup alembic /app/alembic
 COPY --chown=appuser:appgroup alembic.ini /app/alembic.ini
-COPY --chown=appuser:appgroup seed.py /app/seed.py
 
 USER appuser
 
