@@ -138,8 +138,12 @@ class ApiInventoryRepository implements IInventoryRepository {
 
   @override
   Future<List<InventoryMovementModel>> getAllMovements() async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/movements');
-    return _parseMovementsFromJson(data as List);
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/movements');
+      return _parseMovementsFromJson(data);
+    } catch (_) {
+      return [];
+    }
   }
 
   // Helper methods for JSON parsing (simplified)
@@ -214,8 +218,17 @@ class ApiInventoryRepository implements IInventoryRepository {
     };
   }
 
-  List<InventoryMovementModel> _parseMovementsFromJson(List data) {
-    return data.map((json) => _parseMovementFromJson(json as Map<String, dynamic>)).toList();
+  List<InventoryMovementModel> _parseMovementsFromJson(dynamic data) {
+    if (data is List) {
+      return data.whereType<Map<String, dynamic>>().map((json) => _parseMovementFromJson(json)).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      final list = data['data'] ?? data['items'] ?? data['movements'];
+      if (list is List) {
+        return list.whereType<Map<String, dynamic>>().map((json) => _parseMovementFromJson(json)).toList();
+      }
+    }
+    return [];
   }
 
   InventoryMovementModel _parseMovementFromJson(Map<String, dynamic> json) {

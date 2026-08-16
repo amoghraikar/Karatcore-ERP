@@ -30,8 +30,12 @@ class ApiPledgeRepository implements IPledgeRepository {
 
   @override
   Future<List<PledgeModel>> getPledgesByCustomerId(String customerId) async {
-    final dynamic data = await _api.get('${ApiEndpoints.loans}/customer/$customerId/pledges');
-    return _parsePledgesFromJson(data as List);
+    try {
+      final dynamic data = await _api.get('${ApiEndpoints.loans}/customer/$customerId/pledges');
+      return _parsePledgesFromJson(data);
+    } catch (_) {
+      return [];
+    }
   }
 
   @override
@@ -40,7 +44,7 @@ class ApiPledgeRepository implements IPledgeRepository {
       '${ApiEndpoints.loans}/${pledge.loanId}/pledge',
       body: _pledgeToJson(pledge),
     );
-    return _parsePledgeFromJson(data);
+    return _parsePledgeFromJson(data as Map<String, dynamic>);
   }
 
   @override
@@ -52,11 +56,20 @@ class ApiPledgeRepository implements IPledgeRepository {
         'release_date': releaseDate?.toIso8601String(),
       },
     );
-    return _parsePledgeFromJson(data);
+    return _parsePledgeFromJson(data as Map<String, dynamic>);
   }
 
-  List<PledgeModel> _parsePledgesFromJson(List data) {
-    return data.map((json) => _parsePledgeFromJson(json as Map<String, dynamic>)).toList();
+  List<PledgeModel> _parsePledgesFromJson(dynamic data) {
+    if (data is List) {
+      return data.whereType<Map<String, dynamic>>().map((json) => _parsePledgeFromJson(json)).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      final list = data['data'] ?? data['items'] ?? data['pledges'];
+      if (list is List) {
+        return list.whereType<Map<String, dynamic>>().map((json) => _parsePledgeFromJson(json)).toList();
+      }
+    }
+    return [];
   }
 
   PledgeModel _parsePledgeFromJson(Map<String, dynamic> json) {
