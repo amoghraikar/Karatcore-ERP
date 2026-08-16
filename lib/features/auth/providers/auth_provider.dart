@@ -243,6 +243,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void logout() {
     _apiClient.setToken(null);
     SessionStorageService.clearSession();
-    state = const AuthState(status: AuthStatus.unauthenticated);
+    Future.microtask(() {
+      if (mounted) {
+        state = const AuthState(status: AuthStatus.unauthenticated);
+      }
+    });
   }
 }

@@ -185,8 +185,17 @@ class ApiCustomerRepository implements ICustomerRepository {
     return _parseCustomerFromJson(data);
   }
 
-  List<CustomerModel> _parseCustomersFromJson(List data) {
-    return data.map((json) => _parseCustomerFromJson(json as Map<String, dynamic>)).toList();
+  List<CustomerModel> _parseCustomersFromJson(dynamic data) {
+    if (data is List) {
+      return data.whereType<Map<String, dynamic>>().map((json) => _parseCustomerFromJson(json)).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      final list = data['data'] ?? data['items'] ?? data['customers'];
+      if (list is List) {
+        return list.whereType<Map<String, dynamic>>().map((json) => _parseCustomerFromJson(json)).toList();
+      }
+    }
+    return [];
   }
 
   CustomerModel _parseCustomerFromJson(Map<String, dynamic> json) {

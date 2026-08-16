@@ -73,7 +73,9 @@ class ApiClient {
   dynamic _parseResponse(http.Response response) {
     if (response.statusCode == 401) {
       _token = null;
-      onUnauthorized?.call();
+      Future.microtask(() {
+        onUnauthorized?.call();
+      });
       throw ApiException(
         statusCode: 401,
         code: 'UNAUTHORIZED',
