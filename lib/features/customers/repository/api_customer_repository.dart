@@ -182,7 +182,7 @@ class ApiCustomerRepository implements ICustomerRepository {
       annualIncome: json['annual_income'] as String? ?? '',
       kycStatus: CustomerKycStatus.values.firstWhere(
         (e) => e.name.toLowerCase() == (json['kyc_status'] as String? ?? '').toLowerCase(),
-        orElse: () => CustomerKycStatus.verified,
+        orElse: () => CustomerKycStatus.pending,
       ),
       customerStatus: CustomerStatus.values.firstWhere(
         (e) => e.name.toLowerCase() == (json['customer_status'] as String? ?? json['status'] as String? ?? '').toLowerCase(),

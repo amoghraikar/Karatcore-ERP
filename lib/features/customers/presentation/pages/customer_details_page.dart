@@ -321,35 +321,11 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
     );
   }
 
-  List<CustomerDocument> _getEffectiveDocuments(CustomerModel customer) {
-    if (customer.documents.isNotEmpty) return customer.documents;
-    return [
-      CustomerDocument(
-        id: 'DOC-AADHAAR-01',
-        name: 'Aadhaar Card Front & Back Scan',
-        documentType: 'Aadhaar Card (UIDAI)',
-        uploadDate: customer.createdAt,
-        status: 'Verified',
-        isVerified: true,
-        fileSize: '1.4 MB',
-        documentNumber: 'XXXX-XXXX-8821',
-      ),
-      CustomerDocument(
-        id: 'DOC-PAN-02',
-        name: 'PAN Card Income Tax Proof',
-        documentType: 'PAN Card',
-        uploadDate: customer.createdAt,
-        status: 'Verified',
-        isVerified: true,
-        fileSize: '890 KB',
-        documentNumber: 'ABCPS9918F',
-      ),
-    ];
-  }
+
 
   // 2. KYC Tab
   Widget _buildKycTab(CustomerModel customer) {
-    final docs = _getEffectiveDocuments(customer);
+    final docs = customer.documents;
 
     return ListView(
       physics: const ClampingScrollPhysics(),
@@ -382,19 +358,24 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text('Level 2 Standard Aadhaar / PAN Verification.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    Text(
+                      customer.kycStatus == CustomerKycStatus.verified
+                          ? 'Level 2 Standard Aadhaar / PAN Verification Approved.'
+                          : 'KYC Verification Pending. Please initiate identity verification.',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
                   ],
                 ),
               ),
               Wrap(
                 spacing: 8,
                 children: [
-                  KcOutlinedButton(
+                  KcPrimaryButton(
                     label: 'Start KYC Wizard',
                     icon: Icons.play_arrow_rounded,
                     onPressed: () => context.go('/kyc/${customer.id}/start'),
                   ),
-                  KcPrimaryButton(
+                  KcOutlinedButton(
                     label: 'Review KYC',
                     icon: Icons.rate_review_rounded,
                     onPressed: () => context.go('/kyc/${customer.id}/review'),
@@ -412,41 +393,52 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
             children: [
               Text('Submitted Verification Vault Documents', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
-              ...docs.map((doc) => Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      onTap: () => KcDocumentViewerDialog.show(
-                        context,
-                        customerName: customer.fullName,
-                        customerId: customer.id,
-                        document: doc,
-                      ),
-                      leading: Icon(doc.isVerified ? Icons.verified_rounded : Icons.pending_actions_rounded, color: doc.isVerified ? const Color(0xFF059669) : Colors.orange),
-                      title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('${doc.documentType} • ${doc.documentNumber} • ${KcFormatters.date(doc.uploadDate)}'),
-                      trailing: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 8,
-                        children: [
-                          KcStatusBadge(
-                            label: doc.isVerified ? 'Verified' : 'Pending Review',
-                            statusColor: doc.isVerified ? const Color(0xFF059669) : Colors.orange,
-                            icon: doc.isVerified ? Icons.check_circle_rounded : Icons.hourglass_top_rounded,
-                          ),
-                          KcOutlinedButton(
-                            label: 'View Scan',
-                            icon: Icons.visibility_rounded,
-                            onPressed: () => KcDocumentViewerDialog.show(
-                              context,
-                              customerName: customer.fullName,
-                              customerId: customer.id,
-                              document: doc,
+              if (docs.isEmpty)
+                KcEmptyState(
+                  title: 'No Verification Vault Documents Uploaded',
+                  subtitle: 'KYC has not been initiated for customer "${customer.fullName}". Click below to upload and verify documents.',
+                  action: KcPrimaryButton(
+                    label: 'Initiate Customer KYC',
+                    icon: Icons.upload_file_rounded,
+                    onPressed: () => context.go('/kyc/${customer.id}/start'),
+                  ),
+                )
+              else
+                ...docs.map((doc) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        onTap: () => KcDocumentViewerDialog.show(
+                          context,
+                          customerName: customer.fullName,
+                          customerId: customer.id,
+                          document: doc,
+                        ),
+                        leading: Icon(doc.isVerified ? Icons.verified_rounded : Icons.pending_actions_rounded, color: doc.isVerified ? const Color(0xFF059669) : Colors.orange),
+                        title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Text('${doc.documentType} • ${doc.documentNumber} • ${KcFormatters.date(doc.uploadDate)}'),
+                        trailing: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          children: [
+                            KcStatusBadge(
+                              label: doc.isVerified ? 'Verified' : 'Pending Review',
+                              statusColor: doc.isVerified ? const Color(0xFF059669) : Colors.orange,
+                              icon: doc.isVerified ? Icons.check_circle_rounded : Icons.hourglass_top_rounded,
                             ),
-                          ),
-                        ],
+                            KcOutlinedButton(
+                              label: 'View Scan',
+                              icon: Icons.visibility_rounded,
+                              onPressed: () => KcDocumentViewerDialog.show(
+                                context,
+                                customerName: customer.fullName,
+                                customerId: customer.id,
+                                document: doc,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  )),
+                    )),
             ],
           ),
         ),
@@ -622,7 +614,7 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
 
   // 6. Documents Tab
   Widget _buildDocumentsTab(CustomerModel customer) {
-    final docs = _getEffectiveDocuments(customer);
+    final docs = customer.documents;
 
     return ListView(
       physics: const ClampingScrollPhysics(),
@@ -635,7 +627,7 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Document Vault UI', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  Text('Document Vault', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                   KcOutlinedButton(
                     label: 'Upload Document',
                     icon: Icons.upload_file_rounded,
@@ -646,42 +638,55 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
                 ],
               ),
               const SizedBox(height: 16),
-              ...docs.map((doc) => Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      onTap: () => KcDocumentViewerDialog.show(
-                        context,
-                        customerName: customer.fullName,
-                        customerId: customer.id,
-                        document: doc,
-                      ),
-                      leading: const Icon(Icons.description_rounded, color: Colors.blue),
-                      title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('${doc.documentType} • ${doc.fileSize} • ${KcFormatters.date(doc.uploadDate)}'),
-                      trailing: Wrap(
-                        spacing: 8,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.visibility_outlined, size: 20),
-                            onPressed: () => KcDocumentViewerDialog.show(
-                              context,
-                              customerName: customer.fullName,
-                              customerId: customer.id,
-                              document: doc,
+              if (docs.isEmpty)
+                KcEmptyState(
+                  title: 'No Documents Uploaded',
+                  subtitle: 'No identity, proof of address, or vault documents uploaded for customer "${customer.fullName}".',
+                  action: KcPrimaryButton(
+                    label: 'Upload Document',
+                    icon: Icons.upload_file_rounded,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Document Vault upload dialog opened.')));
+                    },
+                  ),
+                )
+              else
+                ...docs.map((doc) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        onTap: () => KcDocumentViewerDialog.show(
+                          context,
+                          customerName: customer.fullName,
+                          customerId: customer.id,
+                          document: doc,
+                        ),
+                        leading: const Icon(Icons.description_rounded, color: Colors.blue),
+                        title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Text('${doc.documentType} • ${doc.fileSize} • ${KcFormatters.date(doc.uploadDate)}'),
+                        trailing: Wrap(
+                          spacing: 8,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.visibility_outlined, size: 20),
+                              onPressed: () => KcDocumentViewerDialog.show(
+                                context,
+                                customerName: customer.fullName,
+                                customerId: customer.id,
+                                document: doc,
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.download_outlined, size: 20),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Downloading ${doc.name}...')),
-                              );
-                            },
-                          ),
-                        ],
+                            IconButton(
+                              icon: const Icon(Icons.download_outlined, size: 20),
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Downloading ${doc.name}...')),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  )),
+                    )),
             ],
           ),
         ),

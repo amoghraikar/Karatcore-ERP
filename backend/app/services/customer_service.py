@@ -26,15 +26,17 @@ class CustomerService:
             email=customer_in.email,
             address=customer_in.address,
             status="ACTIVE",
-            kyc_status="VERIFIED",
+            kyc_status="PENDING",
+            pan_masked="",
+            aadhaar_masked="",
         )
         created = self.repo.create(customer)
 
-        # Initialize KYC record
+        # Initialize KYC record in PENDING state
         kyc = CustomerKYC(
             customer_id=created.id,
-            status="VERIFIED",
-            verification_method="MANUAL_STORE_REVIEW",
+            status="PENDING",
+            verification_method="NOT_STARTED",
         )
         self.db.add(kyc)
         self.db.commit()

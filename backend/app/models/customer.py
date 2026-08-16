@@ -14,10 +14,10 @@ class Customer(BaseModel):
     address = Column(String(500), nullable=True)
     date_of_birth = Column(DateTime, nullable=True)
     status = Column(String(50), default="ACTIVE", nullable=False)  # ACTIVE, INACTIVE, BLOCKED
-    kyc_status = Column(String(50), default="VERIFIED", nullable=False)
+    kyc_status = Column(String(50), default="PENDING", nullable=False)  # PENDING, VERIFIED, REJECTED, INCOMPLETE
 
-    pan_masked = Column(String(50), nullable=True, default="ABCPS****F")
-    aadhaar_masked = Column(String(50), nullable=True, default="XXXX-XXXX-8821")
+    pan_masked = Column(String(50), nullable=True, default="")
+    aadhaar_masked = Column(String(50), nullable=True, default="")
 
     kyc_record = relationship("CustomerKYC", back_populates="customer", uselist=False)
     ornaments = relationship("Ornament", back_populates="customer")
