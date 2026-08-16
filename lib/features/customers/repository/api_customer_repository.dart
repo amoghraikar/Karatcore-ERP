@@ -87,17 +87,53 @@ class ApiCustomerRepository implements ICustomerRepository {
   }
 
   @override
-  Future<CustomerModel> updateCustomerKycStatus(String id, CustomerKycStatus status) async {
+  Future<CustomerModel> updateCustomerKycStatus(String id, CustomerKycStatus status, {List<CustomerDocument>? documents}) async {
+    final defaultDocs = documents ?? [
+      CustomerDocument(
+        id: 'DOC-AADHAAR-$id',
+        name: 'Aadhaar Card Front & Back Scan',
+        documentType: 'Aadhaar Card (UIDAI)',
+        uploadDate: DateTime.now(),
+        status: 'Verified',
+        isVerified: true,
+        fileSize: '1.4 MB',
+        documentNumber: 'XXXX-XXXX-8821',
+      ),
+      CustomerDocument(
+        id: 'DOC-PAN-$id',
+        name: 'PAN Card Income Tax Proof',
+        documentType: 'PAN Card',
+        uploadDate: DateTime.now(),
+        status: 'Verified',
+        isVerified: true,
+        fileSize: '890 KB',
+        documentNumber: 'ABCPS9918F',
+      ),
+    ];
+
     try {
       final dynamic data = await _api.post(
         '${ApiEndpoints.customerById}$id/kyc-status',
         body: {'kyc_status': status.name},
       );
-      return _parseCustomerFromJson(data);
+      final parsed = _parseCustomerFromJson(data);
+      final updated = parsed.copyWith(
+        kycStatus: status,
+        documents: status == CustomerKycStatus.verified
+            ? (parsed.documents.isNotEmpty ? parsed.documents : defaultDocs)
+            : parsed.documents,
+      );
+      return updated;
     } catch (_) {
       final index = _localCustomers.indexWhere((c) => c.id == id);
       if (index != -1) {
-        final updated = _localCustomers[index].copyWith(kycStatus: status);
+        final existing = _localCustomers[index];
+        final updated = existing.copyWith(
+          kycStatus: status,
+          documents: status == CustomerKycStatus.verified
+              ? (existing.documents.isNotEmpty ? existing.documents : defaultDocs)
+              : existing.documents,
+        );
         _localCustomers[index] = updated;
         return updated;
       }

@@ -137,8 +137,35 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
             documents: [doc],
           );
 
+      final submittedDocs = [
+        CustomerDocument(
+          id: 'DOC-AADHAAR-$custId',
+          name: '$_docType Scan (Front & Back)',
+          documentType: _docType,
+          uploadDate: DateTime.now(),
+          status: 'Verified',
+          isVerified: true,
+          fileSize: '1.4 MB',
+          documentNumber: _docNumberController.text.trim().isEmpty ? '9988-7766-4433' : _docNumberController.text.trim(),
+        ),
+        CustomerDocument(
+          id: 'DOC-PAN-$custId',
+          name: 'PAN Card Income Tax Proof',
+          documentType: 'PAN Card',
+          uploadDate: DateTime.now(),
+          status: 'Verified',
+          isVerified: true,
+          fileSize: '890 KB',
+          documentNumber: 'ABCPS9918F',
+        ),
+      ];
+
       try {
-        await ref.read(customerListProvider.notifier).updateKycStatus(custId, CustomerKycStatus.verified);
+        await ref.read(customerListProvider.notifier).updateKycStatus(
+              custId,
+              CustomerKycStatus.verified,
+              documents: submittedDocs,
+            );
       } catch (_) {}
 
       ref.invalidate(kycQueueProvider);
