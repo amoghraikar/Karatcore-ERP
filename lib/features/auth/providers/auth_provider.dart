@@ -38,9 +38,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> checkInitialSession() async {
     state = state.copyWith(status: AuthStatus.authenticating);
     final savedSession = await SessionStorageService.loadSession();
+
     if (savedSession != null) {
-      if (savedSession.token != null) {
+      if (savedSession.token != null && savedSession.token!.isNotEmpty) {
         _apiClient.setToken(savedSession.token);
+        try {
+          // Verify session validity against backend
+          await _apiClient.get('/health');
+          state = AuthState(
+            status: AuthStatus.authenticated,
+            session: savedSession,
+            selectedBranch: savedSession.branch,
+          );
+          return;
+        } catch (e) {
+          if (e is ApiException && e.statusCode == 401) {
+            _apiClient.setToken(null);
+            await SessionStorageService.clearSession();
+            state = const AuthState(status: AuthStatus.unauthenticated);
+            return;
+          }
+        }
       }
       state = AuthState(
         status: AuthStatus.authenticated,

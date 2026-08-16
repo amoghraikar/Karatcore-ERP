@@ -92,13 +92,14 @@ import '../../shared/widgets/navigation/kc_bottom_navigation.dart';
 import '../../shared/widgets/navigation/kc_navigation_rail.dart';
 import '../../shared/widgets/navigation/kc_sidebar.dart';
 import '../../shared/widgets/navigation/kc_top_bar.dart';
+import '../../features/auth/presentation/pages/not_found_page.dart';
 import '../extensions/context_extensions.dart';
 import 'breadcrumbs.dart';
 import 'routes.dart';
 
 class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this.ref) {
-    ref.listen<AuthState>(authStateProvider, (_, __) {
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
       notifyListeners();
     });
   }
@@ -115,6 +116,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: notifier,
+    errorBuilder: (context, state) => NotFoundPage(path: state.uri.toString()),
     redirect: (context, state) {
       final authState = ref.read(authStateProvider);
       final currentPath = state.uri.path;
