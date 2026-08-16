@@ -28,6 +28,7 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._repository, this._apiClient) : super(const AuthState()) {
+    _apiClient.onUnauthorized = logout;
     checkInitialSession();
   }
 

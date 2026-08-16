@@ -68,7 +68,19 @@ class ApiClient {
     return _parseResponse(response);
   }
 
+  void Function()? onUnauthorized;
+
   dynamic _parseResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      _token = null;
+      onUnauthorized?.call();
+      throw ApiException(
+        statusCode: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Session invalid or expired. Please log in again.',
+      );
+    }
+
     if (response.body.isEmpty) {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return null;
