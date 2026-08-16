@@ -23,7 +23,7 @@ abstract final class KcChartWrapper {
     double height = 220,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = lineColor ?? KcColors.emerald600;
+    final primaryColor = lineColor ?? KcColors.gold500;
 
     return SizedBox(
       height: height,
@@ -33,7 +33,7 @@ abstract final class KcChartWrapper {
             show: true,
             drawVerticalLine: false,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: isDark ? KcColors.navy700.withValues(alpha: 0.5) : KcColors.slate200,
+              color: isDark ? KcColors.obsidian800 : KcColors.slate200,
               strokeWidth: 1,
             ),
           ),
@@ -77,7 +77,7 @@ abstract final class KcChartWrapper {
                   radius: 4,
                   color: primaryColor,
                   strokeWidth: 2,
-                  strokeColor: Colors.white,
+                  strokeColor: KcColors.obsidian950,
                 ),
               ),
               belowBarData: BarAreaData(
@@ -86,7 +86,7 @@ abstract final class KcChartWrapper {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    primaryColor.withValues(alpha: 0.28),
+                    primaryColor.withValues(alpha: 0.32),
                     primaryColor.withValues(alpha: 0.0),
                   ],
                 ),
@@ -105,7 +105,7 @@ abstract final class KcChartWrapper {
     double height = 220,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = barColor ?? KcColors.gold600;
+    final primaryColor = barColor ?? KcColors.gold500;
 
     return SizedBox(
       height: height,
@@ -189,7 +189,7 @@ abstract final class KcChartWrapper {
                       titleStyle: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: KcColors.obsidian950,
                       ),
                     ),
                 ],
@@ -211,13 +211,13 @@ abstract final class KcChartWrapper {
                         height: 10,
                         decoration: BoxDecoration(
                           color: item.color,
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         item.label,
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),

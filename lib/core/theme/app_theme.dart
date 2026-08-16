@@ -5,16 +5,16 @@ import '../constants/typography_tokens.dart';
 import 'dark_theme.dart';
 import 'light_theme.dart';
 
-/// Monochrome Architectural Minimalist (Swiss Style) ThemeData Builder.
+/// Luxury Champagne Obsidian & Satin Gold ThemeData Builder.
 abstract final class AppTheme {
   static ThemeData get light => _build(buildLightColorScheme(), Brightness.light);
   static ThemeData get dark => _build(buildDarkColorScheme(), Brightness.dark);
 
   static ThemeData _build(ColorScheme scheme, Brightness brightness) {
     final isDark = brightness == Brightness.dark;
-    final cardContainer = isDark ? KcColors.slate800 : KcColors.pureWhite;
-    final surfaceSoft = isDark ? KcColors.slate900 : KcColors.slate50;
-    final hairlineBorder = isDark ? KcColors.slate700 : KcColors.slate200;
+    final cardContainer = isDark ? KcColors.obsidian900 : KcColors.pureWhite;
+    final surfaceSoft = isDark ? KcColors.obsidian950 : KcColors.slate50;
+    final hairlineBorder = isDark ? KcColors.obsidian800 : KcColors.slate200;
 
     final base = ThemeData(
       useMaterial3: true,
@@ -22,7 +22,7 @@ abstract final class AppTheme {
       colorScheme: scheme,
       textTheme: KcTypography.buildTextTheme(scheme),
       scaffoldBackgroundColor: surfaceSoft,
-      canvasColor: scheme.surface,
+      canvasColor: isDark ? KcColors.obsidian950 : scheme.surface,
     );
 
     return base.copyWith(
@@ -35,7 +35,7 @@ abstract final class AppTheme {
         iconTheme: IconThemeData(color: scheme.onSurface),
         titleTextStyle: base.textTheme.titleLarge?.copyWith(
           color: scheme.onSurface,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
         ),
       ),
       cardTheme: CardThemeData(
@@ -44,7 +44,7 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(
             color: hairlineBorder,
             width: 1.0,
@@ -53,40 +53,52 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? KcColors.carbon900 : KcColors.carbon50,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        fillColor: isDark ? KcColors.obsidian900 : KcColors.slate50,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
             color: hairlineBorder,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
             color: hairlineBorder,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: BorderSide(
-            color: isDark ? KcColors.pureWhite : KcColors.pitchBlack,
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(
+            color: KcColors.gold500,
             width: 1.5,
           ),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isDark ? KcColors.pureWhite : KcColors.pitchBlack,
-          foregroundColor: isDark ? KcColors.pitchBlack : KcColors.pureWhite,
+          backgroundColor: KcColors.gold500,
+          foregroundColor: KcColors.obsidian950,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: base.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.3,
           ),
         ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: isDark ? KcColors.obsidian850 : KcColors.slate100,
+        deleteIconColor: isDark ? KcColors.slate400 : KcColors.slate600,
+        side: BorderSide(color: hairlineBorder),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface),
+      ),
+      dividerTheme: DividerThemeData(
+        color: hairlineBorder,
+        thickness: 1,
+        space: 1,
       ),
     );
   }

@@ -17,78 +17,89 @@ class WelcomeHeader extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
     final user = authState.session;
     final userName = user?.name ?? 'Store Owner';
-    final storeName = user?.storeName ?? user?.branch?.name ?? 'KaratCore Jewellery';
+    final storeName = user?.storeName ?? user?.branch?.name ?? 'Main Market Branch';
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
+        color: isDark ? KcColors.obsidian900 : KcColors.pureWhite,
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [const Color(0xFF0F2942), const Color(0xFF070E1B)]
-              : [const Color(0xFF0B1F3F), const Color(0xFF1E3A5F)],
+        border: Border.all(
+          color: KcColors.gold500.withValues(alpha: 0.35),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0B1F3F).withValues(alpha: 0.25),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+            blurRadius: 18,
             offset: const Offset(0, 6),
           ),
         ],
-        border: Border.all(
-          color: KcColors.gold600.withValues(alpha: 0.4),
-          width: 1.2,
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top Status & Gold Rate Ribbon
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: KcColors.gold600.withValues(alpha: 0.18),
+                  color: KcColors.gold500.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: KcColors.gold500.withValues(alpha: 0.4)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.workspace_premium_rounded, size: 14, color: KcColors.gold400),
+                    Icon(Icons.auto_awesome_rounded, size: 13, color: KcColors.gold400),
                     SizedBox(width: 6),
                     Text(
-                      'ENTERPRISE SUITE',
+                      'LUXURY ERP SUITE',
                       style: TextStyle(
                         color: KcColors.gold300,
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.0,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 10),
+              // Live Bullion Rate Ticker
+              const Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _RateBadge(label: '24K Gold', price: '₹7,450/g', change: '+0.4%'),
+                      SizedBox(width: 8),
+                      _RateBadge(label: '22K Gold', price: '₹6,830/g', change: '+0.3%'),
+                      SizedBox(width: 8),
+                      _RateBadge(label: '999 Silver', price: '₹88/g', change: '+0.1%'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: KcColors.emerald600.withValues(alpha: 0.2),
+                  color: KcColors.emerald500.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: KcColors.emerald500.withValues(alpha: 0.4)),
+                  border: Border.all(color: KcColors.emerald500.withValues(alpha: 0.35)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(radius: 3, backgroundColor: KcColors.emerald500),
+                    CircleAvatar(radius: 3.5, backgroundColor: KcColors.emerald500),
                     SizedBox(width: 6),
                     Text(
-                      'LIVE SYNC',
+                      'VAULT SECURE',
                       style: TextStyle(
-                        color: KcColors.emerald100,
+                        color: KcColors.emerald500,
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.8,
@@ -99,11 +110,11 @@ class WelcomeHeader extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
             'Welcome back, $userName',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isDark ? KcColors.pureWhite : KcColors.slate900,
               fontSize: 24,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.5,
@@ -114,12 +125,12 @@ class WelcomeHeader extends ConsumerWidget {
           Text(
             '$storeName • $dateStr',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
+              color: isDark ? KcColors.slate400 : KcColors.slate600,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Wrap(
             spacing: 10,
             runSpacing: 8,
@@ -130,17 +141,51 @@ class WelcomeHeader extends ConsumerWidget {
                 onTap: () => context.go(AppRoutes.customerCreate),
               ),
               _HeaderActionButton(
-                label: '+ Issue Gold Loan',
+                label: '+ New Gold Pledge Loan',
                 icon: Icons.add_circle_outline_rounded,
                 onTap: () => context.go(AppRoutes.loanCreate),
               ),
               _HeaderActionButton(
-                label: 'View Accounting',
+                label: 'View Vault Ledger',
                 icon: Icons.account_balance_wallet_rounded,
                 onTap: () => context.go(AppRoutes.accounting),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RateBadge extends StatelessWidget {
+  const _RateBadge({
+    required this.label,
+    required this.price,
+    required this.change,
+  });
+
+  final String label;
+  final String price;
+  final String change;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: KcColors.obsidian850,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: KcColors.obsidian800),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: KcColors.slate400)),
+          const SizedBox(width: 5),
+          Text(price, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: KcColors.pureWhite)),
+          const SizedBox(width: 4),
+          Text(change, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: KcColors.emerald500)),
         ],
       ),
     );
@@ -161,22 +206,26 @@ class _HeaderActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(8),
+      color: KcColors.obsidian850,
+      borderRadius: BorderRadius.circular(10),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KcColors.obsidian800),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 15, color: KcColors.gold400),
-              const SizedBox(width: 6),
+              Icon(icon, size: 16, color: KcColors.gold400),
+              const SizedBox(width: 8),
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: KcColors.pureWhite,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.2,

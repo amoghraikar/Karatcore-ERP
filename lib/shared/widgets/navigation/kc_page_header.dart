@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/color_tokens.dart';
 import '../../../core/extensions/context_extensions.dart';
 
 class KcPageHeader extends StatelessWidget {
@@ -16,24 +17,41 @@ class KcPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (context.isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.3,
+          Row(
+            children: [
+              Container(
+                width: 3,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: KcColors.gold500,
+                  borderRadius: BorderRadius.circular(2),
                 ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                        color: isDark ? KcColors.pureWhite : KcColors.slate900,
+                      ),
+                ),
+              ),
+            ],
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
             Text(
               subtitle!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
+                    color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
                   ),
             ),
           ],
@@ -56,19 +74,37 @@ class KcPageHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: KcColors.gold500,
+                      borderRadius: BorderRadius.circular(2),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? KcColors.pureWhite : KcColors.slate900,
+                          letterSpacing: -0.5,
+                        ),
+                  ),
+                ],
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 14),
+                  child: Text(
+                    subtitle!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
+                        ),
+                  ),
                 ),
               ],
             ],

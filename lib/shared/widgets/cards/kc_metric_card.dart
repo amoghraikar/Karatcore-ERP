@@ -26,9 +26,11 @@ class KcMetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = iconColor ?? KcColors.gold500;
 
     final card = KcCard(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,11 +39,11 @@ class KcMetricCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
+                  title.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
                       ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -49,36 +51,37 @@ class KcMetricCard extends StatelessWidget {
               ),
               if (icon != null)
                 Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: (iconColor ?? scheme.primary).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(6),
+                    color: accentColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: (iconColor ?? scheme.primary).withValues(alpha: 0.25),
+                      color: accentColor.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: Icon(icon, size: 14, color: iconColor ?? scheme.primary),
+                  child: Icon(icon, size: 16, color: accentColor),
                 ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : scheme.onSurface,
+                  color: isDark ? KcColors.pureWhite : scheme.onSurface,
+                  letterSpacing: -0.5,
                 ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           if (trend != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Row(
               children: [
                 Icon(
                   isPositiveTrend ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                  size: 13,
-                  color: isPositiveTrend ? KcColors.emerald600 : KcColors.danger,
+                  size: 14,
+                  color: isPositiveTrend ? KcColors.emerald500 : KcColors.signalRed,
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -87,9 +90,9 @@ class KcMetricCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: isPositiveTrend ? KcColors.emerald600 : KcColors.danger,
+                          color: isPositiveTrend ? KcColors.emerald500 : KcColors.signalRed,
                           fontWeight: FontWeight.w700,
-                          fontSize: 10,
+                          fontSize: 11,
                         ),
                   ),
                 ),
@@ -100,16 +103,6 @@ class KcMetricCard extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return card;
-
-    return Semantics(
-      button: true,
-      label: '$title, $value',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: card,
-      ),
-    );
+    return card;
   }
 }

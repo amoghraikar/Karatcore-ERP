@@ -23,7 +23,6 @@ class KcSidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final scheme = Theme.of(context).colorScheme;
     final authState = ref.watch(authStateProvider);
     final ownerAuth = ref.watch(ownerAuthorizationServiceProvider);
     final user = authState.session;
@@ -40,11 +39,11 @@ class KcSidebar extends ConsumerWidget {
       duration: const Duration(milliseconds: 200),
       width: isCollapsed ? 76 : 264,
       decoration: BoxDecoration(
-        color: isDark ? KcColors.obsidian950 : KcColors.white,
+        color: isDark ? KcColors.obsidian900 : KcColors.white,
         border: Border(
           right: BorderSide(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
+                ? KcColors.obsidian800
                 : KcColors.slate200,
           ),
         ),
@@ -53,8 +52,8 @@ class KcSidebar extends ConsumerWidget {
         children: [
           Padding(
             padding: isCollapsed
-                ? const EdgeInsets.symmetric(vertical: 14)
-                : const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                ? const EdgeInsets.symmetric(vertical: 16)
+                : const EdgeInsets.fromLTRB(16, 18, 12, 18),
             child: isCollapsed
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
@@ -63,12 +62,12 @@ class KcSidebar extends ConsumerWidget {
                         showWordmark: false,
                         size: 34,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       if (onToggleCollapse != null)
                         IconButton(
                           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.chevron_right_rounded, size: 22),
+                          icon: const Icon(Icons.chevron_right_rounded, size: 22, color: KcColors.gold400),
                           onPressed: onToggleCollapse,
                           tooltip: 'Expand sidebar',
                         ),
@@ -83,29 +82,29 @@ class KcSidebar extends ConsumerWidget {
                       const Spacer(),
                       if (onToggleCollapse != null)
                         IconButton(
-                          icon: const Icon(Icons.chevron_left_rounded, size: 22),
+                          icon: const Icon(Icons.chevron_left_rounded, size: 22, color: KcColors.slate400),
                           onPressed: onToggleCollapse,
                           tooltip: 'Collapse sidebar',
                         ),
                     ],
                   ),
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: isDark ? KcColors.obsidian800 : KcColors.slate200),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
               children: [
                 for (final nav in AppRoutes.navigationSections) ...[
                   if (nav.items.any((i) => ownerAuth.canAccessOwnerArea(user, i.path))) ...[
                     if (!isCollapsed && nav.sectionHeader != null)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 16, 12, 6),
+                        padding: const EdgeInsets.fromLTRB(12, 18, 12, 8),
                         child: Text(
                           nav.sectionHeader!.toUpperCase(),
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
+                                color: KcColors.gold500.withValues(alpha: 0.8),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.4,
                               ),
                         ),
                       ),
@@ -127,35 +126,57 @@ class KcSidebar extends ConsumerWidget {
               ],
             ),
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: isDark ? KcColors.obsidian800 : KcColors.slate200),
           Padding(
             padding: const EdgeInsets.all(12),
             child: isCollapsed
-                ? Center(child: KcAvatar(initials: initials, size: 36))
-                : Row(
-                    children: [
-                      KcAvatar(initials: initials, size: 38),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name,
-                              style: Theme.of(context).textTheme.titleSmall,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              'STORE OWNER • Main Branch',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
+                ? Center(child: KcAvatar(initials: initials, size: 38))
+                : Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? KcColors.obsidian850 : KcColors.slate100,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: KcColors.gold500.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        KcAvatar(initials: initials, size: 36),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(color: KcColors.emerald500, shape: BoxShape.circle),
                                   ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'STORE OWNER',
+                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: KcColors.gold400,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 10,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
           ),
         ],
@@ -183,43 +204,59 @@ class _NavTile extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
+          borderRadius: BorderRadius.circular(10),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
             decoration: BoxDecoration(
               color: selected
-                  ? (isDark ? KcColors.pureWhite : KcColors.pitchBlack)
+                  ? (isDark ? KcColors.gold500.withValues(alpha: 0.15) : KcColors.gold100)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: selected
+                    ? KcColors.gold500.withValues(alpha: 0.5)
+                    : Colors.transparent,
+                width: 1.0,
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   selected ? item.selectedIcon : item.icon,
-                  size: 18,
+                  size: 19,
                   color: selected
-                      ? (isDark ? KcColors.pitchBlack : KcColors.pureWhite)
+                      ? (isDark ? KcColors.gold400 : KcColors.gold700)
                       : scheme.onSurfaceVariant,
                 ),
                 if (!isCollapsed) ...[
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       item.label,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: selected
-                                ? (isDark ? KcColors.pitchBlack : KcColors.pureWhite)
-                                : scheme.onSurface,
-                            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                ? (isDark ? KcColors.pureWhite : KcColors.slate900)
+                                : scheme.onSurfaceVariant,
+                            fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
                           ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (selected)
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: KcColors.gold500,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                 ],
               ],
             ),

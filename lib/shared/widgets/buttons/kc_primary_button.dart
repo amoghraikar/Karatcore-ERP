@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/color_tokens.dart';
 
 class KcPrimaryButton extends StatelessWidget {
   const KcPrimaryButton({
@@ -18,21 +19,18 @@ class KcPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final btn = Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        gradient: LinearGradient(
-          colors: isDark
-              ? [scheme.primary, scheme.primary.withValues(alpha: 0.85)]
-              : [scheme.primary, const Color(0xFF0F2942)],
+        gradient: const LinearGradient(
+          colors: [KcColors.gold400, KcColors.gold600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: scheme.primary.withValues(alpha: 0.25),
-            blurRadius: 10,
+            color: KcColors.gold500.withValues(alpha: 0.3),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -45,24 +43,24 @@ class KcPrimaryButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
             child: isLoading
-                ? SizedBox(
+                ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: scheme.onPrimary),
+                    child: CircularProgressIndicator(strokeWidth: 2.2, color: KcColors.obsidian950),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, size: 18, color: scheme.onPrimary),
+                        Icon(icon, size: 18, color: KcColors.obsidian950),
                         const SizedBox(width: 8),
                       ],
                       Text(
                         label,
-                        style: TextStyle(
-                          color: scheme.onPrimary,
-                          fontWeight: FontWeight.w700,
+                        style: const TextStyle(
+                          color: KcColors.obsidian950,
+                          fontWeight: FontWeight.w800,
                           fontSize: 14,
                           letterSpacing: 0.3,
                         ),

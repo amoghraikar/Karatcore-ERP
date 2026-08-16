@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/color_tokens.dart';
 
 class KcCard extends StatefulWidget {
   const KcCard({
@@ -41,6 +42,15 @@ class _KcCardState extends State<KcCard> {
       );
     }
 
+    final effectiveColor = widget.color ?? (isDark ? KcColors.obsidian900 : KcColors.pureWhite);
+    final effectiveBorder = widget.border ??
+        Border.all(
+          color: _isHovered && widget.onTap != null
+              ? KcColors.gold500.withValues(alpha: 0.6)
+              : (isDark ? KcColors.obsidian800 : KcColors.slate200),
+          width: _isHovered && widget.onTap != null ? 1.2 : 1.0,
+        );
+
     return MouseRegion(
       onEnter: (_) {
         if (widget.onTap != null && mounted) setState(() => _isHovered = true);
@@ -51,24 +61,22 @@ class _KcCardState extends State<KcCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCubic,
-        transform: Matrix4.diagonal3Values(_isHovered && widget.onTap != null ? 1.012 : 1.0, _isHovered && widget.onTap != null ? 1.012 : 1.0, 1.0),
+        transform: Matrix4.diagonal3Values(
+          _isHovered && widget.onTap != null ? 1.012 : 1.0,
+          _isHovered && widget.onTap != null ? 1.012 : 1.0,
+          1.0,
+        ),
         decoration: BoxDecoration(
-          color: widget.color ?? scheme.surface,
+          color: effectiveColor,
           borderRadius: BorderRadius.circular(12),
-          border: widget.border ??
-              Border.all(
-                color: _isHovered && widget.onTap != null
-                    ? scheme.primary.withValues(alpha: 0.5)
-                    : scheme.outline.withValues(alpha: isDark ? 0.3 : 0.15),
-                width: _isHovered && widget.onTap != null ? 1.2 : 1.0,
-              ),
+          border: effectiveBorder,
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: _isHovered && widget.onTap != null ? 0.4 : 0.25)
+                  ? Colors.black.withValues(alpha: _isHovered && widget.onTap != null ? 0.45 : 0.25)
                   : scheme.shadow.withValues(alpha: _isHovered && widget.onTap != null ? 0.10 : 0.04),
-              blurRadius: _isHovered && widget.onTap != null ? 12 : 8,
-              offset: Offset(0, _isHovered && widget.onTap != null ? 5 : 3),
+              blurRadius: _isHovered && widget.onTap != null ? 14 : 8,
+              offset: Offset(0, _isHovered && widget.onTap != null ? 6 : 3),
             ),
           ],
         ),
