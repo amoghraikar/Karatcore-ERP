@@ -1,73 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/icon_tokens.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/constants/color_tokens.dart';
 import '../../../core/routing/routes.dart';
-import '../../../shared/widgets/buttons/kc_outlined_button.dart';
-import '../../../shared/widgets/buttons/kc_primary_button.dart';
-import '../../../shared/widgets/cards/kc_card.dart';
-import '../../../shared/widgets/dialogs/kc_snackbars.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return KcCard(
-      padding: const EdgeInsets.all(16),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? KcColors.surfaceDark : KcColors.surfaceLight;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Quick Actions',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            'QUICK SHORTCUTS',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.4,
+              color: KcColors.goldAccent,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Wrap(
-            spacing: 10,
+            spacing: 12,
             runSpacing: 10,
             children: [
-              KcPrimaryButton(
-                label: 'New Customer',
-                icon: KcIcons.add,
-                onPressed: () {
-                  context.go(AppRoutes.customers);
-                  KcSnackbars.success(context, 'Navigated to Customer Registration');
-                },
+              _ShortcutChip(
+                icon: Icons.person_add_alt_1_outlined,
+                label: 'Onboard Customer',
+                onTap: () => context.go(AppRoutes.customerCreate),
               ),
-              KcPrimaryButton(
-                label: 'New Gold Loan',
-                icon: KcIcons.loans,
-                onPressed: () {
-                  context.go(AppRoutes.loans);
-                  KcSnackbars.success(context, 'Navigated to Gold Loan Processing');
-                },
+              _ShortcutChip(
+                icon: Icons.add_circle_outline_rounded,
+                label: 'Issue Gold Loan',
+                onTap: () => context.go(AppRoutes.loanCreate),
               ),
-              KcOutlinedButton(
+              _ShortcutChip(
+                icon: Icons.verified_user_outlined,
                 label: 'Verify KYC',
-                icon: KcIcons.kyc,
-                onPressed: () {
-                  context.go(AppRoutes.kyc);
-                },
+                onTap: () => context.go(AppRoutes.kyc),
               ),
-              KcOutlinedButton(
+              _ShortcutChip(
+                icon: Icons.diamond_outlined,
                 label: 'Add Ornament',
-                icon: KcIcons.ornaments,
-                onPressed: () {
-                  context.go(AppRoutes.ornamentCreate);
-                },
+                onTap: () => context.go(AppRoutes.ornamentCreate),
               ),
-              KcOutlinedButton(
-                label: 'Create Report',
-                icon: KcIcons.reports,
-                onPressed: () {
-                  context.go(AppRoutes.reports);
-                },
+              _ShortcutChip(
+                icon: Icons.bar_chart_rounded,
+                label: 'Monthly Reports',
+                onTap: () => context.go(AppRoutes.reports),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ShortcutChip extends StatelessWidget {
+  const _ShortcutChip({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
+    final textColor = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0x0AFFFFFF) : const Color(0x08111214),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: borderColor, width: 1.0),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: KcColors.goldAccent),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

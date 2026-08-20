@@ -1,91 +1,100 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Monochrome Architectural Minimalist Typography for KaratCore ERP.
+/// Single Primary Font Family (Plus Jakarta Sans) for KaratCore ERP.
 abstract final class KcTypography {
   static TextTheme buildTextTheme(ColorScheme colorScheme) {
-    final bodyFont = GoogleFonts.interTextTheme();
-    final architecturalFont = GoogleFonts.spaceGroteskTextTheme();
+    final font = GoogleFonts.plusJakartaSansTextTheme();
 
-    return bodyFont.copyWith(
-      displayLarge: architecturalFont.displayLarge?.copyWith(
+    return font.copyWith(
+      displayLarge: font.displayLarge?.copyWith(
         color: colorScheme.onSurface,
-        fontWeight: FontWeight.w700,
-        fontSize: 48,
-        letterSpacing: -1.0,
+        fontWeight: FontWeight.w800,
+        fontSize: 56,
+        letterSpacing: -1.4,
+        height: 1.05,
       ),
-      displayMedium: architecturalFont.displayMedium?.copyWith(
+      displayMedium: font.displayMedium?.copyWith(
+        color: colorScheme.onSurface,
+        fontWeight: FontWeight.w800,
+        fontSize: 42,
+        letterSpacing: -1.1,
+        height: 1.1,
+      ),
+      displaySmall: font.displaySmall?.copyWith(
         color: colorScheme.onSurface,
         fontWeight: FontWeight.w700,
-        fontSize: 38,
+        fontSize: 32,
         letterSpacing: -0.8,
+        height: 1.15,
       ),
-      displaySmall: architecturalFont.displaySmall?.copyWith(
+      headlineLarge: font.headlineLarge?.copyWith(
         color: colorScheme.onSurface,
         fontWeight: FontWeight.w700,
-        fontSize: 30,
-        letterSpacing: -0.5,
+        fontSize: 28,
+        letterSpacing: -0.6,
+        height: 1.2,
       ),
-      headlineLarge: architecturalFont.headlineLarge?.copyWith(
+      headlineMedium: font.headlineMedium?.copyWith(
         color: colorScheme.onSurface,
         fontWeight: FontWeight.w700,
-        fontSize: 26,
+        fontSize: 24,
         letterSpacing: -0.4,
+        height: 1.25,
       ),
-      headlineMedium: architecturalFont.headlineMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w700,
-        fontSize: 22,
-        letterSpacing: -0.3,
-      ),
-      headlineSmall: architecturalFont.headlineSmall?.copyWith(
+      headlineSmall: font.headlineSmall?.copyWith(
         color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
+        fontSize: 20,
+        letterSpacing: -0.3,
+        height: 1.3,
+      ),
+      titleLarge: font.titleLarge?.copyWith(
+        color: colorScheme.onSurface,
+        fontWeight: FontWeight.w700,
         fontSize: 18,
         letterSpacing: -0.2,
       ),
-      titleLarge: bodyFont.titleLarge?.copyWith(
+      titleMedium: font.titleMedium?.copyWith(
         color: colorScheme.onSurface,
-        fontWeight: FontWeight.w700,
-        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
         letterSpacing: -0.1,
       ),
-      titleMedium: bodyFont.titleMedium?.copyWith(
+      titleSmall: font.titleSmall?.copyWith(
         color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
-        fontSize: 15,
+        fontSize: 14,
       ),
-      titleSmall: bodyFont.titleSmall?.copyWith(
+      bodyLarge: font.bodyLarge?.copyWith(
         color: colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
-        fontSize: 13,
+        fontSize: 16,
+        height: 1.5,
       ),
-      bodyLarge: bodyFont.bodyLarge?.copyWith(
+      bodyMedium: font.bodyMedium?.copyWith(
         color: colorScheme.onSurface,
-        fontSize: 15,
+        fontSize: 14,
+        height: 1.45,
       ),
-      bodyMedium: bodyFont.bodyMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontSize: 13,
-      ),
-      bodySmall: bodyFont.bodySmall?.copyWith(
+      bodySmall: font.bodySmall?.copyWith(
         color: colorScheme.onSurfaceVariant,
-        fontSize: 11,
+        fontSize: 12,
+        height: 1.4,
       ),
-      labelLarge: bodyFont.labelLarge?.copyWith(
+      labelLarge: font.labelLarge?.copyWith(
         fontWeight: FontWeight.w700,
         fontSize: 13,
-        letterSpacing: 0.5,
+        letterSpacing: 0.2,
       ),
-      labelMedium: bodyFont.labelMedium?.copyWith(
+      labelMedium: font.labelMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        fontSize: 12,
+        letterSpacing: 0.3,
+      ),
+      labelSmall: font.labelSmall?.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 11,
         letterSpacing: 0.5,
-      ),
-      labelSmall: bodyFont.labelSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        fontSize: 10,
-        letterSpacing: 0.8,
       ),
     );
   }

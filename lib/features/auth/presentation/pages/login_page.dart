@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/constants/color_tokens.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../shared/widgets/buttons/karat_badge.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/inputs/kc_password_field.dart';
@@ -56,7 +60,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
+    final secondaryTextColor = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
 
     return AuthSplitLayout(
       child: Form(
@@ -65,38 +72,55 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Category Badge
+            const Row(
+              children: [
+                KaratBadge(
+                  label: 'STORE OWNER PORTAL',
+                  variant: KaratBadgeVariant.gold,
+                  showDot: true,
+                ),
+              ],
+            ).animate().fadeIn(duration: 300.ms),
+            const SizedBox(height: 16),
+
             Text(
               'Sign In to KaratCore',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -1.0,
+                color: primaryTextColor,
+              ),
+            ).animate().fadeIn(delay: 50.ms, duration: 350.ms),
             const SizedBox(height: 6),
             Text(
               'Enter your Store Owner credentials to access store operations.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-            ),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: secondaryTextColor,
+              ),
+            ).animate().fadeIn(delay: 100.ms, duration: 350.ms),
             const SizedBox(height: 24),
 
+            // Humane Error Banner
             if (authState.errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF2F2),
+                  color: KcColors.dangerSubdued,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                  border: Border.all(color: KcColors.danger.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 20),
+                    const Icon(Icons.error_outline_rounded, color: KcColors.danger, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         authState.errorMessage!,
-                        style: const TextStyle(
-                          color: Color(0xFF991B1B),
+                        style: GoogleFonts.plusJakartaSans(
+                          color: KcColors.danger,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -104,7 +128,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
-              ),
+              ).animate().fadeIn(duration: 250.ms).shakeX(amount: 4),
               const SizedBox(height: 20),
             ],
 
@@ -112,7 +136,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             KcTextField(
               controller: _emailController,
               label: 'Email Address or Mobile Number',
-              hintText: 'e.g. arjun@karatcore.com or +91 98200 12345',
+              hintText: 'e.g. amoghrraikar@gmail.com or +91 98200 12345',
               prefixIcon: const Icon(Icons.person_outline_rounded),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -120,7 +144,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 }
                 return null;
               },
-            ),
+            ).animate().fadeIn(delay: 150.ms, duration: 350.ms),
             const SizedBox(height: 16),
             KcPasswordField(
               controller: _passwordController,
@@ -131,7 +155,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 }
                 return null;
               },
-            ),
+            ).animate().fadeIn(delay: 180.ms, duration: 350.ms),
             const SizedBox(height: 12),
 
             // Remember Me & Forgot Password Row
@@ -139,6 +163,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 Checkbox(
                   value: authState.rememberDevice,
+                  activeColor: isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight,
+                  checkColor: isDark ? KcColors.bgDark : KcColors.surfaceLight,
                   onChanged: (val) {
                     ref.read(authStateProvider.notifier).setRememberDevice(val ?? true);
                   },
@@ -150,7 +176,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     },
                     child: Text(
                       'Remember this device',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: GoogleFonts.plusJakartaSans(fontSize: 13, color: primaryTextColor),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -158,65 +184,85 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () => context.go(AppRoutes.forgotPassword),
-                  child: const Text('Forgot Password?'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: KcColors.goldAccent,
+                    ),
+                  ),
                 ),
               ],
-            ),
+            ).animate().fadeIn(delay: 200.ms, duration: 350.ms),
             const SizedBox(height: 20),
 
-            // Buttons
+            // Primary & Secondary Action Buttons
             KcPrimaryButton(
-              label: 'Sign In',
+              label: 'SIGN IN TO DASHBOARD',
               fullWidth: true,
-              icon: Icons.login_rounded,
+              icon: Icons.arrow_forward_rounded,
               isLoading: authState.isAuthenticating,
               onPressed: _submitLogin,
-            ),
+            ).animate().fadeIn(delay: 220.ms, duration: 350.ms),
             const SizedBox(height: 12),
             KcOutlinedButton(
-              label: 'Biometric Login (TouchID / FaceID)',
+              label: 'BIOMETRIC LOGIN (TOUCHID / FACEID)',
               fullWidth: true,
               icon: Icons.fingerprint_rounded,
               onPressed: _submitBiometric,
-            ),
+            ).animate().fadeIn(delay: 240.ms, duration: 350.ms),
             const SizedBox(height: 12),
             KcOutlinedButton(
-              label: 'Sign In via OTP Verification',
+              label: 'SIGN IN VIA OTP VERIFICATION',
               fullWidth: true,
               icon: Icons.phonelink_ring_rounded,
               onPressed: () {
                 ref.read(authStateProvider.notifier).requireOtpStep(_emailController.text.trim());
                 context.go(AppRoutes.verify);
               },
-            ),
-            const SizedBox(height: 12),
+            ).animate().fadeIn(delay: 260.ms, duration: 350.ms),
+            const SizedBox(height: 20),
+
             Wrap(
               alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Text('New Store Owner? ', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+                Text('New Store Owner? ', style: GoogleFonts.plusJakartaSans(color: secondaryTextColor, fontSize: 13)),
                 TextButton(
                   onPressed: () => context.go(AppRoutes.register),
-                  child: const Text('Register Store Account', style: TextStyle(fontWeight: FontWeight.w800)),
+                  child: Text(
+                    'Register Store Account',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w700,
+                      color: KcColors.goldAccent,
+                    ),
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: 24),
+            ).animate().fadeIn(delay: 280.ms, duration: 350.ms),
+            const SizedBox(height: 20),
 
-            // Security Reassurance
+            Divider(height: 1, color: borderColor),
+            const SizedBox(height: 16),
+
+            // Security Footnote
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lock_outline_rounded, size: 14, color: KcColors.slate400),
+                  const Icon(Icons.lock_outline_rounded, size: 14, color: KcColors.goldAccent),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Encrypted 256-bit Secure Authentication',
+                      'ENCRYPTED 256-BIT SECURE AUTHENTICATION',
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: secondaryTextColor,
+                      ),
                     ),
                   ),
                 ],

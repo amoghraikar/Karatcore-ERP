@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/constants/color_tokens.dart';
 import '../../../core/routing/routes.dart';
-import '../../../shared/widgets/cards/kc_card.dart';
 import '../../notifications/providers/notification_providers.dart';
 
 class NotificationsPanelWidget extends ConsumerWidget {
@@ -10,94 +12,130 @@ class NotificationsPanelWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifsAsync = ref.watch(notificationsNotifierProvider);
-    final unreadCount = ref.watch(unreadCountProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final notificationsAsync = ref.watch(notificationsNotifierProvider);
+    final notifications = notificationsAsync.valueOrNull ?? [];
 
-    return KcCard(
+    final cardBg = isDark ? KcColors.surfaceDark : KcColors.surfaceLight;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
+    final primaryTextColor = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
+    final secondaryTextColor = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Notifications & Vault Alerts',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                'STORE NOTIFICATIONS',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.4,
+                  color: KcColors.goldAccent,
+                ),
               ),
-              TextButton(
-                onPressed: () => context.go(AppRoutes.notifications),
-                child: Text('View Center ($unreadCount)'),
+              const Spacer(),
+              InkWell(
+                onTap: () => context.go(AppRoutes.notifications),
+                child: Text(
+                  'View All',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: KcColors.goldAccent,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          notifsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, st) => Text('Error: $err'),
-            data: (notifs) {
-              if (notifs.isEmpty) {
-                return const Text('No recent store alerts.');
-              }
+          const SizedBox(height: 20),
 
-              return Column(
-                children: notifs.take(3).map((n) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () {
-                        if (n.isUnread) {
-                          ref.read(notificationsNotifierProvider.notifier).markAsRead(n.id);
-                        }
-                        if (n.actionRoute != null) {
-                          context.go(n.actionRoute!);
-                        } else {
-                          context.go(AppRoutes.notifications);
-                        }
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: n.type.color.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(n.type.icon, size: 18, color: n.type.color),
+          if (notifications.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  'No urgent store alerts.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    color: secondaryTextColor,
+                  ),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: notifications.take(4).length,
+              separatorBuilder: (context, index) => Divider(height: 16, color: borderColor),
+              itemBuilder: (context, index) {
+                final item = notifications[index];
+                return InkWell(
+                  onTap: () {
+                    if (item.isUnread) {
+                      ref.read(notificationsNotifierProvider.notifier).markAsRead(item.id);
+                    }
+                    if (item.actionRoute != null) {
+                      context.go(item.actionRoute!);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          margin: const EdgeInsets.only(top: 6),
+                          decoration: BoxDecoration(
+                            color: item.isUnread ? KcColors.goldAccent : Colors.transparent,
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  n.title,
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                        fontWeight: n.isUnread ? FontWeight.w800 : FontWeight.w600,
-                                      ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.title,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 14,
+                                  fontWeight: item.isUnread ? FontWeight.w700 : FontWeight.w600,
+                                  color: primaryTextColor,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  n.message,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                item.message,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  color: secondaryTextColor,
                                 ),
-                              ],
-                            ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );

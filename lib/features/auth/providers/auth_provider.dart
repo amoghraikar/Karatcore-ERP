@@ -43,7 +43,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (savedSession.token != null && savedSession.token!.isNotEmpty) {
         _apiClient.setToken(savedSession.token);
         try {
-          // Verify session validity against backend
           await _apiClient.get('/health');
           state = AuthState(
             status: AuthStatus.authenticated,
@@ -73,9 +72,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void forceAuthenticateAsRole(UserRole role) {
     final session = UserSession(
       id: 'OWN-101',
-      name: 'Demo Owner',
+      name: 'Amogh',
       role: role,
-      email: 'owner@karatcore.com',
+      email: 'amoghrraikar@gmail.com',
       phone: '+91 98200 12345',
       branch: BranchModel.defaultBranches[0],
       is2faEnabled: false,
@@ -136,17 +135,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
-      String cleanMsg = 'Invalid email/phone or password. Please check your credentials or register a new Store Owner account.';
+      String humaneMsg;
       if (e is ApiException) {
-        if (e.statusCode == 401 || e.code == 'AUTHENTICATION_FAILED') {
-          cleanMsg = 'Invalid email/phone or password. Please verify your credentials or register a new account.';
-        } else if (e.message.isNotEmpty && !e.message.contains('{')) {
-          cleanMsg = e.message;
+        if (e.statusCode == 401 || e.code == 'AUTHENTICATION_FAILED' || e.code == 'UNAUTHORIZED') {
+          humaneMsg = 'Incorrect email/mobile or password. Please check your credentials and try again.';
+        } else if (e.statusCode == 400 && e.code == 'LOGIN_MODE_UNSUPPORTED') {
+          humaneMsg = 'Customer portal accounts must log in via the Customer Portal.';
+        } else if (e.statusCode == 503 || e.code == 'NETWORK_ERROR') {
+          humaneMsg = 'Unable to connect to the server right now. Please check your network connection and try again.';
+        } else if (e.message.isNotEmpty && !e.message.contains('{') && !e.message.contains('http') && !e.message.contains('8000')) {
+          humaneMsg = e.message;
+        } else {
+          humaneMsg = 'Invalid email/mobile or password. Please verify your details.';
         }
+      } else {
+        humaneMsg = 'Incorrect login credentials. Please verify your email/phone and password.';
       }
+
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
-        errorMessage: cleanMsg,
+        errorMessage: humaneMsg,
       );
       return false;
     }
@@ -178,18 +186,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
         status: AuthStatus.authenticated,
         session: session,
         selectedBranch: session.branch,
-        pendingEmailOrPhone: email,
       );
       await SessionStorageService.saveSession(session);
       return true;
     } catch (e) {
-      String cleanMsg = 'Account creation failed. Please check your details and try again.';
-      if (e is ApiException && e.message.isNotEmpty && !e.message.contains('{')) {
-        cleanMsg = e.message;
+      String humaneMsg;
+      if (e is ApiException) {
+        if (e.message.isNotEmpty && !e.message.contains('{') && !e.message.contains('http') && !e.message.contains('8000')) {
+          humaneMsg = e.message;
+        } else {
+          humaneMsg = 'Could not complete registration. Please check your input details or try again later.';
+        }
+      } else {
+        humaneMsg = 'Unable to create store account right now. Please check your connection and try again.';
       }
+
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
-        errorMessage: cleanMsg,
+        errorMessage: humaneMsg,
       );
       return false;
     }
@@ -199,60 +213,79 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
 
     try {
-      await _repository.verifyOtp(otpCode: code, method: state.otpMethod);
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
+      final success = await _repository.verifyOtp(
+        otpCode: code,
+        method: state.otpMethod,
       );
-      if (state.session != null) {
-        await SessionStorageService.saveSession(state.session!);
+
+      if (success) {
+        final pending = state.pendingEmailOrPhone ?? '';
+        final isEmail = pending.contains('@');
+        final currentSession = state.session ??
+            UserSession(
+              id: 'OWN-101',
+              name: 'Amogh',
+              role: UserRole.owner,
+              email: isEmail ? pending : 'amoghrraikar@gmail.com',
+              phone: isEmail ? '+91 98200 12345' : pending,
+              branch: BranchModel.defaultBranches[0],
+              is2faEnabled: true,
+            );
+
+        state = AuthState(
+          status: AuthStatus.authenticated,
+          session: currentSession,
+          selectedBranch: currentSession.branch,
+        );
+        await SessionStorageService.saveSession(currentSession);
+        return true;
       }
-      return true;
-    } catch (e) {
       state = state.copyWith(
         status: AuthStatus.pendingOtp,
-        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        errorMessage: 'Invalid verification code. Please check the 6-digit OTP code sent to your device.',
+      );
+      return false;
+    } catch (e) {
+      String humaneMsg = 'Invalid verification code. Please check the 6-digit OTP code sent to your device.';
+      if (e is ApiException && e.message.isNotEmpty && !e.message.contains('{')) {
+        humaneMsg = e.message;
+      }
+      state = state.copyWith(
+        status: AuthStatus.pendingOtp,
+        errorMessage: humaneMsg,
       );
       return false;
     }
   }
 
   Future<bool> resendOtp() async {
-    try {
-      await _repository.resendOtp();
-      return true;
-    } catch (e) {
-      return false;
-    }
+    return _repository.resendOtp();
   }
 
   void selectBranch(BranchModel branch) {
-    final updatedSession = state.session?.copyWith(branch: branch);
     state = state.copyWith(
-      status: AuthStatus.authenticated,
-      session: updatedSession,
       selectedBranch: branch,
+      status: AuthStatus.authenticated,
     );
-    if (updatedSession != null) {
-      SessionStorageService.saveSession(updatedSession);
-    }
   }
 
   void lockSession() {
-    if (state.status == AuthStatus.authenticated) {
+    if (state.session != null) {
       state = state.copyWith(status: AuthStatus.locked);
     }
   }
 
-  Future<bool> unlockSession(String passwordOrPin) async {
+  Future<bool> unlockSession(String pinOrPassword) async {
     state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
-    try {
-      await _repository.unlockSession(passwordOrPin: passwordOrPin);
+
+    final success = await _repository.unlockSession(passwordOrPin: pinOrPassword);
+    if (success) {
       state = state.copyWith(status: AuthStatus.authenticated);
       return true;
-    } catch (e) {
+    } else {
       state = state.copyWith(
         status: AuthStatus.locked,
-        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        errorMessage: 'Incorrect PIN or password. Please try again.',
       );
       return false;
     }
@@ -261,10 +294,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void logout() {
     _apiClient.setToken(null);
     SessionStorageService.clearSession();
-    Future.microtask(() {
-      if (mounted) {
-        state = const AuthState(status: AuthStatus.unauthenticated);
-      }
-    });
+    state = const AuthState(status: AuthStatus.unauthenticated);
   }
 }

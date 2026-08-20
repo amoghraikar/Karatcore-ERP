@@ -72,7 +72,7 @@ class ExecutiveOverviewPage extends ConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    mainAxisExtent: 120,
+                    mainAxisExtent: 132,
                     children: [
                       KcMetricCard(
                         title: 'Total Revenue',

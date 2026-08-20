@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/color_tokens.dart';
 
-class KcPrimaryButton extends StatelessWidget {
+class KcPrimaryButton extends StatefulWidget {
   const KcPrimaryButton({
     super.key,
     required this.label,
@@ -18,61 +19,87 @@ class KcPrimaryButton extends StatelessWidget {
   final bool fullWidth;
 
   @override
+  State<KcPrimaryButton> createState() => _KcPrimaryButtonState();
+}
+
+class _KcPrimaryButtonState extends State<KcPrimaryButton> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    final btn = Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: const LinearGradient(
-          colors: [KcColors.gold400, KcColors.gold600],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: KcColors.gold500.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading ? null : onPressed,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final btnColor = _isHovered
+        ? (isDark ? KcColors.pureWhite : const Color(0xFF27272A))
+        : (isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight);
+
+    final textColor = isDark ? KcColors.bgDark : KcColors.pureWhite;
+
+    final btn = MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-            child: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2.2, color: KcColors.obsidian950),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(icon, size: 18, color: KcColors.obsidian950),
-                        const SizedBox(width: 8),
-                      ],
-                      Text(
-                        label,
-                        style: const TextStyle(
-                          color: KcColors.obsidian950,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 14,
-                          letterSpacing: 0.3,
-                        ),
+          color: btnColor,
+          boxShadow: [
+            if (_isHovered)
+              BoxShadow(
+                color: KcColors.goldAccent.withValues(alpha: 0.25),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              )
+            else
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.isLoading ? null : widget.onPressed,
+            borderRadius: BorderRadius.circular(10),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: widget.isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: textColor,
                       ),
-                    ],
-                  ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.label.toUpperCase(),
+                          style: GoogleFonts.plusJakartaSans(
+                            color: textColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        if (widget.icon != null) ...[
+                          const SizedBox(width: 8),
+                          Icon(widget.icon, size: 16, color: KcColors.goldAccent),
+                        ],
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
     );
 
-    if (fullWidth) {
+    if (widget.fullWidth) {
       return SizedBox(width: double.infinity, child: btn);
     }
     return btn;

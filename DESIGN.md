@@ -1,19 +1,21 @@
 # KaratCore ERP — Enterprise Design System Specification (DESIGN.md)
 
-> Inspired by the precision of **Linear**, the financial depth of **Stripe**, the dark-mode craftsmanship of **Supabase**, and the luxury typography of **Apple**.
+> Inspired by the award-winning creative execution of **incredibles.dev** (Awwwards / FWA / CSSDA), combined with the precision of **Linear**, the financial depth of **Stripe**, and high-craft editorial dark-mode minimalism.
 
 ---
 
-## 💎 1. Core Brand Identity & Aesthetics
+## 💎 1. Core Brand Identity & Visual Aesthetic
 
-KaratCore ERP is an enterprise-grade luxury jewellery management & gold loan platform. Its visual language balances **heavy institutional trust** with **modern high-velocity tech execution**.
+KaratCore ERP balances **institutional enterprise trust** with **award-winning creative tech craftsmanship**.
 
-* **Primary Mood**: Executive, trustworthy, ultra-crisp, tactile, and responsive.
-* **Avoid "Vibecoded" Artifacts**:
-  * ❌ No random pastel colors, unconstrained rounded corners, or default browser inputs.
-  * ❌ No hardcoded static pixel heights/widths that break on mobile screens (`<600px`).
-  * ❌ No generic red/blue alert boxes without proper neutral backing and border contrast.
-  * ✅ Curated HSL/HEX luxury tokens, strict typography hierarchy, responsive layout rules, and micro-animated feedback.
+* **Primary Mood**: Bold, high-craft, editorial, brutalist-refined, ultra-tactile, and responsive.
+* **Signature Aesthetic Elements (Incredibles.dev Style)**:
+  * **Giant Editorial Headings**: Ultra-bold grotesk/geometric display typography with tight tracking (`-1.2px`) and compact line-height (`1.05 - 1.1`).
+  * **Micro-Dot Stipple Background**: Subtle dot matrix background patterns (`#EAEAEC` with `#CCCCCC` 1px stipple grid) for high visual texture.
+  * **Uppercase Monospaced Badges**: Crisp uppercase micro-labels (`1X WEBBY AWARD • 5X FWA`, `PRICING`, `START A CONVERSATION`) in high-contrast monospaced font with dot separators.
+  * **Hot Pink / Electric Magenta Accent**: Signature accent dot (`#FF2D55`) on lowercase details, badges, and active state indicators.
+  * **Stark High-Contrast Card Blocks**: Alternating crisp white cards (`#FFFFFF`) and dark charcoal cards (`#18181B`) with high contrast text.
+  * **Dark Mono Pill Buttons**: Solid black/charcoal pill buttons (`border-radius: 9999px`) with uppercase monospaced text (`REQUEST A QUOTE`, `SIGN IN`).
 
 ---
 
@@ -22,65 +24,74 @@ KaratCore ERP is an enterprise-grade luxury jewellery management & gold loan pla
 ### Brand Core Tokens
 ```yaml
 colors:
-  # Primary Brand Palette
-  navy-deep: "#0B1F3F"         # Primary brand dark canvas & high-contrast headers
-  navy-surface: "#0F2942"      # Elevation surface for dark containers
-  gold-primary: "#D97706"      # Primary action gold / high-value accents
-  gold-light: "#F59E0B"        # Gold highlight & active tab states
-  gold-subdued: "rgba(217, 119, 6, 0.12)" # Soft gold badge & chip backing
+  # Base Surface Canvas (Incredibles.dev Light / Dark Stipple)
+  stipple-bg: "#EAEAEC"         # Stipple dot grid background canvas
+  canvas-card-light: "#FFFFFF"   # Pure white elevated card block
+  canvas-card-dark: "#18181B"    # Deep charcoal block container
+  card-border: "rgba(0, 0, 0, 0.08)"
+  dark-card-border: "rgba(255, 255, 255, 0.12)"
 
-  # Functional Colors
-  emerald-success: "#059669"  # Verified KYC, Active Loans, Positive Cashflow
+  # Primary Brand Palette & Accents
+  charcoal-primary: "#121212"   # Stark high-contrast main text & dark pills
+  pink-accent: "#FF2D55"        # Signature Incredibles.dev hot pink dot accent
+  gold-primary: "#D97706"       # Jewellery gold accent / high-value metal indicators
+  gold-light: "#F59E0B"         # Gold highlight & active tab states
+  gold-subdued: "rgba(217, 119, 6, 0.12)"
+
+  # Functional Status Palette
+  emerald-success: "#059669"   # Verified KYC, Active Loans, Positive Cashflow
   emerald-subdued: "rgba(5, 150, 105, 0.12)"
-  rose-danger: "#DC2626"      # Overdue Loans, Penalty Interest, Rejected KYC
+  rose-danger: "#DC2626"       # Overdue Loans, Penalty Interest, Rejected KYC
   rose-subdued: "rgba(220, 38, 38, 0.12)"
-  amber-warning: "#D97706"     # Expiring Documents, Approaching Loan Dues
-  indigo-info: "#2563EB"       # Information notices, System updates
+  amber-warning: "#D97706"      # Expiring Documents, Approaching Dues
+  indigo-info: "#2563EB"        # System Notices & Information
 
-  # Light Mode Surfaces (Default)
-  canvas-bg: "#F8FAFC"         # Page background (Slate 50)
-  card-surface: "#FFFFFF"      # White card surface
-  card-border: "#E2E8F0"       # Hairline border (Slate 200)
-  text-primary: "#0F172A"      # Main text (Slate 900)
-  text-secondary: "#475569"    # Subtitles & field labels (Slate 600)
-  text-muted: "#94A3B8"        # Placeholders & disabled text (Slate 400)
-
-  # Dark Mode Surfaces
-  dark-canvas-bg: "#0B132B"    # Dark theme root canvas
-  dark-card-surface: "#1C2541" # Dark theme elevated card
-  dark-card-border: "rgba(255, 255, 255, 0.08)"
+  # Typography Grays
+  text-primary: "#121212"       # Dark high-contrast primary text
+  text-secondary: "#52525B"     # Subtitles & body descriptions (Zinc 600)
+  text-muted: "#A1A1AA"         # Disabled text & subtle metadata (Zinc 400)
+  text-inverse: "#FAFAFA"       # White text on dark cards
 ```
 
 ---
 
 ## 🔤 3. Typography & Hierarchy
 
-KaratCore ERP pairs **Sora** (Geometrical display font for headings) with **Inter** (High-legibility sans-serif for numbers, tables, and form inputs).
+KaratCore ERP pairs **Sora / Grotesk** (Ultra-bold display font for headlines) with **JetBrains Mono / Space Mono** (Monospaced uppercase micro-badges and metadata) and **Inter** (High-legibility sans-serif for numbers, tables, and form inputs).
 
 ```yaml
 typography:
+  editorial-headline:
+    fontFamily: "Sora, 'Plus Jakarta Sans', sans-serif"
+    fontSize: 42px
+    fontWeight: 800
+    lineHeight: 1.08
+    letterSpacing: "-1.2px"
+    usage: "Hero headers, major section intros, high-impact statements"
+
   display-heading:
     fontFamily: "Sora, sans-serif"
     fontSize: 26px
     fontWeight: 800
     lineHeight: 1.2
-    letterSpacing: -0.5px
+    letterSpacing: "-0.5px"
     usage: "Main Page Headers (KcPageHeader)"
+
+  monospaced-badge:
+    fontFamily: "JetBrains Mono, monospace"
+    fontSize: 11px
+    fontWeight: 700
+    letterSpacing: "0.8px"
+    textTransform: "uppercase"
+    usage: "Category chips, award badges, micro-buttons, action pills"
 
   title-large:
     fontFamily: "Sora, sans-serif"
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.3
-    letterSpacing: -0.3px
+    letterSpacing: "-0.3px"
     usage: "Section Titles & Card Headers"
-
-  title-medium:
-    fontFamily: "Inter, sans-serif"
-    fontSize: 16px
-    fontWeight: 600
-    lineHeight: 1.4
-    usage: "Data Table Headers & Sub-headings"
 
   body-regular:
     fontFamily: "Inter, sans-serif"
@@ -90,10 +101,10 @@ typography:
     usage: "General Body Text & Description Paragraphs"
 
   numeric-tabular:
-    fontFamily: "Inter, sans-serif"
+    fontFamily: "Inter, monospace"
     fontSize: 15px
     fontWeight: 700
-    fontFeatureSettings: "tnum" # Tabular figures for aligned currency values
+    fontFeatureSettings: "tnum"
     usage: "Prices (₹), Interest Rates (%), Loan Balances"
 ```
 
@@ -104,38 +115,30 @@ typography:
 Every layout and page in KaratCore ERP MUST adhere to responsive layout rules:
 
 ### Breakpoint Matrix
-* **Mobile (`<600px`)**: Single-column vertical stacks, 100% width buttons, wrapped page headers (`KcPageHeader`), 2-line stacked search bars (`KcSearchBarFilter`), bottom navigation bar (`KcBottomNavigation`), and horizontal scrolling data tables.
+* **Mobile (`<600px`)**: Single-column vertical stacks, 100% width pill buttons, wrapped page headers (`KcPageHeader`), 2-line stacked search bars (`KcSearchBarFilter`), bottom navigation bar (`KcBottomNavigation`), and horizontal scrolling data tables.
 * **Tablet (`600px - 1024px`)**: 2-column metric cards, collapsable navigation drawer.
-* **Desktop (`>1024px`)**: Multi-column grid layouts, persistent sidebar drawer (`KcSidebar`), and inline action button rows.
-
-### Responsive Component Guidelines
-1. **Page Headers**: Always use `KcPageHeader(title: ..., actions: [...])`. Never use inline `Row(children: [Text, Button])` without checking `context.isMobile`.
-2. **Search & Filter Bars**: Always use `KcSearchBarFilter(onSearch: ..., onFilter: ...)`.
-3. **Form Fields**: On mobile (`context.isMobile`), stack multi-field rows (`Row(children: [Expanded(Field1), Expanded(Field2)])`) into vertical `Column`s.
-4. **Metric Cards**: Wrap metric grids with `crossAxisCount: context.isMobile ? 1 : 4`.
-5. **Data Tables**: Wrap `DataTable` or `Table` widgets in `SingleChildScrollView(scrollDirection: Axis.horizontal)` with `minWidth: 850`.
+* **Desktop (`>1024px`)**: Multi-column split grid layouts, persistent sidebar drawer (`KcSidebar`), and inline action button rows.
 
 ---
 
-## 🧩 5. Atomic Component Standards
+## 🧩 5. Atomic Component Standards (Incredibles.dev Style)
 
-### 1. Action Buttons
-* **Primary Button (`KcPrimaryButton`)**: Solid gold/navy background, rounded radius (10px), 48px touch height, white bold text, subtle press scale animation.
-* **Outlined Button (`KcOutlinedButton`)**: 1px hairline border, transparent background, soft hover state.
+### 1. Action Pill Buttons
+* **Primary Mono Pill Button (`KcPrimaryButton`)**: Solid dark charcoal/black fill (`#18181B`), pill-shaped radius (`9999px`), 44px height, uppercase monospaced bold text (`JetBrains Mono`, letter-spacing `0.8px`), subtle hover scale.
+* **Secondary Outlined Pill (`KcOutlinedButton`)**: 1px hairline border (`#18181B`), transparent background, uppercase monospaced text, pill radius.
 
-### 2. Status Badges (`KcStatusBadge`)
-* Pill-shaped (12px padding), 11px font size, uppercase 800 weight font.
-* Emerald for **Active / Verified**, Rose for **Overdue / Liquidated**, Amber for **Pending**.
+### 2. Micro-Badges & Metric Chips
+* Uppercase monospaced font with optional hot pink accent dot (`•`).
+* Hairline outline or soft tinted background (`gold-subdued` / `emerald-subdued`).
 
-### 3. Metric Cards (`KcMetricCard`)
-* White/dark card backing with subtle hairline border (`Border.all(color: outline.withValues(alpha: 0.3))`).
-* Large bold numeric value in tabular figures format (`KcFormatters.inr(...)`).
-* Icon badge on top-right corner with 12% alpha tinted background.
+### 3. High-Contrast Split Cards
+* Light Card (`#FFFFFF` with `#EAEAEC` border) or Dark Card (`#18181B` with white text).
+* Large bold statement quotes with thin signature divider lines.
 
 ---
 
 ## 🚀 6. Operational & Code Hygiene Rules
 
-1. **No Hardcoded Store Names**: Always read business profile dynamically from `ref.watch(businessProfileProvider)` or `ref.watch(authStateProvider).session`.
+1. **No Hardcoded Store Names**: Always read business profile dynamically from state.
 2. **Zero Lint Warnings**: Every Flutter file MUST pass `flutter analyze` with 0 errors and 0 warnings.
-3. **No Swallowed Exceptions**: Backend and frontend API calls must return clear user-friendly error feedback via `KcToast` or error states.
+3. **No Swallowed Exceptions**: Backend and frontend API calls must return clear user-friendly error feedback.

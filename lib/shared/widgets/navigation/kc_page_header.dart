@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/color_tokens.dart';
 import '../../../core/extensions/context_extensions.dart';
 
@@ -8,16 +9,20 @@ class KcPageHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.actions = const [],
+    this.categoryTag,
   });
 
   final String title;
   final String? subtitle;
   final List<Widget> actions;
+  final String? categoryTag;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final tagText = (categoryTag ?? 'ENTERPRISE MODULE').toUpperCase();
 
     if (context.isMobile) {
       return Column(
@@ -26,33 +31,50 @@ class KcPageHeader extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 3,
-                height: 18,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: KcColors.gold500,
-                  borderRadius: BorderRadius.circular(2),
+                  color: isDark ? KcColors.surfaceDark : KcColors.textPrimaryLight,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  tagText,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                        color: isDark ? KcColors.pureWhite : KcColors.slate900,
-                      ),
+              const SizedBox(width: 6),
+              Container(
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  color: KcColors.goldAccent,
+                  shape: BoxShape.circle,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w800,
+              fontSize: 24,
+              letterSpacing: -0.6,
+              color: isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight,
+            ),
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
             Text(
               subtitle!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
-                  ),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                color: isDark ? KcColors.textSecondaryDark : scheme.onSurfaceVariant,
+              ),
             ),
           ],
           if (actions.isNotEmpty) ...[
@@ -75,35 +97,52 @@ class KcPageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 4,
-                    height: 24,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: KcColors.gold500,
-                      borderRadius: BorderRadius.circular(2),
+                      color: isDark ? KcColors.surfaceDark : KcColors.textPrimaryLight,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      tagText,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? KcColors.pureWhite : KcColors.slate900,
-                          letterSpacing: -0.5,
-                        ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      color: KcColors.goldAccent,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ],
               ),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 28,
+                  letterSpacing: -0.8,
+                  color: isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight,
+                ),
+              ),
               if (subtitle != null) ...[
-                const SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.only(left: 14),
-                  child: Text(
-                    subtitle!,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
-                        ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle!,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    color: isDark ? KcColors.textSecondaryDark : scheme.onSurfaceVariant,
                   ),
                 ),
               ],

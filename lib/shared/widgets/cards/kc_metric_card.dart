@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/color_tokens.dart';
-import 'kc_card.dart';
 
 class KcMetricCard extends StatelessWidget {
   const KcMetricCard({
@@ -24,85 +24,116 @@ class KcMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = iconColor ?? KcColors.gold500;
 
-    final card = KcCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title.toUpperCase(),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isDark ? KcColors.slate400 : scheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? KcColors.surfaceDark : KcColors.surfaceLight,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? KcColors.borderDark : KcColors.borderLight,
+          width: 1.0,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title.toUpperCase(),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 10,
+                                letterSpacing: 0.8,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Container(
+                            width: 4,
+                            height: 4,
+                            decoration: const BoxDecoration(
+                              color: KcColors.goldAccent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    if (icon != null)
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0x0AFFFFFF) : const Color(0x08111214),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: isDark ? KcColors.borderDark : KcColors.borderLight,
+                          ),
+                        ),
+                        child: Icon(icon, size: 14, color: iconColor ?? (isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight)),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                    letterSpacing: -0.6,
+                    color: isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              if (icon != null)
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: accentColor.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Icon(icon, size: 16, color: accentColor),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? KcColors.pureWhite : scheme.onSurface,
-                  letterSpacing: -0.5,
-                ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (trend != null) ...[
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(
-                  isPositiveTrend ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                  size: 14,
-                  color: isPositiveTrend ? KcColors.emerald500 : KcColors.signalRed,
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    trend!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: isPositiveTrend ? KcColors.emerald500 : KcColors.signalRed,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
+                if (trend != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        isPositiveTrend ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                        size: 13,
+                        color: isPositiveTrend ? KcColors.success : KcColors.danger,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          trend!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: isPositiveTrend ? KcColors.success : KcColors.danger,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            letterSpacing: 0.5,
+                          ),
                         ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ],
             ),
-          ],
-        ],
+          ),
+        ),
       ),
     );
-
-    return card;
   }
 }

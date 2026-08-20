@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/constants/color_tokens.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../shared/widgets/buttons/karat_badge.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/inputs/kc_text_field.dart';
@@ -72,8 +76,8 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
       _startTimer();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('A new 6-digit OTP code has been sent to your registered phone/email.'),
-          backgroundColor: KcColors.signalGreen,
+          content: Text('A new 6-digit verification code has been sent to your device.'),
+          backgroundColor: KcColors.success,
         ),
       );
     }
@@ -82,7 +86,10 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
+    final secondaryTextColor = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
     final targetContact = authState.pendingEmailOrPhone ?? '+91 98200 12345';
 
     return AuthSplitLayout(
@@ -92,51 +99,72 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          const Row(
+            children: [
+              KaratBadge(
+                label: 'SECURITY VERIFICATION',
+                variant: KaratBadgeVariant.gold,
+                showDot: true,
+              ),
+            ],
+          ).animate().fadeIn(duration: 300.ms),
+          const SizedBox(height: 16),
+
           Text(
             'Enter Security Code',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 30,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.8,
+              color: primaryTextColor,
+            ),
+          ).animate().fadeIn(delay: 50.ms, duration: 350.ms),
           const SizedBox(height: 6),
           Text(
             'We sent a 6-digit verification code to $targetContact',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: 10),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              color: secondaryTextColor,
+            ),
+          ).animate().fadeIn(delay: 100.ms, duration: 350.ms),
+          const SizedBox(height: 12),
+
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: scheme.outline.withValues(alpha: 0.2)),
+              color: isDark ? const Color(0x0AFFFFFF) : const Color(0x08111214),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: borderColor, width: 1.0),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, size: 16, color: KcColors.signalOrange),
-                const SizedBox(width: 8),
+                const Icon(Icons.info_outline_rounded, size: 16, color: KcColors.goldAccent),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Testing Mode: Enter 123456 (or any 6-digit code) to complete OTP verification.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                    'Testing Mode: Enter 123456 (or any 6-digit code) to complete verification.',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: secondaryTextColor,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
+          ).animate().fadeIn(delay: 120.ms, duration: 350.ms),
           const SizedBox(height: 24),
 
           // 2FA Method Selector
           Text(
             'VERIFICATION METHOD',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.0,
-                  color: scheme.onSurfaceVariant,
-                ),
-          ),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+              color: secondaryTextColor,
+            ),
+          ).animate().fadeIn(delay: 140.ms, duration: 350.ms),
           const SizedBox(height: 8),
           SegmentedButton<String>(
             segments: const [
@@ -160,33 +188,34 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
             onSelectionChanged: (set) {
               ref.read(authStateProvider.notifier).setOtpMethod(set.first);
             },
-          ),
+          ).animate().fadeIn(delay: 160.ms, duration: 350.ms),
           const SizedBox(height: 24),
 
           if (authState.errorMessage != null) ...[
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: KcColors.signalRed.withValues(alpha: 0.1),
+                color: KcColors.dangerSubdued,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: KcColors.signalRed.withValues(alpha: 0.3)),
+                border: Border.all(color: KcColors.danger.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: KcColors.signalRed, size: 20),
+                  const Icon(Icons.error_outline_rounded, color: KcColors.danger, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       authState.errorMessage!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: KcColors.signalRed,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: GoogleFonts.plusJakartaSans(
+                        color: KcColors.danger,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
+            ).animate().fadeIn(duration: 250.ms).shakeX(amount: 4),
             const SizedBox(height: 20),
           ],
 
@@ -196,7 +225,7 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                 setState(() => _otpCode = code);
                 _onVerify();
               },
-            ),
+            ).animate().fadeIn(delay: 180.ms, duration: 350.ms),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,14 +233,21 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                 if (_countdown > 0)
                   Text(
                     'Resend code in ${_countdown}s',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      color: secondaryTextColor,
+                    ),
                   )
                 else
                   TextButton(
                     onPressed: _resendCode,
-                    child: const Text('Resend OTP Code'),
+                    child: Text(
+                      'Resend Code',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        color: KcColors.goldAccent,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -221,34 +257,34 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
               label: 'Authenticator Code (TOTP)',
               hintText: 'Enter 6-digit code from Google/Microsoft Authenticator',
               prefixIcon: const Icon(Icons.security_rounded),
-            ),
+            ).animate().fadeIn(delay: 180.ms, duration: 350.ms),
           ] else ...[
             KcTextField(
               controller: _backupCodeController,
               label: '8-Digit Security Emergency Code',
               hintText: 'e.g. 8492-3019',
               prefixIcon: const Icon(Icons.key_rounded),
-            ),
+            ).animate().fadeIn(delay: 180.ms, duration: 350.ms),
           ],
 
           const SizedBox(height: 24),
           KcPrimaryButton(
-            label: 'Verify & Continue',
+            label: 'VERIFY & CONTINUE',
             fullWidth: true,
             icon: Icons.check_circle_outline_rounded,
             isLoading: authState.isAuthenticating,
             onPressed: _onVerify,
-          ),
+          ).animate().fadeIn(delay: 200.ms, duration: 350.ms),
           const SizedBox(height: 12),
           KcOutlinedButton(
-            label: 'Back to Login',
+            label: 'BACK TO LOGIN',
             fullWidth: true,
             icon: Icons.arrow_back_rounded,
             onPressed: () {
               ref.read(authStateProvider.notifier).logout();
               context.go(AppRoutes.login);
             },
-          ),
+          ).animate().fadeIn(delay: 220.ms, duration: 350.ms),
         ],
       ),
     );

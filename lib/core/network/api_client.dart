@@ -36,35 +36,49 @@ class ApiClient {
     return headers;
   }
 
+  Future<http.Response> _sendRequest(Future<http.Response> Function() requestFn) async {
+    try {
+      return await requestFn().timeout(const Duration(seconds: 5));
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(
+        statusCode: 503,
+        code: 'NETWORK_ERROR',
+        message: 'Unable to connect to the server right now. Please check your network connection and try again.',
+      );
+    }
+  }
+
   Future<dynamic> get(String path) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.get(url, headers: _headers()).timeout(const Duration(seconds: 3));
+    final response = await _sendRequest(() => _client.get(url, headers: _headers()));
     return _parseResponse(response);
   }
 
   Future<dynamic> post(String path, {Map<String, dynamic>? body}) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.post(
+    final response = await _sendRequest(() => _client.post(
       url,
       headers: _headers(),
       body: body != null ? jsonEncode(body) : null,
-    ).timeout(const Duration(seconds: 3));
+    ));
     return _parseResponse(response);
   }
 
   Future<dynamic> put(String path, {Map<String, dynamic>? body}) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.put(
+    final response = await _sendRequest(() => _client.put(
       url,
       headers: _headers(),
       body: body != null ? jsonEncode(body) : null,
-    ).timeout(const Duration(seconds: 3));
+    ));
     return _parseResponse(response);
   }
 
   Future<dynamic> delete(String path) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.delete(url, headers: _headers()).timeout(const Duration(seconds: 3));
+    final response = await _sendRequest(() => _client.delete(url, headers: _headers()));
     return _parseResponse(response);
   }
 

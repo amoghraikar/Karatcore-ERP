@@ -88,7 +88,9 @@ import '../../features/security/presentation/pages/security_dashboard_page.dart'
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/settings_subpages.dart';
 
+import 'package:flutter/services.dart';
 import '../../shared/widgets/navigation/kc_bottom_navigation.dart';
+import '../../shared/widgets/navigation/kc_command_palette.dart';
 import '../../shared/widgets/navigation/kc_navigation_rail.dart';
 import '../../shared/widgets/navigation/kc_sidebar.dart';
 import '../../shared/widgets/navigation/kc_top_bar.dart';
@@ -590,8 +592,32 @@ class _AppShellState extends ConsumerState<_AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final animatedChild = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.02),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(widget.currentPath),
+        child: widget.child,
+      ),
+    );
+
+    Widget shellBody;
+
     if (context.isDesktop) {
-      return Scaffold(
+      shellBody = Scaffold(
         body: Row(
           children: [
             KcSidebar(
@@ -603,17 +629,15 @@ class _AppShellState extends ConsumerState<_AppShell> {
               child: Column(
                 children: [
                   const KcTopBar(),
-                  Expanded(child: widget.child),
+                  Expanded(child: animatedChild),
                 ],
               ),
             ),
           ],
         ),
       );
-    }
-
-    if (context.isTablet) {
-      return Scaffold(
+    } else if (context.isTablet) {
+      shellBody = Scaffold(
         body: Row(
           children: [
             KcNavigationRail(currentPath: widget.currentPath),
@@ -621,26 +645,40 @@ class _AppShellState extends ConsumerState<_AppShell> {
               child: Column(
                 children: [
                   const KcTopBar(),
-                  Expanded(child: widget.child),
+                  Expanded(child: animatedChild),
                 ],
               ),
             ),
           ],
         ),
       );
+    } else {
+      shellBody = Scaffold(
+        appBar: const KcTopBar(),
+        drawer: Drawer(
+          child: KcSidebar(
+            currentPath: widget.currentPath,
+            isCollapsed: false,
+          ),
+        ),
+        body: animatedChild,
+        bottomNavigationBar: KcBottomNavigation(currentPath: widget.currentPath),
+      );
     }
 
-    // Mobile layout
-    return Scaffold(
-      appBar: const KcTopBar(),
-      drawer: Drawer(
-        child: KcSidebar(
-          currentPath: widget.currentPath,
-          isCollapsed: false,
-        ),
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
+          KcCommandPalette.show(context);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
+          KcCommandPalette.show(context);
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: shellBody,
       ),
-      body: widget.child,
-      bottomNavigationBar: KcBottomNavigation(currentPath: widget.currentPath),
     );
   }
 }

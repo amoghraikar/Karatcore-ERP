@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/color_tokens.dart';
 import '../../../core/routing/routes.dart';
@@ -27,7 +28,7 @@ class KcSidebar extends ConsumerWidget {
     final ownerAuth = ref.watch(ownerAuthorizationServiceProvider);
     final user = authState.session;
 
-    final name = user?.name ?? 'Demo Owner';
+    final name = user?.name ?? 'Amogh';
     final initials = name
         .split(' ')
         .take(2)
@@ -35,41 +36,43 @@ class KcSidebar extends ConsumerWidget {
         .join()
         .toUpperCase();
 
+    final bgColor = isDark ? KcColors.surfaceDark : KcColors.surfaceLight;
+    final borderColor = isDark ? KcColors.borderDark : KcColors.borderLight;
+    final headerTextColor = isDark ? KcColors.textMutedDark : KcColors.textSecondaryLight;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: isCollapsed ? 76 : 264,
+      curve: Curves.easeInOut,
+      width: isCollapsed ? 72 : 250,
       decoration: BoxDecoration(
-        color: isDark ? KcColors.obsidian900 : KcColors.white,
+        color: bgColor,
         border: Border(
-          right: BorderSide(
-            color: isDark
-                ? KcColors.obsidian800
-                : KcColors.slate200,
-          ),
+          right: BorderSide(color: borderColor, width: 1.0),
         ),
       ),
       child: Column(
         children: [
+          // Logo Header Area
           Padding(
             padding: isCollapsed
-                ? const EdgeInsets.symmetric(vertical: 16)
-                : const EdgeInsets.fromLTRB(16, 18, 12, 18),
+                ? const EdgeInsets.symmetric(vertical: 20)
+                : const EdgeInsets.fromLTRB(20, 22, 14, 18),
             child: isCollapsed
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const KcBrandMark(
                         showWordmark: false,
-                        size: 34,
+                        size: 32,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       if (onToggleCollapse != null)
                         IconButton(
-                          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.chevron_right_rounded, size: 22, color: KcColors.gold400),
+                          icon: Icon(Icons.chevron_right_rounded, size: 20, color: isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight),
                           onPressed: onToggleCollapse,
-                          tooltip: 'Expand sidebar',
+                          tooltip: 'Expand navigation',
                         ),
                     ],
                   )
@@ -77,42 +80,45 @@ class KcSidebar extends ConsumerWidget {
                     children: [
                       const KcBrandMark(
                         showWordmark: true,
-                        subtitle: 'ERP Suite',
+                        subtitle: 'JEWELLERY ERP',
                       ),
                       const Spacer(),
                       if (onToggleCollapse != null)
                         IconButton(
-                          icon: const Icon(Icons.chevron_left_rounded, size: 22, color: KcColors.slate400),
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          icon: Icon(Icons.chevron_left_rounded, size: 20, color: isDark ? KcColors.textMutedDark : KcColors.textMutedLight),
                           onPressed: onToggleCollapse,
-                          tooltip: 'Collapse sidebar',
+                          tooltip: 'Collapse navigation',
                         ),
                     ],
                   ),
           ),
-          Divider(height: 1, color: isDark ? KcColors.obsidian800 : KcColors.slate200),
+          Divider(height: 1, color: borderColor),
+          // Navigation Items List
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
               children: [
                 for (final nav in AppRoutes.navigationSections) ...[
                   if (nav.items.any((i) => ownerAuth.canAccessOwnerArea(user, i.path))) ...[
                     if (!isCollapsed && nav.sectionHeader != null)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 18, 12, 8),
+                        padding: const EdgeInsets.fromLTRB(14, 18, 14, 8),
                         child: Text(
                           nav.sectionHeader!.toUpperCase(),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: KcColors.gold500.withValues(alpha: 0.8),
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.4,
-                              ),
+                          style: GoogleFonts.plusJakartaSans(
+                            color: headerTextColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            letterSpacing: 1.4,
+                          ),
                         ),
                       ),
                     for (final item in nav.items)
                       if (ownerAuth.canAccessOwnerArea(user, item.path))
-                        _NavTile(
+                        _SidebarTile(
                           item: item,
-                          selected: currentPath.startsWith(item.path),
+                          selected: currentPath == item.path || (item.path != '/' && currentPath.startsWith('${item.path}/')),
                           isCollapsed: isCollapsed,
                           onTap: () {
                             if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
@@ -126,47 +132,56 @@ class KcSidebar extends ConsumerWidget {
               ],
             ),
           ),
-          Divider(height: 1, color: isDark ? KcColors.obsidian800 : KcColors.slate200),
+          Divider(height: 1, color: borderColor),
+          // Minimal Owner Profile Footnote
           Padding(
             padding: const EdgeInsets.all(12),
             child: isCollapsed
-                ? Center(child: KcAvatar(initials: initials, size: 38))
+                ? Center(child: KcAvatar(initials: initials, size: 36))
                 : Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isDark ? KcColors.obsidian850 : KcColors.slate100,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: KcColors.gold500.withValues(alpha: 0.2)),
+                      color: isDark ? const Color(0x0AFFFFFF) : const Color(0x08111214),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        KcAvatar(initials: initials, size: 36),
+                        KcAvatar(initials: initials, size: 32),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 name,
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                  color: isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Row(
                                 children: [
                                   Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(color: KcColors.emerald500, shape: BoxShape.circle),
+                                    width: 4,
+                                    height: 4,
+                                    decoration: const BoxDecoration(
+                                      color: KcColors.goldAccent,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
                                       'STORE OWNER',
-                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                            color: KcColors.gold400,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 10,
-                                          ),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 9,
+                                        letterSpacing: 0.8,
+                                      ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -185,8 +200,8 @@ class KcSidebar extends ConsumerWidget {
   }
 }
 
-class _NavTile extends StatelessWidget {
-  const _NavTile({
+class _SidebarTile extends StatelessWidget {
+  const _SidebarTile({
     required this.item,
     required this.selected,
     required this.isCollapsed,
@@ -200,63 +215,57 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeBg = isDark ? const Color(0x1AFFFFFF) : const Color(0x0A111214);
+    final activeText = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
+    final inactiveText = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
-              color: selected
-                  ? (isDark ? KcColors.gold500.withValues(alpha: 0.15) : KcColors.gold100)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: selected
-                    ? KcColors.gold500.withValues(alpha: 0.5)
-                    : Colors.transparent,
-                width: 1.0,
-              ),
+              color: selected ? activeBg : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
+                // Minimal Gold Active Line Indicator
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 3,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: selected ? KcColors.goldAccent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                SizedBox(width: selected ? 8 : 4),
                 Icon(
                   selected ? item.selectedIcon : item.icon,
-                  size: 19,
-                  color: selected
-                      ? (isDark ? KcColors.gold400 : KcColors.gold700)
-                      : scheme.onSurfaceVariant,
+                  size: 18,
+                  color: selected ? activeText : inactiveText,
                 ),
                 if (!isCollapsed) ...[
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       item.label,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: selected
-                                ? (isDark ? KcColors.pureWhite : KcColors.slate900)
-                                : scheme.onSurfaceVariant,
-                            fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                          ),
+                      style: GoogleFonts.plusJakartaSans(
+                        color: selected ? activeText : inactiveText,
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                        fontSize: 13,
+                        letterSpacing: -0.1,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (selected)
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        color: KcColors.gold500,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
                 ],
               ],
             ),
