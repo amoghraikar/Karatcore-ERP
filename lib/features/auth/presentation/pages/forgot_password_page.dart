@@ -125,7 +125,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               KcTextField(
                 controller: _contactController,
                 label: 'Registered Email or Phone',
-                hintText: 'e.g. arjun@karatcore.com',
                 prefixIcon: const Icon(Icons.mark_email_read_outlined),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {

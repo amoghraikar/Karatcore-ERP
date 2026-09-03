@@ -149,7 +149,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _storeNameController,
                     label: 'Jewellery Store / Business Name *',
-                    hintText: 'e.g. Royal Gold Jewellers',
                     validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your business name' : null,
                   ).animate().fadeIn(delay: 120.ms, duration: 350.ms),
                   const SizedBox(height: 16),
@@ -157,7 +156,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _fullNameController,
                     label: 'Owner Full Name *',
-                    hintText: 'e.g. Rajesh Sharma',
                     validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your full name' : null,
                   ).animate().fadeIn(delay: 140.ms, duration: 350.ms),
                   const SizedBox(height: 16),
@@ -165,7 +163,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _emailController,
                     label: 'Owner Email Address *',
-                    hintText: 'e.g. rajesh@royalgold.com',
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) => val == null || !val.contains('@') ? 'Please enter a valid email address' : null,
                   ).animate().fadeIn(delay: 160.ms, duration: 350.ms),
@@ -174,7 +171,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   KcTextField(
                     controller: _phoneController,
                     label: 'Mobile Phone Number *',
-                    hintText: 'e.g. +91 98765 43210',
                     keyboardType: TextInputType.phone,
                     validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your mobile number' : null,
                   ).animate().fadeIn(delay: 180.ms, duration: 350.ms),

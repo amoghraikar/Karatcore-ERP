@@ -48,15 +48,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  void _submitBiometric() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Biometric authentication requires initial account login and setup in Security settings.'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
@@ -136,7 +127,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             KcTextField(
               controller: _emailController,
               label: 'Email Address or Mobile Number',
-              hintText: 'e.g. amoghrraikar@gmail.com or +91 98200 12345',
               prefixIcon: const Icon(Icons.person_outline_rounded),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -205,13 +195,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               isLoading: authState.isAuthenticating,
               onPressed: _submitLogin,
             ).animate().fadeIn(delay: 220.ms, duration: 350.ms),
-            const SizedBox(height: 12),
-            KcOutlinedButton(
-              label: 'BIOMETRIC LOGIN (TOUCHID / FACEID)',
-              fullWidth: true,
-              icon: Icons.fingerprint_rounded,
-              onPressed: _submitBiometric,
-            ).animate().fadeIn(delay: 240.ms, duration: 350.ms),
+
             const SizedBox(height: 12),
             KcOutlinedButton(
               label: 'SIGN IN VIA OTP VERIFICATION',
@@ -241,7 +225,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ],
             ).animate().fadeIn(delay: 280.ms, duration: 350.ms),
+            const SizedBox(height: 12),
+
+            KcOutlinedButton(
+              label: 'CUSTOMER PORTAL (MOBILE + OTP LOGIN)',
+              fullWidth: true,
+              icon: Icons.account_circle_outlined,
+              onPressed: () => context.go('/customer'),
+            ).animate().fadeIn(delay: 300.ms, duration: 350.ms),
             const SizedBox(height: 20),
+
 
             Divider(height: 1, color: borderColor),
             const SizedBox(height: 16),
