@@ -28,7 +28,6 @@ import '../../features/auth/presentation/pages/branch_selection_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/lock_screen_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
@@ -126,7 +125,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthRoute = currentPath == AppRoutes.splash ||
           currentPath == AppRoutes.login ||
           currentPath == AppRoutes.register ||
-          currentPath == AppRoutes.verify ||
           currentPath == AppRoutes.forgotPassword ||
           currentPath == AppRoutes.resetPassword;
 
@@ -137,13 +135,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authState.status == AuthStatus.unauthenticated) {
         if (!isAuthRoute) {
           return AppRoutes.login;
-        }
-        return null;
-      }
-
-      if (authState.status == AuthStatus.pendingOtp) {
-        if (currentPath != AppRoutes.verify) {
-          return AppRoutes.verify;
         }
         return null;
       }
@@ -187,10 +178,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.register,
         builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.verify,
-        builder: (context, state) => const OtpVerificationPage(),
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,

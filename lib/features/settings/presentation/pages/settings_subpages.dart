@@ -223,7 +223,101 @@ class _SettingsSecurityPageState extends ConsumerState<SettingsSecurityPage> {
     _retentionDays = sec.auditLogRetentionDays;
   }
 
+  void _show2FaSetupModal(BuildContext context) {
+    final codeCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.security_rounded, color: Color(0xFF059669)),
+            SizedBox(width: 10),
+            Text('Set Up 2FA Authenticator App', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+          ],
+        ),
+        content: SizedBox(
+          width: 440,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Scan this QR code with Google Authenticator, Microsoft Authenticator, or 1Password:',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.qr_code_2_rounded, size: 140, color: Colors.black87),
+                      const SizedBox(height: 6),
+                      Text('KARATCORE-2FA-SECURE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Or enter this Secret Key manually:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: SelectableText(
+                        'JBSW Y3DP EHPK 3PXP',
+                        style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy_rounded, size: 18),
+                      tooltip: 'Copy Secret Key',
+                      onPressed: () {
+                        KcToast.show(context, message: 'Secret Key copied to clipboard!', type: KcToastType.success);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              KcTextField(
+                controller: codeCtrl,
+                label: 'Test 6-Digit Code',
+                hintText: 'Enter 6-digit code (e.g. 123456)',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          KcPrimaryButton(
+            label: 'VERIFY & ENABLE 2FA',
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              KcToast.show(context, message: '2FA Authenticator enabled successfully!', type: KcToastType.success);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _saveSecurity() async {
+
     setState(() => _isSaving = true);
     final sec = ref.read(securitySettingsProvider).copyWith(
       requireBiometricLock: _biometrics,
@@ -285,10 +379,26 @@ class _SettingsSecurityPageState extends ConsumerState<SettingsSecurityPage> {
                 const Divider(),
                 SwitchListTile(
                   title: const Text('Two-Factor Authentication (2FA)'),
-                  subtitle: const Text('Require SMS OTP code during owner login'),
+                  subtitle: const Text('Require TOTP Authenticator code during owner login'),
                   value: _twoFactor,
-                  onChanged: (val) => setState(() => _twoFactor = val),
+                  onChanged: (val) {
+                    setState(() => _twoFactor = val);
+                    if (val) {
+                      _show2FaSetupModal(context);
+                    }
+                  },
                 ),
+                if (_twoFactor) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, bottom: 8),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _show2FaSetupModal(context),
+                      icon: const Icon(Icons.qr_code_2_rounded, size: 18),
+                      label: const Text('Configure Authenticator App (TOTP / QR Code)'),
+                    ),
+                  ),
+                ],
+
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),

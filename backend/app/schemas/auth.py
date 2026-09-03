@@ -29,3 +29,15 @@ class TokenResponse(BaseModel):
 class CustomerAuthRequest(BaseModel):
     customer_id: str
     mobile: str
+
+
+class TwoFactorSetupResponse(BaseModel):
+    secret: str
+    qr_uri: str
+    backup_codes: list[str]
+
+
+class TwoFactorVerifyRequest(BaseModel):
+    code: str
+    secret: Optional[str] = None
+

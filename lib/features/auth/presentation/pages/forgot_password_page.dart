@@ -97,7 +97,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Reset Link & OTP Sent!',
+                            'Reset Password Link Sent!',
                             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: KcColors.signalGreen,

@@ -5,6 +5,8 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/feedback/customer_access_restricted_page.dart';
 import '../../providers/customer_portal_providers.dart';
+import '../widgets/quality_certificate_dialog.dart';
+
 
 class CustomerJewelleryDetailPage extends ConsumerWidget {
   const CustomerJewelleryDetailPage({super.key, required this.ornamentId});
@@ -77,6 +79,21 @@ class CustomerJewelleryDetailPage extends ConsumerWidget {
                     _specRow('Net Precious Weight', '${item.weight.netMetalWeight} grams'),
                     const Divider(),
                     _specRow('Vault Storage Status', 'Secured in Vault Storage'),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD97706),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () => QualityCertificateDialog.show(context, item),
+                        icon: const Icon(Icons.verified_rounded, size: 20),
+                        label: const Text('VIEW BIS QUALITY CERTIFICATE', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -86,6 +103,7 @@ class CustomerJewelleryDetailPage extends ConsumerWidget {
       },
     );
   }
+
 
   Widget _specRow(String label, String value) {
     return Padding(

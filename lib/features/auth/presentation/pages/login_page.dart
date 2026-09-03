@@ -195,18 +195,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               isLoading: authState.isAuthenticating,
               onPressed: _submitLogin,
             ).animate().fadeIn(delay: 220.ms, duration: 350.ms),
-
-            const SizedBox(height: 12),
-            KcOutlinedButton(
-              label: 'SIGN IN VIA OTP VERIFICATION',
-              fullWidth: true,
-              icon: Icons.phonelink_ring_rounded,
-              onPressed: () {
-                ref.read(authStateProvider.notifier).requireOtpStep(_emailController.text.trim());
-                context.go(AppRoutes.verify);
-              },
-            ).animate().fadeIn(delay: 260.ms, duration: 350.ms),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             Wrap(
               alignment: WrapAlignment.center,
@@ -224,15 +213,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
               ],
-            ).animate().fadeIn(delay: 280.ms, duration: 350.ms),
+            ).animate().fadeIn(delay: 240.ms, duration: 350.ms),
             const SizedBox(height: 12),
 
             KcOutlinedButton(
-              label: 'CUSTOMER PORTAL (MOBILE + OTP LOGIN)',
+              label: 'CUSTOMER PORTAL',
               fullWidth: true,
               icon: Icons.account_circle_outlined,
               onPressed: () => context.go('/customer'),
-            ).animate().fadeIn(delay: 300.ms, duration: 350.ms),
+            ).animate().fadeIn(delay: 260.ms, duration: 350.ms),
             const SizedBox(height: 20),
 
 

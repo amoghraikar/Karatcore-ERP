@@ -17,12 +17,6 @@ abstract class IAuthRepository {
     required String password,
   });
 
-  Future<bool> verifyOtp({
-    required String otpCode,
-    required String method,
-  });
-
-  Future<bool> resendOtp();
 
   Future<bool> requestPasswordReset({
     required String emailOrPhone,

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/models/customer_session_model.dart';
+import '../../../../shared/widgets/navigation/language_selector.dart';
 import '../../providers/customer_portal_providers.dart';
+
 
 class CustomerShellPage extends ConsumerWidget {
   const CustomerShellPage({super.key, required this.child});
@@ -107,6 +109,7 @@ class CustomerShellPage extends ConsumerWidget {
               ),
             ),
           ),
+          const LanguageSelector(),
           IconButton(
             icon: const Icon(Icons.storefront_outlined),
             tooltip: 'Switch to Owner ERP View',

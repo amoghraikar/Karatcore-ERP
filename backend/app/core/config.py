@@ -32,12 +32,15 @@ class Settings(BaseSettings):
     IDENTITY_PROVIDER: str = "MOCK"
     LOG_LEVEL: str = "INFO"
 
-    # SMS Gateway Configuration (Twilio / Fast2SMS)
-    SMS_PROVIDER: str = "twilio"  # twilio | fast2sms | mock
+    # SMS Gateway Configuration (Twilio / Fast2SMS / MSG91)
+    SMS_PROVIDER: str = "fast2sms"  # twilio | fast2sms | msg91 | mock
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_FROM_NUMBER: str = ""
     FAST2SMS_API_KEY: str = ""
+    MSG91_AUTH_KEY: str = ""
+    MSG91_TEMPLATE_ID: str = ""
+
 
     # SMTP Email Server Configuration
     SMTP_HOST: str = "smtp.gmail.com"

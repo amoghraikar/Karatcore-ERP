@@ -14,6 +14,8 @@ import '../../components/kc_avatar.dart';
 import '../../components/kc_breadcrumb_bar.dart';
 import '../../widgets/dialogs/kc_bottom_sheets.dart';
 import 'kc_command_palette.dart';
+import 'language_selector.dart';
+
 
 class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
   const KcTopBar({super.key});
@@ -28,7 +30,7 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
     final authState = ref.watch(authStateProvider);
     final user = authState.session;
 
-    final name = user?.name ?? 'Amogh';
+    final name = user?.name ?? 'Store Owner';
     final initials = name
         .split(' ')
         .take(2)
@@ -198,6 +200,8 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
             ),
           ),
           const SizedBox(width: 10),
+          // Language Selector
+          const LanguageSelector(),
           // Theme Switcher
           IconButton(
             onPressed: () => ref.read(themeModeProvider.notifier).toggle(),

@@ -64,9 +64,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         setState(() => _isSubmitting = false);
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account Created! Please enter your 6-digit OTP verification code.')),
+            const SnackBar(content: Text('Store Owner Account Created Successfully! Welcome to KaratCore ERP.')),
           );
-          context.go(AppRoutes.verify);
+          context.go(AppRoutes.dashboard);
         } else {
           final errorMsg = ref.read(authStateProvider).errorMessage;
           ScaffoldMessenger.of(context).showSnackBar(

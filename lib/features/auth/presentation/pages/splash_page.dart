@@ -34,9 +34,6 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       case AuthStatus.pendingBranch:
         context.go(AppRoutes.selectBranch);
         break;
-      case AuthStatus.pendingOtp:
-        context.go(AppRoutes.verify);
-        break;
       case AuthStatus.locked:
       case AuthStatus.sessionExpired:
         context.go(AppRoutes.locked);

@@ -9,26 +9,23 @@ logger = logging.getLogger(__name__)
 
 class NotificationService:
     @staticmethod
-    def send_otp_email(to_email: str, otp_code: str) -> bool:
-        """Sends a 6-digit OTP verification email via SMTP."""
+    @staticmethod
+    def send_email(to_email: str, subject: str, message: str) -> bool:
+        """Sends an email notification via SMTP."""
         if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
             logger.warning("SMTP credentials not set in backend environment. Email dispatch skipped.")
             return False
 
         try:
             msg = MIMEMultipart("alternative")
-            msg["Subject"] = f"[{settings.EMAILS_FROM_NAME}] Your 6-Digit OTP Verification Code"
+            msg["Subject"] = subject
             msg["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
             msg["To"] = to_email
 
             html_body = f"""
             <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0f172a; color: #ffffff; border-radius: 12px;">
-                <h2 style="color: #f59e0b;">KaratCore Security Authentication</h2>
-                <p>Use the following 6-digit verification code to complete your login:</p>
-                <div style="font-size: 32px; font-weight: bold; letter-spacing: 6px; padding: 16px; background-color: #1e293b; color: #10b981; text-align: center; border-radius: 8px;">
-                    {otp_code}
-                </div>
-                <p style="color: #94a3b8; font-size: 12px; margin-top: 20px;">This code will expire in 10 minutes. If you did not request this, please contact your store administrator.</p>
+                <h2 style="color: #f59e0b;">KaratCore Security Notification</h2>
+                <p>{message}</p>
             </div>
             """
             msg.attach(MIMEText(html_body, "html"))
@@ -39,15 +36,15 @@ class NotificationService:
                 server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
                 server.sendmail(settings.EMAILS_FROM_EMAIL, to_email, msg.as_string())
 
-            logger.info(f"OTP Email sent successfully to {to_email}")
+            logger.info(f"Email sent successfully to {to_email}")
             return True
         except Exception as e:
-            logger.error(f"Failed to send OTP Email to {to_email}: {str(e)}")
+            logger.error(f"Failed to send Email to {to_email}: {str(e)}")
             return False
 
     @staticmethod
-    def send_otp_sms(to_phone: str, otp_code: str) -> bool:
-        """Sends a 6-digit OTP SMS via Twilio or Fast2SMS."""
+    def send_sms(to_phone: str, message: str) -> bool:
+        """Sends an SMS notification via Twilio or Fast2SMS."""
         if settings.SMS_PROVIDER == "twilio":
             if not settings.TWILIO_ACCOUNT_SID or not settings.TWILIO_AUTH_TOKEN:
                 logger.warning("Twilio credentials not configured in backend environment.")
@@ -61,7 +58,7 @@ class NotificationService:
                 body_data = urllib.parse.urlencode({
                     "From": settings.TWILIO_FROM_NUMBER,
                     "To": to_phone,
-                    "Body": f"Your KaratCore Security verification code is: {otp_code}. Valid for 10 minutes."
+                    "Body": message,
                 }).encode("utf-8")
 
                 req = urllib.request.Request(url, data=body_data, method="POST")
@@ -87,9 +84,10 @@ class NotificationService:
                 url = "https://www.fast2sms.com/dev/bulkV2"
                 body_data = urllib.parse.urlencode({
                     "authorization": settings.FAST2SMS_API_KEY,
-                    "variables_values": otp_code,
-                    "route": "otp",
-                    "numbers": to_phone.replaceAll("+91", "").trim(),
+                    "message": message,
+                    "language": "english",
+                    "route": "q",
+                    "numbers": to_phone.replace("+91", "").strip(),
                 }).encode("utf-8")
 
                 req = urllib.request.Request(url, data=body_data, method="POST")
@@ -97,9 +95,10 @@ class NotificationService:
 
                 with urllib.request.urlopen(req) as resp:
                     logger.info(f"Fast2SMS dispatched to {to_phone}")
-                    return resp.status == 200
+                    return resp.status in (200, 201)
             except Exception as e:
                 logger.error(f"Fast2SMS dispatch failed: {str(e)}")
                 return False
 
         return False
+

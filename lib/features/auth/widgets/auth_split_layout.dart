@@ -293,58 +293,60 @@ class AuthSplitLayout extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: 1.0),
       ),
-      padding: const EdgeInsets.all(40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Monospaced Category Tag Badge
-          const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              KaratBadge(
-                label: 'ENTERPRISE JEWELLERY ERP',
-                variant: KaratBadgeVariant.gold,
-                showDot: true,
-              ),
-            ],
-          ).animate().fadeIn(duration: 300.ms),
-          const SizedBox(height: 24),
-
-          // Giant Editorial Display Title
-          RichText(
-            text: TextSpan(
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 44,
-                fontWeight: FontWeight.w800,
-                height: 1.08,
-                letterSpacing: -1.4,
-                color: primaryTextColor,
-              ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Monospaced Category Tag Badge
+            const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const TextSpan(text: 'Complete management '),
-                TextSpan(
-                  text: 'platform',
-                  style: TextStyle(color: primaryTextColor),
-                ),
-                const TextSpan(text: ' for high-precision '),
-                const TextSpan(
-                  text: 'jewellery businesses.',
-                  style: TextStyle(color: KcColors.goldAccent),
+                KaratBadge(
+                  label: 'ENTERPRISE JEWELLERY ERP',
+                  variant: KaratBadgeVariant.gold,
+                  showDot: true,
                 ),
               ],
-            ),
-          ).animate().fadeIn(delay: 50.ms, duration: 400.ms).slideY(begin: 0.04, end: 0),
-          const SizedBox(height: 16),
-          Text(
-            subheadline,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 15,
-              height: 1.5,
-              color: secondaryTextColor,
-            ),
-          ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
+            ).animate().fadeIn(duration: 300.ms),
+            const SizedBox(height: 20),
 
-          const Spacer(),
+            // Giant Editorial Display Title
+            RichText(
+              text: TextSpan(
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: -1.0,
+                  color: primaryTextColor,
+                ),
+                children: [
+                  const TextSpan(text: 'Complete management '),
+                  TextSpan(
+                    text: 'platform',
+                    style: TextStyle(color: primaryTextColor),
+                  ),
+                  const TextSpan(text: ' for high-precision '),
+                  const TextSpan(
+                    text: 'jewellery businesses.',
+                    style: TextStyle(color: KcColors.goldAccent),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(delay: 50.ms, duration: 400.ms).slideY(begin: 0.04, end: 0),
+            const SizedBox(height: 12),
+            Text(
+              subheadline,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                height: 1.5,
+                color: secondaryTextColor,
+              ),
+            ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
+
+            const SizedBox(height: 24),
 
           // Animated Visual Showcase Component (Replaces Feedback Box)
           Container(
@@ -512,7 +514,8 @@ class AuthSplitLayout extends StatelessWidget {
               ],
             ),
           ).animate().fadeIn(delay: 200.ms, duration: 450.ms).slideY(begin: 0.05, end: 0),
-        ],
+          ],
+        ),
       ),
     );
   }

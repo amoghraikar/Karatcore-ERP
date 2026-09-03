@@ -7,6 +7,9 @@ import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../providers/customer_portal_providers.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+import '../widgets/quality_certificate_dialog.dart';
+
 class CustomerJewelleryPage extends ConsumerStatefulWidget {
   const CustomerJewelleryPage({super.key});
 
@@ -26,7 +29,7 @@ class _CustomerJewelleryPageState extends ConsumerState<CustomerJewelleryPage> {
         padding: EdgeInsets.all(context.pageGutter),
         children: [
           Text(
-            'My Pledged Jewellery',
+            context.tr('my_pledged_ornaments'),
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -81,7 +84,7 @@ class _CustomerJewelleryPageState extends ConsumerState<CustomerJewelleryPage> {
                   crossAxisCount: context.isDesktop ? 3 : (context.isTablet ? 2 : 1),
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: 1.4,
+                  childAspectRatio: 1.1,
                 ),
                 itemCount: filtered.length,
                 itemBuilder: (ctx, idx) {
@@ -119,7 +122,7 @@ class _CustomerJewelleryPageState extends ConsumerState<CustomerJewelleryPage> {
                                   color: const Color(0xFF059669).withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text('VAULT SECURE', style: TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.w800, fontSize: 9)),
+                                child: Text(context.tr('vault_secure'), style: const TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.w800, fontSize: 9)),
                               ),
                             ],
                           ),
@@ -130,18 +133,30 @@ class _CustomerJewelleryPageState extends ConsumerState<CustomerJewelleryPage> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Metal & Purity', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                  Text(context.tr('purity'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                                   Text('${item.metalType.label} (${item.purity.label})', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                                 ],
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  const Text('Net Weight', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                  Text(context.tr('net_weight'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                                   Text('${item.weight.netMetalWeight}g', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF7C3AED))),
                                 ],
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => QualityCertificateDialog.show(context, item),
+                              icon: const Icon(Icons.verified_rounded, size: 16, color: Color(0xFFD97706)),
+                              label: Text(
+                                context.tr('view_certificate'),
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFD97706)),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -156,3 +171,4 @@ class _CustomerJewelleryPageState extends ConsumerState<CustomerJewelleryPage> {
     );
   }
 }
+

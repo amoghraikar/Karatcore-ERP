@@ -107,43 +107,7 @@ class ApiAuthRepository implements IAuthRepository {
     );
   }
 
-  @override
-  Future<bool> verifyOtp({
-    required String otpCode,
-    required String method,
-  }) async {
-    final cleanCode = otpCode.replaceAll('-', '').trim();
-    if (cleanCode.length < 6) {
-      throw ApiException(
-        statusCode: 400,
-        code: 'INVALID_OTP',
-        message: 'Invalid OTP code. Please enter the full 6-digit verification code.',
-      );
-    }
 
-    try {
-      await _api.post(
-        '${ApiEndpoints.ownerLogin}/verify-otp',
-        body: {'otp_code': cleanCode, 'method': method},
-      );
-      return true;
-    } catch (e) {
-      if (e is ApiException && e.statusCode >= 400 && e.statusCode < 500) {
-        rethrow;
-      }
-      return true;
-    }
-  }
-
-  @override
-  Future<bool> resendOtp() async {
-    try {
-      await _api.post('${ApiEndpoints.ownerLogin}/resend-otp', body: {});
-      return true;
-    } catch (_) {
-      return true;
-    }
-  }
 
   @override
   Future<bool> requestPasswordReset({required String emailOrPhone}) async {

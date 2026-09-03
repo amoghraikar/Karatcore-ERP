@@ -72,10 +72,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void forceAuthenticateAsRole(UserRole role) {
     final session = UserSession(
       id: 'OWN-101',
-      name: 'Amogh',
+      name: 'Store Owner',
       role: role,
-      email: 'amoghrraikar@gmail.com',
-      phone: '+91 98200 12345',
+      email: 'owner@karatcore.com',
+      phone: '+91 98765 43210',
       branch: BranchModel.defaultBranches[0],
       is2faEnabled: false,
     );
@@ -91,17 +91,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(rememberDevice: value);
   }
 
-  void setOtpMethod(String method) {
-    state = state.copyWith(otpMethod: method);
-  }
-
-  void requireOtpStep(String emailOrPhone) {
-    state = state.copyWith(
-      status: AuthStatus.pendingOtp,
-      pendingEmailOrPhone: emailOrPhone.isNotEmpty ? emailOrPhone : '+91 98200 12345',
-      otpMethod: 'sms',
-    );
-  }
 
   void selectRole(UserRole role) {
     state = state.copyWith(pendingRole: role);
@@ -209,58 +198,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<bool> verifyOtp(String code) async {
-    state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
-
-    try {
-      final success = await _repository.verifyOtp(
-        otpCode: code,
-        method: state.otpMethod,
-      );
-
-      if (success) {
-        final pending = state.pendingEmailOrPhone ?? '';
-        final isEmail = pending.contains('@');
-        final currentSession = state.session ??
-            UserSession(
-              id: 'OWN-101',
-              name: 'Amogh',
-              role: UserRole.owner,
-              email: isEmail ? pending : 'amoghrraikar@gmail.com',
-              phone: isEmail ? '+91 98200 12345' : pending,
-              branch: BranchModel.defaultBranches[0],
-              is2faEnabled: true,
-            );
-
-        state = AuthState(
-          status: AuthStatus.authenticated,
-          session: currentSession,
-          selectedBranch: currentSession.branch,
-        );
-        await SessionStorageService.saveSession(currentSession);
-        return true;
-      }
-      state = state.copyWith(
-        status: AuthStatus.pendingOtp,
-        errorMessage: 'Invalid verification code. Please check the 6-digit OTP code sent to your device.',
-      );
-      return false;
-    } catch (e) {
-      String humaneMsg = 'Invalid verification code. Please check the 6-digit OTP code sent to your device.';
-      if (e is ApiException && e.message.isNotEmpty && !e.message.contains('{')) {
-        humaneMsg = e.message;
-      }
-      state = state.copyWith(
-        status: AuthStatus.pendingOtp,
-        errorMessage: humaneMsg,
-      );
-      return false;
-    }
-  }
-
-  Future<bool> resendOtp() async {
-    return _repository.resendOtp();
-  }
 
   void selectBranch(BranchModel branch) {
     state = state.copyWith(

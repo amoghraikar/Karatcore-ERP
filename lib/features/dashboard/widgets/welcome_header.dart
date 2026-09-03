@@ -18,7 +18,7 @@ class WelcomeHeader extends ConsumerWidget {
     final dateStr = DateFormat('EEEE · d MMMM yyyy').format(now);
     final authState = ref.watch(authStateProvider);
     final user = authState.session;
-    final userName = user?.name ?? 'AMOGH';
+    final userName = user?.name ?? 'STORE OWNER';
 
     final primaryTextColor = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
     final secondaryTextColor = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;

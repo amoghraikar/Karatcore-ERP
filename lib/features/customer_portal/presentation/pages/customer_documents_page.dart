@@ -22,7 +22,8 @@ class _CustomerDocumentsPageState extends ConsumerState<CustomerDocumentsPage> {
     final loansAsync = ref.watch(customerLoansProvider);
     final paymentsAsync = ref.watch(customerPaymentsProvider);
 
-    final categories = ['All', 'KYC', 'Loan', 'Receipts'];
+    final categories = ['All', 'KYC', 'Loan', 'Certificates', 'Receipts'];
+
 
     return Scaffold(
       body: ListView(
@@ -88,6 +89,22 @@ class _CustomerDocumentsPageState extends ConsumerState<CustomerDocumentsPage> {
                   ));
                 }
               }
+
+              // Add Quality Certificates
+              if (_selectedCategory == 'All' || _selectedCategory == 'Certificates') {
+                final ornamentsAsync = ref.watch(customerJewelleryProvider);
+                final ornaments = ornamentsAsync.valueOrNull ?? [];
+                for (final o in ornaments) {
+                  docs.add(_DocItem(
+                    title: 'BIS Hallmark Purity Certificate #${o.id.toUpperCase()}',
+                    category: 'Certificates',
+                    date: DateTime.now().subtract(const Duration(days: 90)),
+                    status: 'BIS VERIFIED',
+                    icon: Icons.verified_rounded,
+                  ));
+                }
+              }
+
 
               // Add Payment Receipts
               if (_selectedCategory == 'All' || _selectedCategory == 'Receipts') {

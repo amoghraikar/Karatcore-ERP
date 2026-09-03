@@ -6,7 +6,6 @@ import 'user_role.dart';
 enum AuthStatus {
   unauthenticated,
   authenticating,
-  pendingOtp,
   pendingBranch,
   authenticated,
   sessionExpired,
@@ -22,7 +21,6 @@ class AuthState extends Equatable {
     this.pendingRole = UserRole.owner,
     this.rememberDevice = true,
     this.errorMessage,
-    this.otpMethod = 'sms',
   });
 
   final AuthStatus status;
@@ -32,7 +30,6 @@ class AuthState extends Equatable {
   final UserRole pendingRole;
   final bool rememberDevice;
   final String? errorMessage;
-  final String otpMethod; // 'sms', 'authenticator', 'backup'
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get isLocked => status == AuthStatus.locked || status == AuthStatus.sessionExpired;
@@ -46,7 +43,6 @@ class AuthState extends Equatable {
     UserRole? pendingRole,
     bool? rememberDevice,
     String? errorMessage,
-    String? otpMethod,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -56,7 +52,6 @@ class AuthState extends Equatable {
       pendingRole: pendingRole ?? this.pendingRole,
       rememberDevice: rememberDevice ?? this.rememberDevice,
       errorMessage: errorMessage,
-      otpMethod: otpMethod ?? this.otpMethod,
     );
   }
 
@@ -69,6 +64,5 @@ class AuthState extends Equatable {
         pendingRole,
         rememberDevice,
         errorMessage,
-        otpMethod,
       ];
 }

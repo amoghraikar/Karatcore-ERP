@@ -28,7 +28,7 @@ class KcSidebar extends ConsumerWidget {
     final ownerAuth = ref.watch(ownerAuthorizationServiceProvider);
     final user = authState.session;
 
-    final name = user?.name ?? 'Amogh';
+    final name = user?.name ?? 'Store Owner';
     final initials = name
         .split(' ')
         .take(2)
