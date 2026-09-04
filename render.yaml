@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: karatcore-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PROJECT_NAME
+        value: "KaratCore ERP Backend"
+      - key: API_V1_STR
+        value: "/api/v1"
+      - key: DATABASE_URL
+        value: sqlite:///./karatcore.db
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["*"]'
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: PAYMENT_PROVIDER
+        value: MOCK
+      - key: IDENTITY_PROVIDER
+        value: MOCK
+      - key: SMS_PROVIDER
+        value: mock
