@@ -228,22 +228,45 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             Divider(height: 1, color: borderColor),
             const SizedBox(height: 16),
 
-            // Security Footnote
+            // Security Footnote & Version Badge
             Center(
-              child: Row(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lock_outline_rounded, size: 14, color: KcColors.goldAccent),
-                  const SizedBox(width: 6),
-                  Flexible(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.lock_outline_rounded, size: 14, color: KcColors.goldAccent),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'ENCRYPTED 256-BIT SECURE AUTHENTICATION',
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: KcColors.goldAccent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: KcColors.goldAccent.withValues(alpha: 0.3), width: 0.8),
+                    ),
                     child: Text(
-                      'ENCRYPTED 256-BIT SECURE AUTHENTICATION',
-                      overflow: TextOverflow.ellipsis,
+                      'v1.2.0 • LIVE CLOUD CONNECTED',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 0.8,
-                        color: secondaryTextColor,
+                        color: KcColors.goldAccent,
                       ),
                     ),
                   ),

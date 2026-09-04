@@ -178,6 +178,12 @@ class AuthSplitLayout extends StatelessWidget {
                               Image.asset(
                                 'assets/images/luxury_jewellery_hero.jpg',
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  color: const Color(0xFF1E1A14),
+                                  child: const Center(
+                                    child: Icon(Icons.diamond_outlined, color: KcColors.goldAccent, size: 36),
+                                  ),
+                                ),
                               ),
                               Container(
                                 decoration: BoxDecoration(
@@ -440,6 +446,12 @@ class AuthSplitLayout extends StatelessWidget {
                     Image.asset(
                       'assets/images/luxury_jewellery_hero.jpg',
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFF1E1A14),
+                        child: const Center(
+                          child: Icon(Icons.diamond_outlined, color: KcColors.goldAccent, size: 48),
+                        ),
+                      ),
                     ),
                     // Ambient gradient overlay
                     Container(
