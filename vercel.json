@@ -4,6 +4,10 @@
   "outputDirectory": "build/web",
   "rewrites": [
     {
+      "source": "/api/v1/:match*",
+      "destination": "https://karatcore-erp.onrender.com/api/v1/:match*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

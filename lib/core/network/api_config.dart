@@ -23,10 +23,10 @@ class ApiConfig {
       if (host == 'localhost' || host == '127.0.0.1' || host.isEmpty) {
         return 'http://localhost:8000/api/v1';
       }
-      // On cloud web domains (like *.vercel.app), use relative path so Vercel rewrites can proxy requests
-      return '/api/v1';
+      // On cloud web domains (like *.vercel.app), connect directly to the live Render backend
+      return 'https://karatcore-erp.onrender.com/api/v1';
     } catch (_) {}
 
-    return 'http://localhost:8000/api/v1';
+    return 'https://karatcore-erp.onrender.com/api/v1';
   }
 }

@@ -30,8 +30,8 @@ if [ -n "$API_URL" ]; then
   echo ">>> Building with API_URL=$API_URL"
   flutter build web --release --dart-define=API_URL="$API_URL"
 else
-  echo ">>> Building with default API configuration"
-  flutter build web --release
+  echo ">>> Building with default Render API URL"
+  flutter build web --release --dart-define=API_URL="https://karatcore-erp.onrender.com/api/v1"
 fi
 
 echo "==============================================="
