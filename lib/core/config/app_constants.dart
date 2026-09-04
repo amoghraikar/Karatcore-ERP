@@ -8,6 +8,17 @@ abstract final class AppConstants {
   static const String logoFullGold = 'assets/images/logo_full_gold.png';
   static const String logoFullWhite = 'assets/images/logo_full_white.png';
 
+  // Luxury Jewellery Visual Assets
+  static const String jewelleryHero = 'assets/images/luxury_jewellery_hero.jpg';
+  static const String goldVault = 'assets/images/gold_bullion_vault.jpg';
+  static const String goldInspection = 'assets/images/gold_inspection_hero.jpg';
+  static const String catNecklace = 'assets/images/jewellery_necklace.jpg';
+  static const String catRing = 'assets/images/jewellery_ring.jpg';
+  static const String catBangle = 'assets/images/jewellery_bangle.jpg';
+  static const String catEarrings = 'assets/images/jewellery_earrings.jpg';
+  static const String catChain = 'assets/images/jewellery_chain.jpg';
+  static const String catCoin = 'assets/images/jewellery_coin.jpg';
+
   // Storage Keys
   static const String keyThemeMode = 'kc_theme_mode';
   static const String keyUserSession = 'kc_user_session';

@@ -149,7 +149,72 @@ class AuthSplitLayout extends StatelessWidget {
                         subtitle: 'STORE OWNER PORTAL',
                         size: 38,
                       ).animate().fadeIn(duration: 300.ms).scale(begin: const Offset(0.95, 0.95)),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
+
+                      // Compact Luxury Jewellery Hero Visual for Mobile
+                      Container(
+                        height: 120,
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: KcColors.goldAccent.withValues(alpha: 0.3),
+                            width: 1.0,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: KcColors.goldAccent.withValues(alpha: 0.08),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(13),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Image.asset(
+                                'assets/images/luxury_jewellery_hero.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withValues(alpha: 0.75),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                left: 12,
+                                bottom: 10,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.verified_rounded, color: KcColors.goldAccent, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '22K BIS HALLMARKED CRAFTSMANSHIP',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.6,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).animate().fadeIn(delay: 50.ms, duration: 300.ms),
+
                       Container(
                         decoration: BoxDecoration(
                           color: isDark ? KcColors.surfaceDark : KcColors.surfaceLight,
@@ -346,11 +411,111 @@ class AuthSplitLayout extends StatelessWidget {
               ),
             ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-          // Animated Visual Showcase Component (Replaces Feedback Box)
-          Container(
-            padding: const EdgeInsets.all(28),
+            // Luxury Jewellery Showcase Visual Banner
+            Container(
+              height: 200,
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: KcColors.goldAccent.withValues(alpha: 0.35),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: KcColors.goldAccent.withValues(alpha: 0.12),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      'assets/images/luxury_jewellery_hero.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                    // Ambient gradient overlay
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.1),
+                            Colors.black.withValues(alpha: 0.85),
+                          ],
+                          stops: const [0.4, 1.0],
+                        ),
+                      ),
+                    ),
+                    // Trust badges overlay
+                    Positioned(
+                      left: 16,
+                      bottom: 16,
+                      right: 16,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: KcColors.goldAccent.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.verified_rounded, color: KcColors.goldAccent, size: 14),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '22K BIS HALLMARKED CRAFTSMANSHIP',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: KcColors.goldSubdued,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'VAULT SECURE',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: KcColors.goldAccent,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ).animate().fadeIn(delay: 150.ms, duration: 400.ms),
+
+            // Animated Visual Showcase Component (Replaces Feedback Box)
+            Container(
+              padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
               color: showcaseBg,
               borderRadius: BorderRadius.circular(16),

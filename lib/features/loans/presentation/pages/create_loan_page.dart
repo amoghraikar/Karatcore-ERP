@@ -444,6 +444,78 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
       children: [
         Text('STEP 2: SELECT PLEDGED ORNAMENTS (COLLATERAL)', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 16),
+
+        // Collateral Inspection Visual Card
+        Container(
+          height: 120,
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFD97706).withValues(alpha: 0.4),
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(11),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/images/gold_inspection_hero.jpg',
+                  fit: BoxFit.cover,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.85),
+                        Colors.black.withValues(alpha: 0.35),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 16,
+                  top: 16,
+                  bottom: 16,
+                  right: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD97706).withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFFD97706)),
+                        ),
+                        child: const Text(
+                          'PHYSICAL PURITY & WEIGHT ASSAY',
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Color(0xFFFBBF24), letterSpacing: 0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Collateral Verification & Geotagged Custody',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Confirm gross vs. net weight after stone deduction prior to sanctioning loan.',
+                        style: TextStyle(fontSize: 12, color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
         Text('Selected Ornaments (${_selectedCollateral.length})', style: const TextStyle(fontWeight: FontWeight.w700)),
         const SizedBox(height: 10),
         ..._selectedCollateral.map((orn) {
@@ -451,12 +523,15 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Card(
               child: ListTile(
-                leading: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(image: NetworkImage(orn.imageUrl), fit: BoxFit.cover),
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Image.asset(
+                      orn.category.assetImage,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 title: Text(orn.name, style: const TextStyle(fontWeight: FontWeight.w700)),

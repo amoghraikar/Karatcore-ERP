@@ -29,21 +29,22 @@ enum OrnamentPurity {
 }
 
 enum OrnamentCategory {
-  rings('Rings', Icons.circle_outlined),
-  necklaces('Necklaces', Icons.auto_awesome_rounded),
-  chains('Chains', Icons.link_rounded),
-  bracelets('Bracelets', Icons.adjust_rounded),
-  bangles('Bangles', Icons.panorama_fish_eye_rounded),
-  earrings('Earrings', Icons.flare_rounded),
-  pendants('Pendants', Icons.turned_in_not_rounded),
-  coins('Coins', Icons.toll_rounded),
-  bars('Bullion Bars', Icons.crop_portrait_rounded),
-  sets('Jewellery Sets', Icons.collections_rounded),
-  other('Other Ornaments', Icons.widgets_rounded);
+  rings('Rings', Icons.circle_outlined, 'assets/images/jewellery_ring.jpg'),
+  necklaces('Necklaces', Icons.auto_awesome_rounded, 'assets/images/jewellery_necklace.jpg'),
+  chains('Chains', Icons.link_rounded, 'assets/images/jewellery_chain.jpg'),
+  bracelets('Bracelets', Icons.adjust_rounded, 'assets/images/jewellery_bangle.jpg'),
+  bangles('Bangles', Icons.panorama_fish_eye_rounded, 'assets/images/jewellery_bangle.jpg'),
+  earrings('Earrings', Icons.flare_rounded, 'assets/images/jewellery_earrings.jpg'),
+  pendants('Pendants', Icons.turned_in_not_rounded, 'assets/images/jewellery_necklace.jpg'),
+  coins('Coins', Icons.toll_rounded, 'assets/images/jewellery_coin.jpg'),
+  bars('Bullion Bars', Icons.crop_portrait_rounded, 'assets/images/jewellery_coin.jpg'),
+  sets('Jewellery Sets', Icons.collections_rounded, 'assets/images/luxury_jewellery_hero.jpg'),
+  other('Other Ornaments', Icons.widgets_rounded, 'assets/images/gold_inspection_hero.jpg');
 
-  const OrnamentCategory(this.label, this.icon);
+  const OrnamentCategory(this.label, this.icon, this.assetImage);
   final String label;
   final IconData icon;
+  final String assetImage;
 }
 
 enum OrnamentStatus {

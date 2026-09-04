@@ -9,6 +9,7 @@ import '../../widgets/kpi_section.dart';
 import '../../widgets/notifications_panel.dart';
 import '../../widgets/quick_actions.dart';
 import '../../widgets/today_tasks.dart';
+import '../../widgets/vault_showcase_card.dart';
 import '../../widgets/welcome_header.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -28,7 +29,14 @@ class DashboardPage extends StatelessWidget {
               .animate()
               .fadeIn(duration: 300.ms)
               .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
+
+          // 1b. Live Bullion Vault Showcase Visual Card
+          const VaultShowcaseCard()
+              .animate()
+              .fadeIn(delay: 50.ms, duration: 350.ms)
+              .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic),
+          const SizedBox(height: 28),
 
           // 2. TODAY Hero Revenue & Metric Counter
           const KpiSection()

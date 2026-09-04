@@ -5,11 +5,11 @@ class ApiConfig {
 
     try {
       final host = Uri.base.host;
-      if (host.isNotEmpty && host != 'localhost' && host != '127.0.0.1') {
+      if (host.isNotEmpty) {
         return 'http://$host:8000/api/v1';
       }
     } catch (_) {}
 
-    return 'http://127.0.0.1:8000/api/v1';
+    return 'http://localhost:8000/api/v1';
   }
 }

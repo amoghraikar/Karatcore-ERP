@@ -89,13 +89,25 @@ class _OrnamentDetailsPageState extends ConsumerState<OrnamentDetailsPage> with 
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(image: NetworkImage(ornament.imageUrl), fit: BoxFit.cover),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFFD97706).withValues(alpha: 0.3),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Image.asset(
+                          ornament.category.assetImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: scheme.surfaceContainerHighest,
+                            child: Icon(ornament.category.icon, size: 36, color: scheme.primary),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -405,18 +417,48 @@ class _OrnamentDetailsPageState extends ConsumerState<OrnamentDetailsPage> with 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Product Photography Gallery', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              Container(
-                height: 240,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(image: NetworkImage(o.imageUrl), fit: BoxFit.cover),
+              Row(
+                children: [
+                  Text('Product Photography Gallery', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD97706).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0xFFD97706).withValues(alpha: 0.5)),
+                    ),
+                    child: const Text(
+                      'BIS HALLMARK ASSAYED',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFFD97706)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  height: 280,
+                  width: double.infinity,
+                  child: Image.asset(
+                    o.category.assetImage,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              const Text('Primary high-resolution vault photo. Sealed and timestamped.'),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  _buildPhotoThumb(o.category.assetImage, 'Primary Studio View'),
+                  const SizedBox(width: 12),
+                  _buildPhotoThumb('assets/images/gold_inspection_hero.jpg', 'Assay Inspection'),
+                  const SizedBox(width: 12),
+                  _buildPhotoThumb('assets/images/luxury_jewellery_hero.jpg', 'Vault Showcase'),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Text('High-resolution timestamped catalog imagery with cryptographic hash verification.'),
             ],
           ),
         ),
@@ -448,6 +490,34 @@ class _OrnamentDetailsPageState extends ConsumerState<OrnamentDetailsPage> with 
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPhotoThumb(String assetPath, String label) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 70,
+              width: double.infinity,
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 

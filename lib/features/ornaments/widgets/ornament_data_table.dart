@@ -36,15 +36,18 @@ class OrnamentDataTable extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: scheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: NetworkImage(o.imageUrl),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Image.asset(
+                            o.category.assetImage,
                             fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: scheme.surfaceContainerHighest,
+                              child: Icon(o.category.icon, size: 24, color: scheme.primary),
+                            ),
                           ),
                         ),
                       ),
@@ -133,15 +136,18 @@ class OrnamentDataTable extends ConsumerWidget {
                         flex: 3,
                         child: Row(
                           children: [
-                            Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: scheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: NetworkImage(o.imageUrl),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: Image.asset(
+                                  o.category.assetImage,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: scheme.surfaceContainerHighest,
+                                    child: Icon(o.category.icon, size: 20, color: scheme.primary),
+                                  ),
                                 ),
                               ),
                             ),
