@@ -5,13 +5,19 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 
 class CustomerBase(BaseModel):
     full_name: str
-    phone: str
-    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
     address: Optional[str] = None
 
 
-class CustomerCreate(CustomerBase):
+class CustomerCreate(BaseModel):
+    full_name: str
+    phone: Optional[str] = None
+    mobile: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
     customer_code: Optional[str] = None
+    id: Optional[str] = None
 
 
 class CustomerResponse(CustomerBase):

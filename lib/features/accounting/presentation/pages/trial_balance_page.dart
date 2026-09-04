@@ -41,33 +41,46 @@ class TrialBalancePage extends ConsumerWidget {
             loading: () => const KcSkeletonLoader(height: 100),
             error: (err, st) => Text('Error: $err'),
             data: (tb) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final isBalanced = tb.isBalanced;
+              final bgColor = isBalanced
+                  ? (isDark ? const Color(0xFF064E3B).withValues(alpha: 0.25) : const Color(0xFFECFDF5))
+                  : (isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.25) : const Color(0xFFFEF2F2));
+              final borderColor = isBalanced
+                  ? (isDark ? const Color(0xFF059669).withValues(alpha: 0.5) : const Color(0xFF10B981))
+                  : (isDark ? const Color(0xFFDC2626).withValues(alpha: 0.5) : const Color(0xFFEF4444));
+              final titleColor = isBalanced
+                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF065F46))
+                  : (isDark ? const Color(0xFFF87171) : const Color(0xFF991B1B));
+              final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF374151);
+
               return Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: tb.isBalanced ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                  color: bgColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: tb.isBalanced ? const Color(0xFF10B981) : const Color(0xFFEF4444)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Row(
                   children: [
-                    Icon(tb.isBalanced ? Icons.check_circle_rounded : Icons.warning_rounded, color: tb.isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626), size: 36),
+                    Icon(isBalanced ? Icons.check_circle_rounded : Icons.warning_rounded, color: isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626), size: 36),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            tb.isBalanced ? 'TRIAL BALANCE IS BALANCED' : 'TRIAL BALANCE UNBALANCED WARNING',
-                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: tb.isBalanced ? const Color(0xFF065F46) : const Color(0xFF991B1B)),
+                            isBalanced ? 'TRIAL BALANCE IS BALANCED' : 'TRIAL BALANCE UNBALANCED WARNING',
+                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: titleColor),
                           ),
                           const SizedBox(height: 2),
-                          Text('Total Debit: ${KcFormatters.inr(tb.totalDebit)} • Total Credit: ${KcFormatters.inr(tb.totalCredit)} • Difference: ${KcFormatters.inr(tb.difference)}', style: const TextStyle(fontSize: 12)),
+                          Text('Total Debit: ${KcFormatters.inr(tb.totalDebit)} • Total Credit: ${KcFormatters.inr(tb.totalCredit)} • Difference: ${KcFormatters.inr(tb.difference)}', style: TextStyle(fontSize: 12, color: subtitleColor)),
                         ],
                       ),
                     ),
                     KcStatusBadge(
-                      label: tb.isBalanced ? 'Balanced' : 'Unbalanced',
-                      statusColor: tb.isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                      label: isBalanced ? 'Balanced' : 'Unbalanced',
+                      statusColor: isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626),
                     ),
                   ],
                 ),

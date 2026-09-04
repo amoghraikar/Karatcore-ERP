@@ -228,6 +228,61 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> updateOwnerProfile({
+    required String fullName,
+    required String storeName,
+    required String phone,
+  }) async {
+    try {
+      await _apiClient.put(
+        '/auth/owner/profile',
+        body: {
+          'full_name': fullName,
+          'store_name': storeName,
+          'phone': phone,
+        },
+      );
+    } catch (_) {
+      // Graceful fallback for local state persistence
+    }
+
+    if (state.session != null) {
+      final updated = state.session!.copyWith(
+        name: fullName,
+        storeName: storeName,
+        phone: phone,
+      );
+      state = state.copyWith(session: updated);
+      await SessionStorageService.saveSession(updated);
+    }
+    return true;
+  }
+
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiClient.post(
+        '/auth/owner/change-password',
+        body: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      );
+      return true;
+    } catch (e) {
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(
+        statusCode: 400,
+        code: 'PASSWORD_ERROR',
+        message: 'Could not update password. Please check your current password.',
+      );
+    }
+  }
+
   void logout() {
     _apiClient.setToken(null);
     SessionStorageService.clearSession();

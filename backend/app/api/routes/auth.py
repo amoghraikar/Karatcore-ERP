@@ -4,9 +4,18 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.exceptions import AuthenticationError, BusinessRuleError
 from app.core.security import create_access_token, hash_password, verify_password
+from app.api.dependencies import get_current_owner
 from app.models.customer import Customer
 from app.models.owner import Owner
-from app.schemas.auth import CustomerAuthRequest, LoginRequest, OwnerRegisterRequest, TokenResponse
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    CustomerAuthRequest,
+    LoginRequest,
+    OwnerProfileResponse,
+    OwnerProfileUpdateRequest,
+    OwnerRegisterRequest,
+    TokenResponse,
+)
 from app.schemas.response import APIResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -159,4 +168,67 @@ def toggle_two_factor(payload: Dict[str, bool]):
         data={"two_factor_auth_enabled": enabled},
         message=f"Two-Factor Authentication policy is now {'ENABLED' if enabled else 'DISABLED'}.",
     )
+
+
+@router.get("/owner/profile", response_model=APIResponse[OwnerProfileResponse])
+def get_owner_profile(owner: Owner = Depends(get_current_owner)):
+    return APIResponse(
+        data=OwnerProfileResponse(
+            id=owner.id,
+            full_name=owner.full_name,
+            store_name=owner.store_name,
+            email=owner.email,
+            phone=owner.phone,
+            status=owner.status,
+        ),
+        message="Owner profile fetched successfully.",
+    )
+
+
+@router.put("/owner/profile", response_model=APIResponse[OwnerProfileResponse])
+def update_owner_profile(
+    req: OwnerProfileUpdateRequest,
+    owner: Owner = Depends(get_current_owner),
+    db: Session = Depends(get_db),
+):
+    if req.full_name is not None and req.full_name.strip():
+        owner.full_name = req.full_name.strip()
+    if req.store_name is not None:
+        owner.store_name = req.store_name.strip()
+    if req.phone is not None and req.phone.strip():
+        owner.phone = req.phone.strip()
+
+    db.commit()
+    db.refresh(owner)
+    return APIResponse(
+        data=OwnerProfileResponse(
+            id=owner.id,
+            full_name=owner.full_name,
+            store_name=owner.store_name,
+            email=owner.email,
+            phone=owner.phone,
+            status=owner.status,
+        ),
+        message="Owner profile updated successfully.",
+    )
+
+
+@router.post("/owner/change-password", response_model=APIResponse[Dict[str, bool]])
+def change_owner_password(
+    req: ChangePasswordRequest,
+    owner: Owner = Depends(get_current_owner),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(req.current_password, owner.password_hash):
+        raise AuthenticationError("Current password is incorrect.")
+    if len(req.new_password) < 6:
+        raise BusinessRuleError("New password must be at least 6 characters.")
+
+    owner.password_hash = hash_password(req.new_password)
+    db.commit()
+    return APIResponse(
+        data={"success": True},
+        message="Password updated successfully.",
+    )
+
 

@@ -358,52 +358,74 @@ class _CreateJournalEntryPageState extends ConsumerState<CreateJournalEntryPage>
   }
 
   Widget _buildStep3Validation() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isBalanced = _isBalanced;
+
+    final Color bgColor = isBalanced
+        ? (isDark ? const Color(0xFF064E3B).withValues(alpha: 0.25) : const Color(0xFFECFDF5))
+        : (isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.25) : const Color(0xFFFEF2F2));
+    final Color borderColor = isBalanced
+        ? (isDark ? const Color(0xFF059669) : const Color(0xFF10B981))
+        : (isDark ? const Color(0xFFDC2626) : const Color(0xFFEF4444));
+    final Color labelColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155);
+    final Color valueColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final Color diffColor = isBalanced
+        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+        : (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626));
+    final Color dividerColor = isDark
+        ? (isBalanced ? const Color(0xFF059669).withValues(alpha: 0.3) : const Color(0xFFDC2626).withValues(alpha: 0.3))
+        : (isBalanced ? const Color(0xFF10B981).withValues(alpha: 0.3) : const Color(0xFFEF4444).withValues(alpha: 0.3));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('STEP 3: DOUBLE-ENTRY BALANCE VALIDATION', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+        Text(
+          'STEP 3: DOUBLE-ENTRY BALANCE VALIDATION',
+          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        ),
         const SizedBox(height: 16),
 
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: _isBalanced ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+            color: bgColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _isBalanced ? const Color(0xFF10B981) : const Color(0xFFEF4444)),
+            border: Border.all(color: borderColor, width: 1.5),
           ),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Total Debit Amount:', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                  Text(KcFormatters.inr(_totalDebit), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text('Total Debit Amount:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: labelColor)),
+                  Text(KcFormatters.inr(_totalDebit), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: valueColor)),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Total Credit Amount:', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                  Text(KcFormatters.inr(_totalCredit), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text('Total Credit Amount:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: labelColor)),
+                  Text(KcFormatters.inr(_totalCredit), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: valueColor)),
                 ],
               ),
-              const Divider(height: 20),
+              Divider(height: 24, color: dividerColor),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Balance Difference:', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  Text('Balance Difference:', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: valueColor)),
                   Text(
                     KcFormatters.inr(_difference),
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: _isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626)),
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: diffColor),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               KcStatusBadge(
-                label: _isBalanced ? 'BALANCED — Ready to Submit' : 'UNBALANCED — Total Debit != Total Credit',
-                statusColor: _isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626),
-                icon: _isBalanced ? Icons.check_circle_rounded : Icons.error_rounded,
+                label: isBalanced ? 'BALANCED — Ready to Submit' : 'UNBALANCED — Total Debit != Total Credit',
+                statusColor: isBalanced ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                icon: isBalanced ? Icons.check_circle_rounded : Icons.error_rounded,
               ),
             ],
           ),

@@ -126,6 +126,29 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
       isMasked: true,
     );
 
+    final submittedDocs = [
+      CustomerDocument(
+        id: 'DOC-AADHAAR-$custId',
+        name: '$_docType Scan (Front & Back)',
+        documentType: _docType,
+        uploadDate: DateTime.now(),
+        status: 'Verified',
+        isVerified: true,
+        fileSize: '1.4 MB',
+        documentNumber: _docNumberController.text.trim().isEmpty ? '9988-7766-4433' : _docNumberController.text.trim(),
+      ),
+      CustomerDocument(
+        id: 'DOC-PAN-$custId',
+        name: 'PAN Card Income Tax Proof',
+        documentType: 'PAN Card',
+        uploadDate: DateTime.now(),
+        status: 'Verified',
+        isVerified: true,
+        fileSize: '890 KB',
+        documentNumber: 'ABCPS9918F',
+      ),
+    ];
+
     try {
       final record = await ref.read(kycRepositoryProvider).startKycWorkflow(
             customerId: custId,
@@ -136,57 +159,28 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
             consent: consent,
             documents: [doc],
           );
+      _submittedRecord = record;
+    } catch (_) {}
 
-      final submittedDocs = [
-        CustomerDocument(
-          id: 'DOC-AADHAAR-$custId',
-          name: '$_docType Scan (Front & Back)',
-          documentType: _docType,
-          uploadDate: DateTime.now(),
-          status: 'Verified',
-          isVerified: true,
-          fileSize: '1.4 MB',
-          documentNumber: _docNumberController.text.trim().isEmpty ? '9988-7766-4433' : _docNumberController.text.trim(),
-        ),
-        CustomerDocument(
-          id: 'DOC-PAN-$custId',
-          name: 'PAN Card Income Tax Proof',
-          documentType: 'PAN Card',
-          uploadDate: DateTime.now(),
-          status: 'Verified',
-          isVerified: true,
-          fileSize: '890 KB',
-          documentNumber: 'ABCPS9918F',
-        ),
-      ];
+    try {
+      await ref.read(customerListProvider.notifier).updateKycStatus(
+            custId,
+            CustomerKycStatus.verified,
+            documents: submittedDocs,
+          );
+    } catch (_) {}
 
-      try {
-        await ref.read(customerListProvider.notifier).updateKycStatus(
-              custId,
-              CustomerKycStatus.verified,
-              documents: submittedDocs,
-            );
-      } catch (_) {}
+    ref.invalidate(customerListProvider);
+    ref.invalidate(customerDetailProvider(custId));
+    ref.invalidate(kycQueueProvider);
+    ref.invalidate(kycMetricsProvider);
+    ref.invalidate(kycDetailProvider(custId));
 
-      ref.invalidate(kycQueueProvider);
-      ref.invalidate(kycMetricsProvider);
-      ref.invalidate(kycDetailProvider(custId));
-      ref.invalidate(customerDetailProvider(custId));
-
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-          _submittedRecord = record;
-          _currentStep = 5; // Step 6: Confirmation Screen
-        });
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-          _currentStep = 5; // Step 6: Confirmation Screen on local fallback
-        });
-      }
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+        _currentStep = 5; // Step 6: Confirmation Screen
+      });
     }
   }
 

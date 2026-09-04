@@ -41,3 +41,23 @@ class TwoFactorVerifyRequest(BaseModel):
     code: str
     secret: Optional[str] = None
 
+
+class OwnerProfileResponse(BaseModel):
+    id: int
+    full_name: str
+    store_name: Optional[str] = None
+    email: str
+    phone: str
+    status: str
+
+
+class OwnerProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    store_name: Optional[str] = None
+    phone: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+

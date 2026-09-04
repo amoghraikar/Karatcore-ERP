@@ -83,19 +83,37 @@ class BalanceSheetPage extends ConsumerWidget {
                     _buildRow('TOTAL EQUITY', KcFormatters.inr(bs.totalEquity), isBold: true, fontSize: 16),
                     const Divider(height: 28, thickness: 2),
 
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: bs.isBalanced ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('TOTAL LIABILITIES & EQUITY', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                          Text(KcFormatters.inr(bs.totalLiabilities + bs.totalEquity), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Color(0xFF059669))),
-                        ],
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                        final isBalanced = bs.isBalanced;
+                        final bgColor = isBalanced
+                            ? (isDark ? const Color(0xFF064E3B).withValues(alpha: 0.25) : const Color(0xFFECFDF5))
+                            : (isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.25) : const Color(0xFFFEF2F2));
+                        final labelColor = isDark ? Colors.white : const Color(0xFF0F172A);
+                        final valColor = isBalanced
+                            ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                            : (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626));
+                        final borderColor = isBalanced
+                            ? (isDark ? const Color(0xFF059669).withValues(alpha: 0.5) : const Color(0xFF10B981))
+                            : (isDark ? const Color(0xFFDC2626).withValues(alpha: 0.5) : const Color(0xFFEF4444));
+
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('TOTAL LIABILITIES & EQUITY', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: labelColor)),
+                              Text(KcFormatters.inr(bs.totalLiabilities + bs.totalEquity), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: valColor)),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

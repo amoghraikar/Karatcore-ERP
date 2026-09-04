@@ -53,6 +53,9 @@ def update_customer_kyc_status(
     db: Session = Depends(get_db),
     owner: Owner = Depends(get_current_owner),
 ):
+    from datetime import datetime, timezone
+    from app.models.kyc import CustomerKYC
+
     service = CustomerService(db)
     customer = service.repo.get_by_id(id)
     if not customer:
@@ -60,6 +63,23 @@ def update_customer_kyc_status(
 
     status_str = payload.get("kyc_status", "VERIFIED").upper()
     customer.kyc_status = status_str
+
+    # Synchronize CustomerKYC model in DB
+    kyc = db.query(CustomerKYC).filter(CustomerKYC.customer_id == customer.id).first()
+    if not kyc:
+        kyc = CustomerKYC(
+            customer_id=customer.id,
+            status=status_str,
+            verification_method="MANUAL_STORE_REVIEW",
+            verified_at=datetime.now(timezone.utc) if status_str == "VERIFIED" else None,
+        )
+        db.add(kyc)
+    else:
+        kyc.status = status_str
+        if status_str == "VERIFIED":
+            kyc.verified_at = datetime.now(timezone.utc)
+            kyc.reverification_required = False
+
     db.commit()
     db.refresh(customer)
     return APIResponse(data=CustomerResponse.model_validate(customer), message="Customer KYC status updated successfully")

@@ -1,6 +1,8 @@
 class ApiEndpoints {
   static const String ownerRegister = '/auth/owner/register';
   static const String ownerLogin = '/auth/owner/login';
+  static const String ownerProfile = '/auth/owner/profile';
+  static const String ownerChangePassword = '/auth/owner/change-password';
   static const String customerLogin = '/auth/customer/login';
 
   static const String customers = '/customers';

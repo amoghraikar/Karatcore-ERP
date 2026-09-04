@@ -73,21 +73,35 @@ class _LoanSettlementPageState extends ConsumerState<LoanSettlementPage> {
                     Text('Customer: ${loan.customerName} (${loan.customerId})', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 16),
 
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF10B981))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('CALCULATED SETTLEMENT FIGURES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF065F46))),
-                          const SizedBox(height: 12),
-                          _buildRow('Outstanding Principal', KcFormatters.inr(loan.outstandingPrincipal)),
-                          _buildRow('Accrued Interest Due', KcFormatters.inr(loan.accruedInterest)),
-                          _buildRow('Processing & Closure Fee', KcFormatters.inr(loan.processingFee)),
-                          const Divider(height: 20, color: Color(0xFF10B981)),
-                          _buildRow('Total Settlement Amount', KcFormatters.inr(settlementAmt), isBold: true, fontSize: 18),
-                        ],
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                        final bgColor = isDark ? const Color(0xFF064E3B).withValues(alpha: 0.25) : const Color(0xFFECFDF5);
+                        final borderColor = isDark ? const Color(0xFF059669).withValues(alpha: 0.5) : const Color(0xFF10B981);
+                        final headerColor = isDark ? const Color(0xFF34D399) : const Color(0xFF065F46);
+                        final dividerColor = isDark ? const Color(0xFF059669).withValues(alpha: 0.3) : const Color(0xFF10B981).withValues(alpha: 0.4);
+
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('CALCULATED SETTLEMENT FIGURES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: headerColor)),
+                              const SizedBox(height: 12),
+                              _buildRow('Outstanding Principal', KcFormatters.inr(loan.outstandingPrincipal)),
+                              _buildRow('Accrued Interest Due', KcFormatters.inr(loan.accruedInterest)),
+                              _buildRow('Processing & Closure Fee', KcFormatters.inr(loan.processingFee)),
+                              Divider(height: 20, color: dividerColor),
+                              _buildRow('Total Settlement Amount', KcFormatters.inr(settlementAmt), isBold: true, fontSize: 18),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 20),
 

@@ -69,19 +69,37 @@ class CashFlowPage extends ConsumerWidget {
                     _buildRow('Net Cash Flow from Financing Activities', KcFormatters.inr(netFinancing), isBold: true, fontSize: 15),
                     const Divider(height: 28, thickness: 2),
 
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: netCashFlow >= 0 ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('NET INCREASE / DECREASE IN CASH BALANCES', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
-                          Text(KcFormatters.inr(netCashFlow), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: netCashFlow >= 0 ? const Color(0xFF059669) : const Color(0xFFDC2626))),
-                        ],
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                        final isPositive = netCashFlow >= 0;
+                        final bgColor = isPositive
+                            ? (isDark ? const Color(0xFF064E3B).withValues(alpha: 0.25) : const Color(0xFFECFDF5))
+                            : (isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.25) : const Color(0xFFFEF2F2));
+                        final labelColor = isDark ? Colors.white : const Color(0xFF0F172A);
+                        final valColor = isPositive
+                            ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                            : (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626));
+                        final borderColor = isPositive
+                            ? (isDark ? const Color(0xFF059669).withValues(alpha: 0.5) : const Color(0xFF10B981))
+                            : (isDark ? const Color(0xFFDC2626).withValues(alpha: 0.5) : const Color(0xFFEF4444));
+
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('NET INCREASE / DECREASE IN CASH BALANCES', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: labelColor)),
+                              Text(KcFormatters.inr(netCashFlow), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: valColor)),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

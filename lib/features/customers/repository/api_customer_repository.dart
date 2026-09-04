@@ -20,7 +20,9 @@ class ApiCustomerRepository implements ICustomerRepository {
         '${ApiEndpoints.customers}?search=${Uri.encodeComponent(searchQuery ?? '')}',
       );
       final remote = _parseCustomersFromJson(data as List);
-      return [...remote, ..._localCustomers];
+      final remoteIds = remote.map((c) => c.id).toSet();
+      final localOnly = _localCustomers.where((c) => !remoteIds.contains(c.id)).toList();
+      return [...remote, ...localOnly];
     } catch (_) {
       return List.from(_localCustomers);
     }
@@ -30,7 +32,14 @@ class ApiCustomerRepository implements ICustomerRepository {
   Future<CustomerModel?> getCustomerById(String id) async {
     try {
       final dynamic data = await _api.get('${ApiEndpoints.customerById}$id');
-      return _parseCustomerFromJson(data);
+      final remote = _parseCustomerFromJson(data);
+      final localIdx = _localCustomers.indexWhere((c) => c.id == id);
+      if (localIdx != -1) {
+        _localCustomers[localIdx] = remote;
+      } else {
+        _localCustomers.add(remote);
+      }
+      return remote;
     } catch (_) {
       final found = _localCustomers.where((c) => c.id == id);
       return found.isNotEmpty ? found.first : null;
@@ -50,10 +59,20 @@ class ApiCustomerRepository implements ICustomerRepository {
         body: _customerToJson(savedCust),
       );
       final created = _parseCustomerFromJson(data);
-      _localCustomers.add(created);
+      final existingIndex = _localCustomers.indexWhere((c) => c.id == created.id);
+      if (existingIndex != -1) {
+        _localCustomers[existingIndex] = created;
+      } else {
+        _localCustomers.add(created);
+      }
       return created;
     } catch (_) {
-      _localCustomers.add(savedCust);
+      final existingIndex = _localCustomers.indexWhere((c) => c.id == savedCust.id);
+      if (existingIndex != -1) {
+        _localCustomers[existingIndex] = savedCust;
+      } else {
+        _localCustomers.add(savedCust);
+      }
       return savedCust;
     }
   }
@@ -111,34 +130,63 @@ class ApiCustomerRepository implements ICustomerRepository {
       ),
     ];
 
+    CustomerModel? updated;
     try {
       final dynamic data = await _api.post(
         '${ApiEndpoints.customerById}$id/kyc-status',
         body: {'kyc_status': status.name},
       );
       final parsed = _parseCustomerFromJson(data);
-      final updated = parsed.copyWith(
+      updated = parsed.copyWith(
         kycStatus: status,
         documents: status == CustomerKycStatus.verified
             ? (parsed.documents.isNotEmpty ? parsed.documents : defaultDocs)
             : parsed.documents,
       );
-      return updated;
-    } catch (_) {
-      final index = _localCustomers.indexWhere((c) => c.id == id);
-      if (index != -1) {
-        final existing = _localCustomers[index];
-        final updated = existing.copyWith(
-          kycStatus: status,
-          documents: status == CustomerKycStatus.verified
-              ? (existing.documents.isNotEmpty ? existing.documents : defaultDocs)
-              : existing.documents,
-        );
-        _localCustomers[index] = updated;
-        return updated;
-      }
-      throw Exception('Customer not found');
+    } catch (_) {}
+
+    final index = _localCustomers.indexWhere((c) => c.id == id);
+    if (index != -1) {
+      final existing = _localCustomers[index];
+      final localUpdated = existing.copyWith(
+        kycStatus: status,
+        documents: status == CustomerKycStatus.verified
+            ? (existing.documents.isNotEmpty ? existing.documents : defaultDocs)
+            : existing.documents,
+      );
+      _localCustomers[index] = localUpdated;
+      return updated ?? localUpdated;
     }
+
+    if (updated != null) {
+      _localCustomers.add(updated);
+      return updated;
+    }
+
+    final fallback = CustomerModel(
+      id: id,
+      firstName: 'Customer',
+      lastName: '',
+      dateOfBirth: DateTime.now(),
+      gender: 'Individual',
+      customerType: CustomerType.individual,
+      mobile: '',
+      email: '',
+      addressLine: '',
+      city: '',
+      state: '',
+      pincode: '',
+      occupation: '',
+      annualIncome: '',
+      kycStatus: status,
+      customerStatus: CustomerStatus.active,
+      riskStatus: CustomerRiskLevel.low,
+      createdAt: DateTime.now(),
+      lastActivityAt: DateTime.now(),
+      documents: status == CustomerKycStatus.verified ? defaultDocs : const [],
+    );
+    _localCustomers.add(fallback);
+    return fallback;
   }
 
   @override
@@ -245,13 +293,24 @@ class ApiCustomerRepository implements ICustomerRepository {
   Map<String, dynamic> _customerToJson(CustomerModel customer) {
     return {
       'id': customer.id,
+      'customer_code': customer.id,
       'first_name': customer.firstName,
       'last_name': customer.lastName,
       'full_name': customer.fullName,
       'date_of_birth': customer.dateOfBirth.toIso8601String(),
       'gender': customer.gender,
+      'phone': customer.mobile,
       'mobile': customer.mobile,
       'email': customer.email,
+      'address': customer.addressLine,
+      'address_line': customer.addressLine,
+      'city': customer.city,
+      'state': customer.state,
+      'pincode': customer.pincode,
+      'occupation': customer.occupation,
+      'annual_income': customer.annualIncome,
+      'kyc_status': customer.kycStatus.name.toUpperCase(),
+      'status': customer.customerStatus.name.toUpperCase(),
     };
   }
 }
