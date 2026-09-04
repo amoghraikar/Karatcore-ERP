@@ -34,6 +34,9 @@ else
   flutter build web --release --dart-define=API_URL="https://karatcore-erp.onrender.com/api/v1"
 fi
 
+echo ">>> Removing service worker to ensure instantaneous web updates..."
+rm -f build/web/flutter_service_worker.js
+
 echo "==============================================="
 echo "   KaratCore ERP Web Build Complete!           "
 echo "   Output: build/web                           "
