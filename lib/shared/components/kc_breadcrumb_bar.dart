@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/localization/app_localizations.dart';
 import '../models/breadcrumb_item.dart';
 
 class KcBreadcrumbBar extends StatelessWidget {
   const KcBreadcrumbBar({super.key, required this.items});
   final List<BreadcrumbItem> items;
+
+  static const Map<String, String> _breadcrumbKeyMap = {
+    'Dashboard': 'dashboard',
+    'Customers': 'customers',
+    'KYC Verification': 'kyc_verification',
+    'Ornaments & Inventory': 'inventory_and_stock',
+    'Gold Loans': 'loans',
+    'Reports & Analytics': 'reports_and_analytics',
+    'Accounting Ledger': 'accounting_ledger',
+    'Audit Log': 'audit_log',
+    'Security Activity': 'security_activity',
+    'Notifications': 'notifications',
+    'Owner Profile': 'owner_profile',
+    'Store Settings': 'store_settings',
+    'Help & Docs': 'help_and_docs',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +48,9 @@ class KcBreadcrumbBar extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Text(
-                  items[i].label,
+                  _breadcrumbKeyMap[items[i].label] != null
+                      ? context.tr(_breadcrumbKeyMap[items[i].label]!)
+                      : items[i].label,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: i == items.length - 1
                             ? scheme.onSurface

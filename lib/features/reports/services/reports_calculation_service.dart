@@ -112,13 +112,15 @@ class ReportsCalculationService implements IReportsCalculationService {
     final overdueCount = loans.where((l) => l.status == LoanStatus.overdue).length;
     final pendingKycCount = kycRecords.where((k) => k.status == KycStatus.underReview || k.status == KycStatus.submitted).length;
     final pendingApprovalLoansCount = loans.where((l) => l.status == LoanStatus.pendingApproval || l.riskStatus == LoanRiskStatus.high).length;
-    final ornamentsAttentionCount = ornaments.where((o) => o.status == OrnamentStatus.damaged || o.status == OrnamentStatus.available).length;
+    final ornamentsAttentionCount = ornaments.where((o) => o.status == OrnamentStatus.damaged).length;
+    final overdueReceivablesCount = loans.where((l) => l.status == LoanStatus.overdue && l.accruedInterest > 0).length;
+    final highRiskCount = loans.where((l) => l.riskStatus == LoanRiskStatus.high).length;
 
     return [
       AttentionIndicatorItem(
         id: 'ATTN-01',
         title: 'Overdue Gold Loans',
-        count: overdueCount > 0 ? overdueCount : 12,
+        count: overdueCount,
         description: 'Pledge accounts past their scheduled maturity due date.',
         category: ReportCategory.loans,
         route: '/reports/loans?filter=overdue',
@@ -128,7 +130,7 @@ class ReportsCalculationService implements IReportsCalculationService {
       AttentionIndicatorItem(
         id: 'ATTN-02',
         title: 'Pending KYC Records',
-        count: pendingKycCount > 0 ? pendingKycCount : 5,
+        count: pendingKycCount,
         description: 'Customer identity verification submissions awaiting manager review.',
         category: ReportCategory.kyc,
         route: '/reports/kyc?filter=pending',
@@ -138,7 +140,7 @@ class ReportsCalculationService implements IReportsCalculationService {
       AttentionIndicatorItem(
         id: 'ATTN-03',
         title: 'Loans Awaiting Approval',
-        count: pendingApprovalLoansCount > 0 ? pendingApprovalLoansCount : 3,
+        count: pendingApprovalLoansCount,
         description: 'Loan pledges with LTV exceeding 75% requiring senior manager approval.',
         category: ReportCategory.risk,
         route: '/reports/risk?filter=high-ltv',
@@ -148,31 +150,31 @@ class ReportsCalculationService implements IReportsCalculationService {
       AttentionIndicatorItem(
         id: 'ATTN-04',
         title: 'Ornaments Requiring Attention',
-        count: ornamentsAttentionCount > 0 ? ornamentsAttentionCount : 7,
+        count: ornamentsAttentionCount,
         description: 'Pledged ornaments scheduled for quarterly physical vault audit.',
         category: ReportCategory.inventory,
         route: '/reports/inventory?filter=vault-audit',
         statusColor: const Color(0xFF2563EB),
         icon: Icons.inventory_2_rounded,
       ),
-      const AttentionIndicatorItem(
+      AttentionIndicatorItem(
         id: 'ATTN-05',
         title: 'Overdue Receivables',
-        count: 4,
+        count: overdueReceivablesCount,
         description: 'Customer balances & interest yield receivables past 30 days.',
         category: ReportCategory.accounting,
         route: '/accounting/receivables',
-        statusColor: Color(0xFFEC4899),
+        statusColor: const Color(0xFFEC4899),
         icon: Icons.call_made_rounded,
       ),
-      const AttentionIndicatorItem(
+      AttentionIndicatorItem(
         id: 'ATTN-06',
         title: 'High-Risk Customer Records',
-        count: 2,
+        count: highRiskCount,
         description: 'Borrower profiles with multi-pledge exposure & late payment history.',
         category: ReportCategory.risk,
         route: '/reports/risk?filter=high-risk',
-        statusColor: Color(0xFFB91C1C),
+        statusColor: const Color(0xFFB91C1C),
         icon: Icons.error_outline_rounded,
       ),
     ];
@@ -185,6 +187,10 @@ class ReportsCalculationService implements IReportsCalculationService {
     final rejected = customers.where((c) => c.kycStatus == CustomerKycStatus.rejected).length;
 
     final activeCustomerIds = loans.where((l) => l.status == LoanStatus.active).map((l) => l.customerId).toSet();
+    final now = DateTime.now();
+    final newCustCount = customers.where((c) => c.createdAt.isAfter(now.subtract(const Duration(days: 30)))).length;
+    final frequentCount = customers.where((c) => loans.where((l) => l.customerId == c.id).length >= 5).length;
+    final riskyCount = customers.where((c) => c.customerStatus == CustomerStatus.blocked || c.riskStatus == CustomerRiskLevel.high).length;
 
     return {
       'totalCustomers': customers.length,
@@ -192,12 +198,12 @@ class ReportsCalculationService implements IReportsCalculationService {
       'pendingCount': pending,
       'rejectedCount': rejected,
       'activeBorrowersCount': activeCustomerIds.length,
-      'segments': const [
-        CustomerSegmentSummary(segmentName: 'New Customers', count: 18, description: 'Joined within last 30 days', color: Color(0xFF2563EB)),
-        CustomerSegmentSummary(segmentName: 'Active Borrowers', count: 42, description: 'Has at least one active gold loan', color: Color(0xFF059669)),
-        CustomerSegmentSummary(segmentName: 'High Value VIP', count: 12, description: 'Total portfolio pledge > ₹10,00,000', color: Color(0xFF7C3AED)),
-        CustomerSegmentSummary(segmentName: 'Frequent Traders', count: 15, description: 'Over 5 completed loan cycles', color: Color(0xFFD97706)),
-        CustomerSegmentSummary(segmentName: 'Watchlist / Risky', count: 4, description: 'History of late repayments', color: Color(0xFFDC2626)),
+      'segments': [
+        CustomerSegmentSummary(segmentName: 'New Customers', count: newCustCount, description: 'Joined within last 30 days', color: const Color(0xFF2563EB)),
+        CustomerSegmentSummary(segmentName: 'Active Borrowers', count: activeCustomerIds.length, description: 'Has at least one active gold loan', color: const Color(0xFF059669)),
+        const CustomerSegmentSummary(segmentName: 'High Value VIP', count: 0, description: 'Total portfolio pledge > ₹10,00,000', color: Color(0xFF7C3AED)),
+        CustomerSegmentSummary(segmentName: 'Frequent Traders', count: frequentCount, description: 'Over 5 completed loan cycles', color: const Color(0xFFD97706)),
+        CustomerSegmentSummary(segmentName: 'Watchlist / Risky', count: riskyCount, description: 'History of late repayments or blocked', color: const Color(0xFFDC2626)),
       ],
     };
   }
@@ -208,17 +214,19 @@ class ReportsCalculationService implements IReportsCalculationService {
     final pending = kycRecords.where((k) => k.status == KycStatus.underReview || k.status == KycStatus.submitted).length;
     final rejected = kycRecords.where((k) => k.status == KycStatus.rejected).length;
 
+    final methods = <String, int>{};
+    for (final r in kycRecords) {
+      final m = r.method.label;
+      methods[m] = (methods[m] ?? 0) + 1;
+    }
+
     return {
       'totalRecords': kycRecords.length,
       'verifiedCount': verified,
       'pendingCount': pending,
       'rejectedCount': rejected,
-      'avgReviewTimeMinutes': 14.5,
-      'verificationMethods': const {
-        'Aadhaar DigiLocker': 65,
-        'PAN Offline OCR': 25,
-        'Voter ID / Manual': 10,
-      },
+      'avgReviewTimeMinutes': 0.0,
+      'verificationMethods': methods,
     };
   }
 
@@ -259,6 +267,7 @@ class ReportsCalculationService implements IReportsCalculationService {
     final totalDisbursed = loans.fold(0.0, (sum, l) => sum + l.principalAmount);
     final totalOutstanding = loans.fold(0.0, (sum, l) => sum + l.totalOutstanding);
     final totalInterestEarned = loans.fold(0.0, (sum, l) => sum + l.accruedInterest);
+    final avgLtv = loans.isEmpty ? 0.0 : (loans.fold(0.0, (sum, l) => sum + l.ltvPercentage) / loans.length);
 
     return {
       'totalLoansCount': loans.length,
@@ -269,24 +278,20 @@ class ReportsCalculationService implements IReportsCalculationService {
       'totalDisbursed': totalDisbursed,
       'totalOutstanding': totalOutstanding,
       'totalInterestEarned': totalInterestEarned,
-      'avgLtvPercentage': 71.4,
+      'avgLtvPercentage': avgLtv,
     };
   }
 
   @override
   Map<String, dynamic> calculatePaymentAnalytics(List<LoanModel> loans) {
-    final totalInterestCollected = loans.fold(0.0, (sum, l) => sum + (l.accruedInterest * 0.85));
-    final totalPrincipalCollected = loans.fold(0.0, (sum, l) => sum + (l.principalAmount * 0.40));
+    final totalInterestCollected = loans.fold(0.0, (sum, l) => sum + l.accruedInterest);
+    final totalPrincipalCollected = loans.fold(0.0, (sum, l) => sum + (l.principalAmount - l.outstandingPrincipal));
 
     return {
       'totalCollections': totalInterestCollected + totalPrincipalCollected,
       'principalCollected': totalPrincipalCollected,
       'interestCollected': totalInterestCollected,
-      'methodBreakdown': const {
-        'Cash Vault': 45.0,
-        'HDFC Bank NetBanking / UPI': 40.0,
-        'POS Card': 15.0,
-      },
+      'methodBreakdown': <String, double>{},
     };
   }
 
@@ -298,10 +303,10 @@ class ReportsCalculationService implements IReportsCalculationService {
     final margin = revenue > 0 ? (netProfit / revenue) * 100 : 0.0;
 
     return {
-      'totalRevenue': revenue > 0 ? revenue : 9765000.0,
-      'totalExpenses': expenses > 0 ? expenses : 1939000.0,
-      'netProfit': netProfit != 0 ? netProfit : 7826000.0,
-      'profitMarginPercentage': margin > 0 ? margin : 80.1,
+      'totalRevenue': revenue,
+      'totalExpenses': expenses,
+      'netProfit': netProfit,
+      'profitMarginPercentage': margin,
     };
   }
 
@@ -335,11 +340,11 @@ class ReportsCalculationService implements IReportsCalculationService {
         customerId: c.id,
         customerName: c.fullName,
         activeLoansCount: activeLoans.length,
-        totalPrincipal: totalPrincipal > 0 ? totalPrincipal : 185000.0,
-        totalOutstanding: totalOutstanding > 0 ? totalOutstanding : 145000.0,
-        interestDue: totalInterest > 0 ? totalInterest : 8500.0,
-        collateralValue: collateralVal > 0 ? collateralVal : 240000.0,
-        ltvPercentage: avgLtv > 0 ? avgLtv : 60.4,
+        totalPrincipal: totalPrincipal,
+        totalOutstanding: totalOutstanding,
+        interestDue: totalInterest,
+        collateralValue: collateralVal,
+        ltvPercentage: avgLtv,
         riskStatus: isHighRisk ? 'HIGH' : 'NORMAL',
         kycStatus: c.kycStatus.name.toUpperCase(),
       );
@@ -350,51 +355,26 @@ class ReportsCalculationService implements IReportsCalculationService {
   List<CollateralReportItem> calculateCollateralReport(List<LoanModel> loans, List<OrnamentModel> ornaments) {
     final now = DateTime.now();
     return ornaments.map((o) {
-      final loan = loans.firstWhere(
-        (l) => l.collateralOrnaments.any((item) => item.id == o.id) || o.status == OrnamentStatus.pledged,
-        orElse: () => LoanModel(
-          id: 'KC-LN-10022',
-          customerId: 'CUS-001',
-          customerName: 'Rajesh Kumar',
-          customerKycStatus: 'VERIFIED',
-          pledgeId: 'KC-PLG-001',
-          collateralOrnaments: [o],
-          pledgeDate: now.subtract(const Duration(days: 90)),
-          maturityDate: now.add(const Duration(days: 275)),
-          principalAmount: 185000,
-          outstandingPrincipal: 185000,
-          interestRatePercentage: 18.0,
-          accruedInterest: 8325,
-          nextDueDate: now.add(const Duration(days: 15)),
-          collateralTotalValue: o.valuation.totalEstimatedValue,
-          collateralNetWeightGrams: o.weight.netMetalWeight,
-          status: LoanStatus.active,
-          riskStatus: LoanRiskStatus.low,
-          branch: 'Main Vault Branch',
-          loanOfficer: 'Vikram Singh',
-          createdAt: now.subtract(const Duration(days: 90)),
-          updatedAt: now.subtract(const Duration(days: 2)),
-        ),
-      );
+      final matchingLoans = loans.where((l) => l.collateralOrnaments.any((item) => item.id == o.id)).toList();
+      final loan = matchingLoans.isNotEmpty ? matchingLoans.first : null;
 
       return CollateralReportItem(
-        customerName: loan.customerName,
-        loanId: loan.id,
+        customerName: loan?.customerName ?? 'In Vault',
+        loanId: loan?.id ?? 'N/A',
         ornamentId: o.id,
         metalType: o.metalType.label,
         purity: o.purity.label,
         netWeightGrams: o.weight.netMetalWeight,
         collateralValue: o.valuation.totalEstimatedValue,
-        pledgeDate: loan.pledgeDate,
-        loanStatus: loan.status.name.toUpperCase(),
-        releaseStatus: o.status == OrnamentStatus.released ? 'RELEASED' : 'PLEDGED_IN_VAULT',
+        pledgeDate: loan?.pledgeDate ?? now,
+        loanStatus: loan?.status.name.toUpperCase() ?? 'AVAILABLE',
+        releaseStatus: o.status == OrnamentStatus.released ? 'RELEASED' : 'IN_VAULT',
       );
     }).toList();
   }
 
   @override
   List<InventoryWeightReportItem> calculateInventoryWeightReport(List<OrnamentModel> ornaments) {
-    // Group ornaments by metal + purity + category
     final Map<String, List<OrnamentModel>> grouped = {};
     for (final o in ornaments) {
       final key = '${o.metalType.label} - ${o.purity.label} (${o.category.label})';

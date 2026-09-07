@@ -40,22 +40,27 @@ def get_loan_metrics(
 ):
     service = LoanService(db)
     loans = service.loan_repo.get_all()
-    active_loans = [l for l in loans if getattr(l, "status", "ACTIVE") in ("ACTIVE", "OVERDUE")]
+    active_loans = [l for l in loans if getattr(l, "status", "ACTIVE") in ("ACTIVE", "OVERDUE", "DUE_SOON")]
     total_outstanding = sum(getattr(l, "outstanding_principal", 0.0) or 0.0 for l in active_loans)
     total_interest_due = sum(getattr(l, "accrued_interest", 0.0) or 0.0 for l in active_loans)
     overdue_count = sum(1 for l in active_loans if getattr(l, "status", "") == "OVERDUE")
+    due_soon_count = sum(1 for l in active_loans if getattr(l, "status", "") == "DUE_SOON")
+    closed_count = sum(1 for l in loans if getattr(l, "status", "") in ("CLOSED", "REPAID"))
+    total_collateral_value = sum(getattr(l, "collateral_value", 0.0) or 0.0 for l in active_loans)
+    total_pledged_weight = sum(getattr(l, "net_weight_grams", 0.0) or 0.0 for l in active_loans)
+    total_interest_collected = sum(getattr(l, "interest_collected", 0.0) or 0.0 for l in loans)
 
     return APIResponse(
         data={
             "active_loans_count": len(active_loans),
             "total_outstanding_principal": total_outstanding,
             "total_interest_due": total_interest_due,
-            "total_interest_collected": 125000.0,
+            "total_interest_collected": total_interest_collected,
             "overdue_loans_count": overdue_count,
-            "loans_due_soon_count": 2,
-            "loans_closed_this_month_count": 4,
-            "total_collateral_value": total_outstanding * 1.3,
-            "total_pledged_weight_grams": 450.5,
+            "loans_due_soon_count": due_soon_count,
+            "loans_closed_this_month_count": closed_count,
+            "total_collateral_value": total_collateral_value,
+            "total_pledged_weight_grams": total_pledged_weight,
         }
     )
 
@@ -73,16 +78,23 @@ def get_inventory_metrics(
     db: Session = Depends(get_db),
     owner: Owner = Depends(get_current_owner),
 ):
+    service = LoanService(db)
+    loans = service.loan_repo.get_all()
+    active_loans = [l for l in loans if getattr(l, "status", "ACTIVE") in ("ACTIVE", "OVERDUE", "DUE_SOON")]
+    total_gross = sum(getattr(l, "gross_weight_grams", 0.0) or 0.0 for l in active_loans)
+    total_net = sum(getattr(l, "net_weight_grams", 0.0) or 0.0 for l in active_loans)
+    total_val = sum(getattr(l, "collateral_value", 0.0) or 0.0 for l in active_loans)
+
     return APIResponse(
         data={
-            "total_ornaments_count": 12,
-            "total_vault_value": 4500000.0,
-            "total_gross_weight_grams": 680.0,
-            "total_net_weight_grams": 645.0,
-            "gold_inventory_weight_grams": 510.0,
-            "silver_inventory_weight_grams": 135.0,
-            "unpledged_stock_count": 3,
-            "pledged_vault_count": 9,
+            "total_ornaments_count": len(active_loans),
+            "total_vault_value": total_val,
+            "total_gross_weight_grams": total_gross,
+            "total_net_weight_grams": total_net,
+            "gold_inventory_weight_grams": total_net,
+            "silver_inventory_weight_grams": 0.0,
+            "unpledged_stock_count": 0,
+            "pledged_vault_count": len(active_loans),
         }
     )
 

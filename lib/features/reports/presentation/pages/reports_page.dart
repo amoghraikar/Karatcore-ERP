@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
@@ -24,16 +25,15 @@ class ReportsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final execAsync = ref.watch(executiveMetricsProvider);
     final savedViewsAsync = ref.watch(savedReportViewsProvider);
-    final filter = ref.watch(reportDateFilterProvider);
     final scheme = Theme.of(context).colorScheme;
 
     return ListView(
       padding: EdgeInsets.all(context.pageGutter),
       children: [
         // Header
-        const KcPageHeader(
-          title: 'Reports & Business Intelligence Center',
-          subtitle: 'Executive dashboards, operational analytics, risk indicators & exportable financial statements',
+        KcPageHeader(
+          title: context.tr('reports_and_bi_center'),
+          subtitle: context.tr('reports_bi_desc'),
         ),
         const SizedBox(height: 20),
 
@@ -46,15 +46,13 @@ class ReportsPage extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // 12 Premium KPI Metric Cards with Interactive Drill-Downs
-        Text('Executive KPI Summary Metrics (Interactive Drill-Down)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(context.tr('executive_kpi_metrics'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
 
         execAsync.when(
           loading: () => const KcSkeletonLoader(height: 300),
           error: (err, st) => ReportErrorState(error: err, onRetry: () { ref.invalidate(executiveMetricsProvider); ref.invalidate(savedReportViewsProvider); }),
           data: (metrics) {
-            final isComparison = filter.comparisonMode != ComparisonMode.none;
-
             return GridView.count(
               crossAxisCount: context.isMobile ? 1 : (MediaQuery.of(context).size.width > 1200 ? 4 : 3),
               shrinkWrap: true,
@@ -64,86 +62,86 @@ class ReportsPage extends ConsumerWidget {
               mainAxisExtent: 110,
               children: [
                 KcMetricCard(
-                  title: 'Revenue',
+                  title: context.tr('revenue'),
                   value: KcFormatters.inr(metrics.revenue),
-                  trend: isComparison ? '+14.2% vs prev' : 'Gross Income',
+                  trend: 'Gross Income',
                   icon: Icons.trending_up_rounded,
                   onTap: () => context.go(AppRoutes.reportsProfitability),
                 ),
                 KcMetricCard(
-                  title: 'Expenses',
+                  title: context.tr('expenses'),
                   value: KcFormatters.inr(metrics.expenses),
-                  trend: isComparison ? '-2.1% vs prev' : 'Store Rent & Wages',
+                  trend: 'Operating Costs',
                   icon: Icons.trending_down_rounded,
                   onTap: () => context.go(AppRoutes.reportsProfitability),
                 ),
                 KcMetricCard(
-                  title: 'Net Profit',
+                  title: context.tr('net_profit'),
                   value: KcFormatters.inr(metrics.netProfit),
-                  trend: isComparison ? '+18.5% vs prev' : 'Net Business Yield',
+                  trend: 'Net Business Yield',
                   icon: Icons.account_balance_wallet_rounded,
                   onTap: () => context.go(AppRoutes.reportsProfitability),
                 ),
                 KcMetricCard(
-                  title: 'Active Loans',
-                  value: '${metrics.activeLoansCount} Loans',
+                  title: context.tr('active_loans'),
+                  value: '${metrics.activeLoansCount}',
                   trend: 'Pledge Portfolio',
                   icon: Icons.request_quote_rounded,
                   onTap: () => context.go(AppRoutes.reportsLoans),
                 ),
                 KcMetricCard(
-                  title: 'Loan Outstanding',
+                  title: context.tr('loan_outstanding'),
                   value: KcFormatters.inr(metrics.loanOutstanding),
                   trend: 'Active Principal Balance',
                   icon: Icons.account_balance_rounded,
                   onTap: () => context.go(AppRoutes.reportsLoans),
                 ),
                 KcMetricCard(
-                  title: 'Interest Income',
+                  title: context.tr('interest_income'),
                   value: KcFormatters.inr(metrics.interestIncome),
                   trend: 'Accumulated Yield',
                   icon: Icons.monetization_on_rounded,
                   onTap: () => context.go(AppRoutes.reportsPayments),
                 ),
                 KcMetricCard(
-                  title: 'Inventory Value',
+                  title: context.tr('inventory_value'),
                   value: KcFormatters.inr(metrics.inventoryValue),
                   trend: 'Total Vault Stock',
                   icon: Icons.inventory_2_rounded,
                   onTap: () => context.go(AppRoutes.reportsInventory),
                 ),
                 KcMetricCard(
-                  title: 'Pledged Inventory',
+                  title: context.tr('pledged_inventory'),
                   value: KcFormatters.inr(metrics.pledgedInventoryValue),
                   trend: 'Collateral Stocks',
                   icon: Icons.lock_rounded,
                   onTap: () => context.go(AppRoutes.reportsInventory),
                 ),
                 KcMetricCard(
-                  title: 'Customer Count',
-                  value: '${metrics.customerCount} Users',
+                  title: context.tr('customer_count'),
+                  value: '${metrics.customerCount}',
                   trend: 'Active Profiles',
                   icon: Icons.people_rounded,
                   onTap: () => context.go(AppRoutes.reportsCustomers),
                 ),
                 KcMetricCard(
-                  title: 'Overdue Loans',
-                  value: '${metrics.overdueLoansCount} Loans',
+                  title: context.tr('overdue_loans'),
+                  value: '${metrics.overdueLoansCount}',
                   trend: 'Maturity Past Due',
                   icon: Icons.warning_rounded,
                   onTap: () => context.go(AppRoutes.reportsLoans),
                 ),
                 KcMetricCard(
-                  title: 'Cash Balance',
+                  title: context.tr('cash_balance'),
                   value: KcFormatters.inr(metrics.cashBalance),
                   trend: 'Vault Physical Cash',
                   icon: Icons.payments_rounded,
                   onTap: () => context.go('/accounting/cash-book'),
                 ),
                 KcMetricCard(
-                  title: 'Bank Balance',
+                  title: context.tr('bank_balance'),
                   value: KcFormatters.inr(metrics.bankBalance),
-                  trend: 'HDFC & SBI Accounts',
+                  trend: 'Verified Bank Accounts',
                   icon: Icons.account_balance_rounded,
                   onTap: () => context.go('/accounting/bank-book'),
                 ),
@@ -154,7 +152,7 @@ class ReportsPage extends ConsumerWidget {
         const SizedBox(height: 28),
 
         // Saved Report Views & Favorites Section
-        Text('Saved & Pinned Report Views', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(context.tr('saved_pinned_reports'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
 
         savedViewsAsync.when(
@@ -215,7 +213,7 @@ class ReportsPage extends ConsumerWidget {
         const SizedBox(height: 28),
 
         // Recent Reports Section
-        Text('Recent Reports & Favorites', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(context.tr('recent_reports'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
 
         savedViewsAsync.when(
@@ -256,7 +254,7 @@ class ReportsPage extends ConsumerWidget {
         const SizedBox(height: 28),
 
         // 11 Dedicated Report Modules Directory
-        Text('Dedicated Report Modules Directory', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(context.tr('dedicated_reports_directory'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
 
         GridView.count(

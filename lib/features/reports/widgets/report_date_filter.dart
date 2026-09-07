@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
@@ -10,6 +11,40 @@ import '../providers/reports_providers.dart';
 
 class ReportDateFilter extends ConsumerWidget {
   const ReportDateFilter({super.key});
+
+  String _getPresetLabel(BuildContext context, DateFilterPreset preset) {
+    switch (preset) {
+      case DateFilterPreset.today:
+        return context.tr('today');
+      case DateFilterPreset.yesterday:
+        return context.tr('yesterday');
+      case DateFilterPreset.thisWeek:
+        return context.tr('this_week');
+      case DateFilterPreset.thisMonth:
+        return context.tr('this_month');
+      case DateFilterPreset.lastMonth:
+        return context.tr('last_month');
+      case DateFilterPreset.thisQuarter:
+        return context.tr('this_quarter');
+      case DateFilterPreset.thisYear:
+        return context.tr('this_year');
+      case DateFilterPreset.financialYear:
+        return context.tr('financial_year');
+      case DateFilterPreset.custom:
+        return context.tr('custom_range');
+    }
+  }
+
+  String _getComparisonLabel(BuildContext context, ComparisonMode mode) {
+    switch (mode) {
+      case ComparisonMode.none:
+        return context.tr('no_comparison');
+      case ComparisonMode.previousPeriod:
+        return context.tr('previous_period');
+      case ComparisonMode.samePeriodLastYear:
+        return context.tr('same_period_last_year');
+    }
+  }
 
   void _showCustomRangePicker(BuildContext context, WidgetRef ref, ReportDateFilterModel currentFilter) async {
     final range = await showDateRangePicker(
@@ -39,7 +74,7 @@ class ReportDateFilter extends ConsumerWidget {
               const Icon(Icons.date_range_rounded, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Report Date Filter:',
+                '${context.tr('report_date_filter')}:',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(width: 8),
@@ -57,7 +92,7 @@ class ReportDateFilter extends ConsumerWidget {
               const Spacer(),
               if (filter.preset != DateFilterPreset.thisMonth || filter.comparisonMode != ComparisonMode.none)
                 KcOutlinedButton(
-                  label: 'Reset Filters',
+                  label: context.tr('reset_filters'),
                   icon: Icons.refresh_rounded,
                   onPressed: () => ref.read(reportDateFilterProvider.notifier).reset(),
                 ),
@@ -73,7 +108,7 @@ class ReportDateFilter extends ConsumerWidget {
                     padding: const EdgeInsets.only(right: 6),
                     child: FilterChip(
                       selected: filter.preset == preset,
-                      label: Text(preset.label),
+                      label: Text(_getPresetLabel(context, preset)),
                       labelStyle: TextStyle(
                         fontSize: 12,
                         fontWeight: filter.preset == preset ? FontWeight.w800 : FontWeight.w500,
@@ -97,7 +132,7 @@ class ReportDateFilter extends ConsumerWidget {
             children: [
               const Icon(Icons.compare_arrows_rounded, size: 18),
               const SizedBox(width: 6),
-              const Text('Comparison Mode:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${context.tr('comparison_mode')}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               const SizedBox(width: 12),
               DropdownButton<ComparisonMode>(
                 value: filter.comparisonMode,
@@ -110,7 +145,7 @@ class ReportDateFilter extends ConsumerWidget {
                 items: ComparisonMode.values.map((mode) {
                   return DropdownMenuItem(
                     value: mode,
-                    child: Text(mode.label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    child: Text(_getComparisonLabel(context, mode), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                   );
                 }).toList(),
               ),

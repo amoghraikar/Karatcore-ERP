@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
@@ -14,6 +15,8 @@ import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 import '../../../../shared/widgets/navigation/kc_page_header.dart';
 import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 
+import '../../models/loan_model.dart';
+import '../../../ornaments/models/ornament_model.dart';
 import '../../providers/loan_providers.dart';
 import '../../repository/loan_repository.dart';
 import '../../widgets/loan_data_table.dart';
@@ -55,6 +58,19 @@ class _LoansPageState extends ConsumerState<LoansPage> {
     final activeFilters = ref.watch(loanFilterProvider);
     final currentSort = ref.watch(loanSortProvider);
 
+    final loans = loanState.valueOrNull ?? [];
+    final totalLoans = loans.length;
+    final silverLoans = loans.where((l) => l.collateralOrnaments.any((o) => o.metalType == MetalType.silver)).length;
+    final goldLoans = totalLoans - silverLoans;
+    final goldPct = totalLoans > 0 ? ((goldLoans / totalLoans) * 100).toStringAsFixed(1) : '0.0';
+    final silverPct = totalLoans > 0 ? ((silverLoans / totalLoans) * 100).toStringAsFixed(1) : '0.0';
+
+    final activeLoans = loans.where((l) => l.status == LoanStatus.active || l.status == LoanStatus.dueSoon || l.status == LoanStatus.overdue).toList();
+    final overdueLoans = activeLoans.where((l) => l.status == LoanStatus.overdue).length;
+    final onTimeLoans = activeLoans.length - overdueLoans;
+    final onTimePct = activeLoans.isNotEmpty ? ((onTimeLoans / activeLoans.length) * 100).toStringAsFixed(1) : (totalLoans == 0 ? '0.0' : '100.0');
+    final overduePct = activeLoans.isNotEmpty ? ((overdueLoans / activeLoans.length) * 100).toStringAsFixed(1) : '0.0';
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
@@ -66,16 +82,16 @@ class _LoansPageState extends ConsumerState<LoansPage> {
           children: [
             // Page Header
             KcPageHeader(
-              title: 'Pledge & Gold/Silver Loans',
-              subtitle: 'Secured precious-metal lending, KYC verified customer pledges, interest accruals, repayments, full settlements, and collateral releases.',
+              title: context.tr('loans'),
+              subtitle: context.tr('pledge_and_loans_desc'),
               actions: [
                 KcPrimaryButton(
-                  label: 'New Loan & Pledge',
+                  label: context.tr('new_loan_and_pledge'),
                   icon: Icons.add_rounded,
                   onPressed: () => context.go('/loans/create'),
                 ),
                 KcOutlinedButton(
-                  label: 'Loan Reports',
+                  label: context.tr('loan_reports'),
                   icon: Icons.bar_chart_rounded,
                   onPressed: () => context.go('/reports/loans'),
                 ),
@@ -95,14 +111,16 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                       return Column(
                         children: [
                           KcMetricCard(
-                            title: 'Active Loans',
+                            title: context.tr('active_loans'),
                             value: m.activeLoansCount.toString(),
-                            trend: '${KcFormatters.inr(m.totalOutstandingPrincipal)} Outstanding',
+                            trend: m.totalOutstandingPrincipal > 0
+                                ? '${KcFormatters.inr(m.totalOutstandingPrincipal)} Outstanding'
+                                : 'No Active Loans',
                             icon: Icons.account_balance_rounded,
                           ),
                           const SizedBox(height: 12),
                           KcMetricCard(
-                            title: 'Interest Due',
+                            title: context.tr('interest_accrued_due'),
                             value: KcFormatters.inr(m.totalInterestDue),
                             trend: '${KcFormatters.inr(m.totalInterestCollected)} Collected',
                             icon: Icons.monetization_on_rounded,
@@ -117,25 +135,27 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                           children: [
                             Expanded(
                               child: KcMetricCard(
-                                title: 'Active Loans',
+                                title: context.tr('active_loans'),
                                 value: m.activeLoansCount.toString(),
-                                trend: '${m.loansClosedThisMonthCount} Closed This Month',
+                                trend: m.loansClosedThisMonthCount > 0
+                                    ? '${m.loansClosedThisMonthCount} Closed This Month'
+                                    : 'No Closed Loans',
                                 icon: Icons.folder_open_rounded,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: KcMetricCard(
-                                title: 'Outstanding Principal',
+                                title: context.tr('outstanding_principal'),
                                 value: KcFormatters.inr(m.totalOutstandingPrincipal),
-                                trend: 'Total Active Exposure',
+                                trend: m.totalOutstandingPrincipal > 0 ? 'Total Active Exposure' : 'No Active Exposure',
                                 icon: Icons.account_balance_wallet_rounded,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: KcMetricCard(
-                                title: 'Interest Accrued Due',
+                                title: context.tr('interest_accrued_due'),
                                 value: KcFormatters.inr(m.totalInterestDue),
                                 trend: '${m.overdueLoansCount} Overdue Accounts',
                                 icon: Icons.schedule_rounded,
@@ -144,9 +164,11 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: KcMetricCard(
-                                title: 'Total Collateral Value',
+                                title: context.tr('total_collateral_value'),
                                 value: KcFormatters.inr(m.totalCollateralValue),
-                                trend: '${m.totalPledgedWeightGrams.toStringAsFixed(1)}g Pledged Wt',
+                                trend: m.totalPledgedWeightGrams > 0
+                                    ? '${m.totalPledgedWeightGrams.toStringAsFixed(1)}g Pledged Wt'
+                                    : '0.0g Pledged Wt',
                                 icon: Icons.savings_rounded,
                               ),
                             ),
@@ -166,30 +188,30 @@ class _LoansPageState extends ConsumerState<LoansPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Loan Portfolio & Collateral Analytics', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  Text(context.tr('loan_portfolio_analytics'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 14),
                   if (context.isMobile) ...[
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Collateral Distribution', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                          SizedBox(height: 8),
+                          Text(context.tr('collateral_distribution'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Gold Collateral Loans', style: TextStyle(fontSize: 13)),
-                              Text('83.4%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                              Text(context.tr('gold_collateral_loans'), style: const TextStyle(fontSize: 13)),
+                              Text('$goldPct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
                             ],
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Silver Collateral Loans', style: TextStyle(fontSize: 13)),
-                              Text('16.6%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
+                              Text(context.tr('silver_collateral_loans'), style: const TextStyle(fontSize: 13)),
+                              Text('$silverPct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
                             ],
                           ),
                         ],
@@ -199,24 +221,24 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Loan Health Performance', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                          SizedBox(height: 8),
+                          Text(context.tr('loan_health_performance'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Current On-Time Loans', style: TextStyle(fontSize: 13)),
-                              Text('92.1%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                              Text(context.tr('current_on_time_loans'), style: const TextStyle(fontSize: 13)),
+                              Text('$onTimePct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
                             ],
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Overdue Interest Accounts', style: TextStyle(fontSize: 13)),
-                              Text('7.9%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
+                              Text(context.tr('overdue_interest_accounts'), style: const TextStyle(fontSize: 13)),
+                              Text('$overduePct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
                             ],
                           ),
                         ],
@@ -229,24 +251,24 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                            child: const Column(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Collateral Distribution', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                                SizedBox(height: 8),
+                                Text(context.tr('collateral_distribution'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Gold Collateral Loans', style: TextStyle(fontSize: 13)),
-                                    Text('83.4%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                                    Text(context.tr('gold_collateral_loans'), style: const TextStyle(fontSize: 13)),
+                                    Text('$goldPct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
                                   ],
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Silver Collateral Loans', style: TextStyle(fontSize: 13)),
-                                    Text('16.6%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
+                                    Text(context.tr('silver_collateral_loans'), style: const TextStyle(fontSize: 13)),
+                                    Text('$silverPct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
                                   ],
                                 ),
                               ],
@@ -258,24 +280,24 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-                            child: const Column(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Loan Health Performance', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                                SizedBox(height: 8),
+                                Text(context.tr('loan_health_performance'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Current On-Time Loans', style: TextStyle(fontSize: 13)),
-                                    Text('92.1%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                                    Text(context.tr('current_on_time_loans'), style: const TextStyle(fontSize: 13)),
+                                    Text('$onTimePct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF059669))),
                                   ],
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Overdue Interest Accounts', style: TextStyle(fontSize: 13)),
-                                    Text('7.9%', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
+                                    Text(context.tr('overdue_interest_accounts'), style: const TextStyle(fontSize: 13)),
+                                    Text('$overduePct%', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFDC2626))),
                                   ],
                                 ),
                               ],
@@ -292,7 +314,7 @@ class _LoansPageState extends ConsumerState<LoansPage> {
             // Search Bar & Filter Controls
             KcSearchBarFilter(
               searchController: _searchController,
-              hintText: 'Search Loans by Loan ID, Customer Name, Mobile, or Pledge ID...',
+              hintText: context.tr('search_loans_placeholder'),
               onSearchChanged: _onSearchChanged,
               filterButton: Badge(
                 isLabelVisible: !activeFilters.isEmpty,
@@ -300,7 +322,7 @@ class _LoansPageState extends ConsumerState<LoansPage> {
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
                   icon: const Icon(Icons.filter_list_rounded, size: 18),
-                  label: const Text('Filters'),
+                  label: Text(context.tr('filters')),
                   onPressed: () => showLoanFilterSheet(context),
                 ),
               ),

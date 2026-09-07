@@ -2,14 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 
+import '../models/reports_model.dart';
 import '../providers/reports_providers.dart';
 import 'report_error_state.dart';
 
 class AttentionPanel extends ConsumerWidget {
   const AttentionPanel({super.key});
+
+  String _getLocalizedTitle(BuildContext context, AttentionIndicatorItem item) {
+    switch (item.id) {
+      case 'ATTN-01':
+        return context.tr('overdue_gold_loans');
+      case 'ATTN-02':
+        return context.tr('pending_kyc_records');
+      case 'ATTN-03':
+        return context.tr('loans_awaiting_approval');
+      case 'ATTN-04':
+        return context.tr('ornaments_requiring_attention');
+      case 'ATTN-05':
+        return context.tr('overdue_receivables');
+      case 'ATTN-06':
+        return context.tr('high_risk_customers');
+      default:
+        return item.title;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,12 +57,12 @@ class AttentionPanel extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Attention Required — Action Panel',
+                    context.tr('attention_required'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Rule-based operational indicators requiring owner/manager action',
+                    context.tr('attention_required_desc'),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ],
@@ -94,7 +115,7 @@ class AttentionPanel extends ConsumerWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        item.title,
+                                        _getLocalizedTitle(context, item),
                                         style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                                         overflow: TextOverflow.ellipsis,
                                       ),

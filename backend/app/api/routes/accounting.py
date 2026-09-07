@@ -17,12 +17,12 @@ def get_accounting_metrics(
 ):
     return APIResponse(
         data={
-            "total_income": 350000.0,
-            "total_expenses": 120000.0,
-            "net_profit": 230000.0,
-            "cash_on_hand": 850000.0,
-            "bank_balance": 1250000.0,
-            "interest_income": 280000.0,
+            "total_income": 0.0,
+            "total_expenses": 0.0,
+            "net_profit": 0.0,
+            "cash_on_hand": 0.0,
+            "bank_balance": 0.0,
+            "interest_income": 0.0,
         }
     )
 
@@ -32,14 +32,7 @@ def get_accounts(
     db: Session = Depends(get_db),
     owner: Owner = Depends(get_current_owner),
 ):
-    return APIResponse(
-        data=[
-            {"id": "1", "account_number": "1001", "name": "Cash Desk Vault", "account_type": "ASSET", "balance": 850000.0},
-            {"id": "2", "account_number": "1002", "name": "Primary HDFC Bank", "account_type": "ASSET", "balance": 1250000.0},
-            {"id": "3", "account_number": "4001", "name": "Gold Loan Interest Revenue", "account_type": "INCOME", "balance": 280000.0},
-            {"id": "4", "account_number": "5001", "name": "Store Rent & Utilities", "account_type": "EXPENSE", "balance": 45000.0},
-        ]
-    )
+    return APIResponse(data=[])
 
 
 @router.get("/transactions/periods")
