@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/print_export_service.dart';
 
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../models/ornament_model.dart';
@@ -125,16 +126,30 @@ class BarcodeQrDialog extends ConsumerWidget {
                 KcOutlinedButton(
                   label: 'Print Tag',
                   icon: Icons.print_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Print job sent to thermal tag printer.')));
+                  onPressed: () async {
+                    await PrintExportService.printBarcodeTag(
+                      ornamentId: ornament.id,
+                      ornamentName: ornament.name,
+                      purity: ornament.purity.label,
+                      grossWeight: ornament.weight.grossWeight,
+                      netWeight: ornament.weight.netMetalWeight,
+                      estimatedValue: ornament.valuation.totalEstimatedValue,
+                    );
                   },
                 ),
                 const SizedBox(width: 8),
                 KcOutlinedButton(
-                  label: 'Download QR',
+                  label: 'Export Asset Tag',
                   icon: Icons.download_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('QR code asset downloaded.')));
+                  onPressed: () async {
+                    await PrintExportService.printBarcodeTag(
+                      ornamentId: ornament.id,
+                      ornamentName: ornament.name,
+                      purity: ornament.purity.label,
+                      grossWeight: ornament.weight.grossWeight,
+                      netWeight: ornament.weight.netMetalWeight,
+                      estimatedValue: ornament.valuation.totalEstimatedValue,
+                    );
                   },
                 ),
                 const Spacer(),

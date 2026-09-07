@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/utils/file_downloader.dart';
+import '../../../../core/services/print_export_service.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../models/loan_model.dart';
@@ -119,8 +119,17 @@ class ReceiptPreviewDialog extends StatelessWidget {
                 KcOutlinedButton(
                   label: 'Print',
                   icon: Icons.print_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Receipt sent to thermal receipt printer.')));
+                  onPressed: () async {
+                    await PrintExportService.printReceipt(
+                      receiptNumber: receiptNumber,
+                      title: receiptTitle,
+                      customerName: customerName,
+                      loanId: loan.id,
+                      amount: amount,
+                      paymentMethod: paymentMethod,
+                      date: date,
+                      staffName: staffName,
+                    );
                   },
                 ),
                 const SizedBox(width: 8),
@@ -128,13 +137,15 @@ class ReceiptPreviewDialog extends StatelessWidget {
                   label: 'Download PDF',
                   icon: Icons.picture_as_pdf_rounded,
                   onPressed: () async {
-                    await FileDownloader.downloadReceiptPdf(
+                    await PrintExportService.downloadReceiptPdf(
                       receiptNumber: receiptNumber,
+                      title: receiptTitle,
                       customerName: customerName,
                       loanId: loan.id,
                       amount: amount,
                       paymentMethod: paymentMethod,
                       date: date,
+                      staffName: staffName,
                     );
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Downloaded $receiptNumber.pdf')));

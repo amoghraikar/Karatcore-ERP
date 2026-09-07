@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/print_export_service.dart';
 import '../../../../core/utils/file_downloader.dart';
 
 enum ExportFormat { csv, excel, pdf, print }
@@ -45,20 +46,14 @@ class ExportService implements IExportService {
         rows: csvRows,
       );
     } else if (format == ExportFormat.pdf) {
-      final pdfContent = '''
-============================================================
-           KARATCORE JEWELLERY ERP - $reportTitle         
-============================================================
-Generated Date: ${DateTime.now().toIso8601String()}
-Total Records: ${data.length}
-------------------------------------------------------------
-${data.take(10).map((d) => d.entries.map((e) => '${e.key}: ${e.value}').join(' | ')).join('\n')}
-============================================================
-''';
-      await FileDownloader.downloadFile(
-        filename: '$fileName.pdf',
-        content: pdfContent,
-        mimeType: 'application/pdf',
+      await PrintExportService.downloadReportPdf(
+        reportTitle: reportTitle,
+        rows: data,
+      );
+    } else if (format == ExportFormat.print) {
+      await PrintExportService.printReportTable(
+        reportTitle: reportTitle,
+        rows: data,
       );
     }
 

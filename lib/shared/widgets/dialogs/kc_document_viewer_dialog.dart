@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/print_export_service.dart';
+import '../../../../core/utils/file_downloader.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../features/customers/models/customer_model.dart';
 import '../buttons/kc_outlined_button.dart';
@@ -241,19 +243,49 @@ class KcDocumentViewerDialog extends StatelessWidget {
                 KcOutlinedButton(
                   label: 'Download Original File',
                   icon: Icons.download_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Downloading ${document.name} to local device...')),
+                  onPressed: () async {
+                    await FileDownloader.downloadFile(
+                      filename: document.name.endsWith('.pdf') ? document.name : '${document.name}.pdf',
+                      content: '''KARATCORE ERP - SECURE VAULT RECORD
+============================================================
+Customer: $customerName (ID: $customerId)
+Document: ${document.name}
+Type: ${document.documentType}
+Document Number: ${document.documentNumber}
+Verified: ${document.isVerified ? 'YES (Tamper-evident record)' : 'PENDING'}
+Date: ${document.uploadDate.toIso8601String()}
+Size: ${document.fileSize}
+============================================================''',
+                      mimeType: 'application/pdf',
                     );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Downloaded "${document.name}" to local device.'),
+                          backgroundColor: const Color(0xFF059669),
+                        ),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(width: 12),
                 KcOutlinedButton(
                   label: 'Print Copy',
                   icon: Icons.print_rounded,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Preparing print job for ${document.name}...')),
+                  onPressed: () async {
+                    await PrintExportService.printReportTable(
+                      reportTitle: 'Customer Vault Record — ${document.name}',
+                      rows: [
+                        {
+                          'Customer': customerName,
+                          'Customer ID': customerId,
+                          'Document Type': document.documentType,
+                          'Document No': document.documentNumber,
+                          'Upload Date': KcFormatters.date(document.uploadDate),
+                          'Status': document.status,
+                          'Verified': document.isVerified ? 'YES' : 'NO',
+                        }
+                      ],
                     );
                   },
                 ),

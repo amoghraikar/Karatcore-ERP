@@ -113,6 +113,13 @@ class CustomerListNotifier extends StateNotifier<AsyncValue<List<CustomerModel>>
     await loadCustomers();
     ref.invalidate(customerDetailProvider(customerId));
   }
+
+  Future<void> addDocument(String customerId, CustomerDocument document) async {
+    final repo = ref.read(customerRepositoryProvider);
+    await repo.addCustomerDocument(customerId, document);
+    await loadCustomers();
+    ref.invalidate(customerDetailProvider(customerId));
+  }
 }
 
 final customerListProvider =

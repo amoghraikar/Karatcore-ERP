@@ -63,4 +63,6 @@ abstract class ICustomerRepository {
   Future<CustomerModel> togglePinCustomerNote(String customerId, String noteId);
 
   Future<CustomerModel> deleteCustomerNote(String customerId, String noteId);
+
+  Future<CustomerModel> addCustomerDocument(String customerId, CustomerDocument document);
 }

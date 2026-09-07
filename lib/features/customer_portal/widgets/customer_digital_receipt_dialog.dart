@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/utils/file_downloader.dart';
+import '../../../../core/services/print_export_service.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
 import '../../loans/models/loan_model.dart';
@@ -150,20 +150,38 @@ class CustomerDigitalReceiptDialog extends StatelessWidget {
         ),
         OutlinedButton.icon(
           onPressed: () async {
-            await FileDownloader.downloadReceiptPdf(
+            await PrintExportService.printReceipt(
               receiptNumber: payment.receiptNumber,
+              title: 'Customer Payment Receipt',
               customerName: customerName,
               loanId: payment.loanId,
               amount: payment.amount,
               paymentMethod: payment.method.label,
               date: payment.paymentDate,
+              staffName: payment.recordedBy,
+            );
+          },
+          icon: const Icon(Icons.print_rounded, size: 16),
+          label: const Text('Print'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () async {
+            await PrintExportService.downloadReceiptPdf(
+              receiptNumber: payment.receiptNumber,
+              title: 'Customer Payment Receipt',
+              customerName: customerName,
+              loanId: payment.loanId,
+              amount: payment.amount,
+              paymentMethod: payment.method.label,
+              date: payment.paymentDate,
+              staffName: payment.recordedBy,
             );
             if (context.mounted) {
               KcToast.info(context, 'Receipt PDF generated & downloaded for #${payment.receiptNumber}.', title: 'Downloaded');
             }
           },
-          icon: const Icon(Icons.print_rounded, size: 16),
-          label: const Text('Print / Download'),
+          icon: const Icon(Icons.download_rounded, size: 16),
+          label: const Text('Download PDF'),
         ),
       ],
     );

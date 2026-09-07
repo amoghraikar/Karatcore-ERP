@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/services/file_upload_service.dart';
 
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
@@ -36,11 +37,11 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
 
   // Step 4 & 5 Document Info
   final String _docType = 'Aadhaar Card';
-  final _docNumberController = TextEditingController(text: '9988-7766-4433');
-  final _nameOnDocController = TextEditingController(text: 'Rahul Kumar Sharma');
-  final DateTime _dateOfBirth = DateTime(1985, 4, 12);
-  bool _hasUploadedFront = true;
-  bool _hasUploadedBack = true;
+  final _docNumberController = TextEditingController();
+  final _nameOnDocController = TextEditingController();
+  final DateTime _dateOfBirth = DateTime(1990, 1, 1);
+  UploadedDocument? _frontDocument;
+  UploadedDocument? _backDocument;
   bool _isSubmitting = false;
   KycRecordModel? _submittedRecord;
 
@@ -74,9 +75,9 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
         return false;
       }
     } else if (step == 3) {
-      if (!_hasUploadedFront) {
+      if (_frontDocument == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please upload front side of government document.')),
+          const SnackBar(content: Text('Please upload front side of government document using the file picker.')),
         );
         return false;
       }
@@ -118,11 +119,18 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
       acceptedPrivacy: _acceptedPrivacy,
     );
 
+    final docNumber = _docNumberController.text.trim().isNotEmpty
+        ? _docNumberController.text.trim()
+        : 'DOC-${DateTime.now().millisecondsSinceEpoch}';
+    final nameOnDoc = _nameOnDocController.text.trim().isNotEmpty
+        ? _nameOnDocController.text.trim()
+        : (customer?.fullName ?? 'Customer Name');
+
     final doc = KycDocumentModel(
       id: 'DOC-${DateTime.now().millisecondsSinceEpoch}',
       type: _docType,
-      documentNumber: _docNumberController.text.trim().isEmpty ? '9988-7766-4433' : _docNumberController.text.trim(),
-      nameOnDoc: _nameOnDocController.text.trim().isEmpty ? (customer?.fullName ?? 'Customer Name') : _nameOnDocController.text.trim(),
+      documentNumber: docNumber,
+      nameOnDoc: nameOnDoc,
       dateOfBirth: _dateOfBirth,
       uploadDate: DateTime.now(),
       uploadedBy: 'Store Compliance Agent',
@@ -130,28 +138,35 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
       isMasked: true,
     );
 
-    final submittedDocs = [
-      CustomerDocument(
-        id: 'DOC-AADHAAR-$custId',
-        name: '$_docType Scan (Front & Back)',
-        documentType: _docType,
-        uploadDate: DateTime.now(),
-        status: 'Verified',
-        isVerified: true,
-        fileSize: '1.4 MB',
-        documentNumber: _docNumberController.text.trim().isEmpty ? '9988-7766-4433' : _docNumberController.text.trim(),
-      ),
-      CustomerDocument(
-        id: 'DOC-PAN-$custId',
-        name: 'PAN Card Income Tax Proof',
-        documentType: 'PAN Card',
-        uploadDate: DateTime.now(),
-        status: 'Verified',
-        isVerified: true,
-        fileSize: '890 KB',
-        documentNumber: 'ABCPS9918F',
-      ),
-    ];
+    final submittedDocs = <CustomerDocument>[];
+    if (_frontDocument != null) {
+      submittedDocs.add(
+        CustomerDocument(
+          id: 'DOC-FRONT-$custId',
+          name: _frontDocument!.fileName,
+          documentType: '$_docType (Front)',
+          uploadDate: DateTime.now(),
+          status: 'Verified',
+          isVerified: true,
+          fileSize: _frontDocument!.formattedSize,
+          documentNumber: docNumber,
+        ),
+      );
+    }
+    if (_backDocument != null) {
+      submittedDocs.add(
+        CustomerDocument(
+          id: 'DOC-BACK-$custId',
+          name: _backDocument!.fileName,
+          documentType: '$_docType (Back)',
+          uploadDate: DateTime.now(),
+          status: 'Verified',
+          isVerified: true,
+          fileSize: _backDocument!.formattedSize,
+          documentNumber: docNumber,
+        ),
+      );
+    }
 
     try {
       final record = await ref.read(kycRepositoryProvider).startKycWorkflow(
@@ -457,25 +472,52 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
           children: [
             Expanded(
               child: Container(
-                height: 160,
+                height: 170,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _frontDocument != null ? Colors.green : Colors.white24,
+                    width: _frontDocument != null ? 2 : 1,
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(_hasUploadedFront ? Icons.check_circle_rounded : Icons.cloud_upload_rounded, color: _hasUploadedFront ? Colors.green : Colors.white70, size: 36),
+                    Icon(
+                      _frontDocument != null ? Icons.check_circle_rounded : Icons.cloud_upload_rounded,
+                      color: _frontDocument != null ? Colors.greenAccent : Colors.white70,
+                      size: 36,
+                    ),
                     const SizedBox(height: 8),
-                    Text(_hasUploadedFront ? 'Front Side Uploaded' : 'Upload Front Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    Text(
+                      _frontDocument != null ? _frontDocument!.fileName : 'Upload Front Side',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (_frontDocument != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        _frontDocument!.formattedSize,
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       children: [
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
-                          onPressed: () => setState(() => _hasUploadedFront = true),
-                          child: const Text('Choose File'),
+                          onPressed: () async {
+                            final doc = await FileUploadService.pickDocument();
+                            if (doc != null) {
+                              setState(() => _frontDocument = doc);
+                            }
+                          },
+                          child: Text(_frontDocument != null ? 'Change File' : 'Choose File'),
                         ),
                       ],
                     ),
@@ -486,25 +528,52 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
             const SizedBox(width: 16),
             Expanded(
               child: Container(
-                height: 160,
+                height: 170,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _backDocument != null ? Colors.green : Colors.white24,
+                    width: _backDocument != null ? 2 : 1,
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(_hasUploadedBack ? Icons.check_circle_rounded : Icons.cloud_upload_rounded, color: _hasUploadedBack ? Colors.green : Colors.white70, size: 36),
+                    Icon(
+                      _backDocument != null ? Icons.check_circle_rounded : Icons.cloud_upload_rounded,
+                      color: _backDocument != null ? Colors.greenAccent : Colors.white70,
+                      size: 36,
+                    ),
                     const SizedBox(height: 8),
-                    Text(_hasUploadedBack ? 'Back Side Uploaded' : 'Upload Back Side', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    Text(
+                      _backDocument != null ? _backDocument!.fileName : 'Upload Back Side (Optional)',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (_backDocument != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        _backDocument!.formattedSize,
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       children: [
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
-                          onPressed: () => setState(() => _hasUploadedBack = true),
-                          child: const Text('Choose File'),
+                          onPressed: () async {
+                            final doc = await FileUploadService.pickDocument();
+                            if (doc != null) {
+                              setState(() => _backDocument = doc);
+                            }
+                          },
+                          child: Text(_backDocument != null ? 'Change File' : 'Choose File'),
                         ),
                       ],
                     ),

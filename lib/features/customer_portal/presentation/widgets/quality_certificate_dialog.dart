@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/print_export_service.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
@@ -180,8 +181,15 @@ class QualityCertificateDialog extends StatelessWidget {
                   child: KcOutlinedButton(
                     label: 'PRINT CERTIFICATE',
                     icon: Icons.print_rounded,
-                    onPressed: () {
-                      KcToast.show(context, message: 'Sending quality certificate to printer...', type: KcToastType.info);
+                    onPressed: () async {
+                      await PrintExportService.printQualityCertificate(
+                        ornamentId: ornament.id,
+                        ornamentName: ornament.name,
+                        purity: ornament.purity.label,
+                        grossWeight: ornament.weight.grossWeight,
+                        netWeight: ornament.weight.netMetalWeight,
+                        valuationAmount: ornament.valuation.totalEstimatedValue,
+                      );
                     },
                   ),
                 ),
@@ -190,8 +198,18 @@ class QualityCertificateDialog extends StatelessWidget {
                   child: KcPrimaryButton(
                     label: 'DOWNLOAD PDF',
                     icon: Icons.download_rounded,
-                    onPressed: () {
-                      KcToast.show(context, message: 'Quality Certificate PDF downloaded to device!', type: KcToastType.success);
+                    onPressed: () async {
+                      await PrintExportService.downloadQualityCertificatePdf(
+                        ornamentId: ornament.id,
+                        ornamentName: ornament.name,
+                        purity: ornament.purity.label,
+                        grossWeight: ornament.weight.grossWeight,
+                        netWeight: ornament.weight.netMetalWeight,
+                        valuationAmount: ornament.valuation.totalEstimatedValue,
+                      );
+                      if (context.mounted) {
+                        KcToast.show(context, message: 'Quality Certificate PDF downloaded to device!', type: KcToastType.success);
+                      }
                     },
                   ),
                 ),

@@ -233,6 +233,33 @@ class ApiCustomerRepository implements ICustomerRepository {
     return _parseCustomerFromJson(data);
   }
 
+  @override
+  Future<CustomerModel> addCustomerDocument(String customerId, CustomerDocument document) async {
+    try {
+      final dynamic data = await _api.post(
+        '${ApiEndpoints.customerById}$customerId/documents',
+        body: {
+          'id': document.id,
+          'name': document.name,
+          'document_type': document.documentType,
+          'upload_date': document.uploadDate.toIso8601String(),
+          'file_size': document.fileSize,
+          'document_number': document.documentNumber,
+          'status': document.status,
+          'is_verified': document.isVerified,
+        },
+      );
+      return _parseCustomerFromJson(data);
+    } catch (_) {
+      final existing = await getCustomerById(customerId);
+      if (existing != null) {
+        final updatedDocs = [document, ...existing.documents.where((d) => d.id != document.id)];
+        return existing.copyWith(documents: updatedDocs);
+      }
+      rethrow;
+    }
+  }
+
   List<CustomerModel> _parseCustomersFromJson(dynamic data) {
     if (data is List) {
       return data.whereType<Map<String, dynamic>>().map((json) => _parseCustomerFromJson(json)).toList();

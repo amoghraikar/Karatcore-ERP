@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:printing/printing.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/print_export_service.dart';
 
 class FileDownloader {
-  /// Triggers a real browser file download for Web / Desktop
+  /// Triggers a real browser file download for Web / Mobile
   static Future<void> downloadFile({
     required String filename,
     required String content,
@@ -19,26 +21,21 @@ class FileDownloader {
     required List<int> bytes,
     required String mimeType,
   }) async {
-    if (kIsWeb) {
-      // Trigger Web Blob Download
-      final base64Data = base64Encode(bytes);
-      final dataUrl = 'data:$mimeType;base64,$base64Data';
-      final uri = Uri.parse(dataUrl);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      }
-    } else {
-      // Fallback URI trigger
-      final base64Data = base64Encode(bytes);
-      final dataUrl = 'data:$mimeType;base64,$base64Data';
-      final uri = Uri.parse(dataUrl);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      }
+    final uint8Bytes = Uint8List.fromList(bytes);
+    if (mimeType == 'application/pdf') {
+      await Printing.sharePdf(bytes: uint8Bytes, filename: filename);
+      return;
+    }
+
+    final base64Data = base64Encode(bytes);
+    final dataUrl = 'data:$mimeType;charset=utf-8;base64,$base64Data';
+    final uri = Uri.parse(dataUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 
-  /// Generate & Download Real PDF Receipt
+  /// Generate & Download Real Vector PDF Receipt
   static Future<void> downloadReceiptPdf({
     required String receiptNumber,
     required String customerName,
@@ -47,26 +44,14 @@ class FileDownloader {
     required String paymentMethod,
     required DateTime date,
   }) async {
-    final pdfText = '''
-============================================================
-           KARATCORE JEWELLERY ERP - PAYMENT RECEIPT        
-============================================================
-Receipt Number: $receiptNumber
-Date: ${date.toIso8601String()}
-Customer: $customerName
-Loan Contract: #$loanId
-------------------------------------------------------------
-Payment Method: $paymentMethod
-Amount Paid: INR ${amount.toStringAsFixed(2)}
-------------------------------------------------------------
-Status: SUCCESSFUL (Official Store Financial Record)
-============================================================
-''';
-
-    await downloadFile(
-      filename: '$receiptNumber.pdf',
-      content: pdfText,
-      mimeType: 'application/pdf',
+    await PrintExportService.downloadReceiptPdf(
+      receiptNumber: receiptNumber,
+      title: 'Payment Receipt',
+      customerName: customerName,
+      loanId: loanId,
+      amount: amount,
+      paymentMethod: paymentMethod,
+      date: date,
     );
   }
 
@@ -75,7 +60,7 @@ Status: SUCCESSFUL (Official Store Financial Record)
     required String reportTitle,
     required List<List<String>> rows,
   }) async {
-    final csvString = rows.map((r) => r.map((c) => '"$c"').join(',')).join('\n');
+    final csvString = rows.map((r) => r.map((c) => '"${c.replaceAll('"', '""')}"').join(',')).join('\n');
     await downloadFile(
       filename: '${reportTitle.replaceAll(' ', '_')}_Export.csv',
       content: csvString,
