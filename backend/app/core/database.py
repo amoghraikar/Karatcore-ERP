@@ -1,5 +1,5 @@
 from typing import Generator
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.core.config import settings
 
@@ -15,13 +15,35 @@ if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 # Configure SQLite fallback & PostgreSQL engine parameters
-connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
+is_sqlite = db_url.startswith("sqlite")
+connect_args = {"check_same_thread": False, "timeout": 30} if is_sqlite else {}
 
-engine = create_engine(
-    db_url,
-    connect_args=connect_args,
-    pool_pre_ping=True,
-)
+engine_kwargs = {
+    "connect_args": connect_args,
+    "pool_pre_ping": True,
+}
+
+if not is_sqlite:
+    engine_kwargs.update({
+        "pool_size": 25,
+        "max_overflow": 50,
+        "pool_recycle": 300,
+        "pool_timeout": 30,
+    })
+
+engine = create_engine(db_url, **engine_kwargs)
+
+# Optimize SQLite for ultra-high concurrency and sub-millisecond writes using WAL mode
+if is_sqlite:
+    @event.listens_for(engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA cache_size=-64000")  # 64MB RAM page cache
+        cursor.execute("PRAGMA temp_store=MEMORY")
+        cursor.execute("PRAGMA busy_timeout=15000") # Auto-wait up to 15s instead of instant lock error
+        cursor.close()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

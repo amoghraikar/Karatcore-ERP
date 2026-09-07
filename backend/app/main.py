@@ -30,7 +30,10 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Register Custom Security & Correlation Middlewares
+from fastapi.middleware.gzip import GZipMiddleware
+
+# Register Performance, Security & Correlation Middlewares
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 
