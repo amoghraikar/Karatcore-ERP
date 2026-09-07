@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/color_tokens.dart';
 import '../../../core/extensions/context_extensions.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/routing/breadcrumbs.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/theme_provider.dart';
@@ -78,6 +79,7 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
               onPressed: () => KcCommandPalette.show(context),
               tooltip: 'Command Palette (⌘K)',
             ),
+            const LanguageSelector(),
             IconButton(
               onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
               icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 20),
@@ -139,7 +141,7 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Search customers, loans...',
+                      context.tr('search_placeholder'),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
                         color: isDark ? KcColors.textMutedDark : KcColors.textMutedLight,
@@ -188,7 +190,7 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'VAULT SECURE',
+                  context.tr('vault_secure').toUpperCase(),
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -247,7 +249,7 @@ class KcTopBar extends ConsumerWidget implements PreferredSizeWidget {
                                       Navigator.pop(context);
                                       context.go(AppRoutes.notifications);
                                     },
-                                    child: const Text('View All'),
+                                    child: Text(context.tr('view_all')),
                                   ),
                                 ],
                               ),

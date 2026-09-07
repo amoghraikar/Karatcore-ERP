@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/color_tokens.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/routing/routes.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../components/kc_avatar.dart';
@@ -105,7 +106,7 @@ class KcSidebar extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(14, 18, 14, 8),
                         child: Text(
-                          nav.sectionHeader!.toUpperCase(),
+                          context.tr(nav.sectionHeader!.toLowerCase().replaceAll(' ', '_').replaceAll('&', 'and')).toUpperCase(),
                           style: GoogleFonts.plusJakartaSans(
                             color: headerTextColor,
                             fontWeight: FontWeight.w700,
@@ -175,7 +176,7 @@ class KcSidebar extends ConsumerWidget {
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
-                                      'STORE OWNER',
+                                      context.tr('owner_login').toUpperCase(),
                                       style: GoogleFonts.plusJakartaSans(
                                         color: isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight,
                                         fontWeight: FontWeight.w600,
@@ -213,12 +214,19 @@ class _SidebarTile extends StatelessWidget {
   final bool isCollapsed;
   final VoidCallback onTap;
 
+  String _getTranslatedLabel(BuildContext context, String rawLabel) {
+    final key = rawLabel.toLowerCase().replaceAll(' ', '_').replaceAll('&', 'and');
+    final translated = context.tr(key);
+    return translated != key ? translated : rawLabel;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeBg = isDark ? const Color(0x1AFFFFFF) : const Color(0x0A111214);
     final activeText = isDark ? KcColors.textPrimaryDark : KcColors.textPrimaryLight;
     final inactiveText = isDark ? KcColors.textSecondaryDark : KcColors.textSecondaryLight;
+    final displayLabel = _getTranslatedLabel(context, item.label);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -256,7 +264,7 @@ class _SidebarTile extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      item.label,
+                      displayLabel,
                       style: GoogleFonts.plusJakartaSans(
                         color: selected ? activeText : inactiveText,
                         fontWeight: selected ? FontWeight.w700 : FontWeight.w500,

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/locale_provider.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
+import '../../../../shared/widgets/navigation/language_selector.dart';
 import '../../providers/customer_portal_providers.dart';
 
 class CustomerProfilePage extends ConsumerStatefulWidget {
@@ -151,6 +154,54 @@ class _CustomerProfilePageState extends ConsumerState<CustomerProfilePage> {
                     Text('${profile.addressLine}, ${profile.city}, ${profile.state} - ${profile.pincode}', style: const TextStyle(fontSize: 13)),
                     const SizedBox(height: 8),
                     const Text('Primary Store Counter: M.G. Road Branch, Mumbai', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // App Language / Preferences Card
+              KcCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF059669).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.language_rounded, color: Color(0xFF059669), size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  context.tr('language_and_regional'),
+                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Current: ${AppLocalizations.languageNames[ref.watch(localeProvider).languageCode] ?? "English"}',
+                                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.translate_rounded, size: 16),
+                          label: Text(context.tr('language')),
+                          onPressed: () => LanguageSelector.showLanguageDialog(context, ref),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

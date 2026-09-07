@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/models/customer_session_model.dart';
 import '../../../customers/providers/customer_providers.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/widgets/navigation/language_selector.dart';
 import '../../providers/customer_portal_providers.dart';
 
@@ -151,41 +152,41 @@ class CustomerShellPage extends ConsumerWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (idx) => _onItemTapped(idx, context),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_rounded),
+            label: context.tr('dashboard'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_outlined),
-            selectedIcon: Icon(Icons.account_balance_rounded),
-            label: 'Loans',
+            icon: const Icon(Icons.account_balance_outlined),
+            selectedIcon: const Icon(Icons.account_balance_rounded),
+            label: context.tr('loans'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.diamond_outlined),
-            selectedIcon: Icon(Icons.diamond_rounded),
-            label: 'Jewellery',
+            icon: const Icon(Icons.diamond_outlined),
+            selectedIcon: const Icon(Icons.diamond_rounded),
+            label: context.tr('ornaments'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.payments_outlined),
-            selectedIcon: Icon(Icons.payments_rounded),
-            label: 'Payments',
+            icon: const Icon(Icons.payments_outlined),
+            selectedIcon: const Icon(Icons.payments_rounded),
+            label: context.tr('payments'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.folder_open_outlined),
-            selectedIcon: Icon(Icons.folder_rounded),
-            label: 'Documents',
+            icon: const Icon(Icons.folder_open_outlined),
+            selectedIcon: const Icon(Icons.folder_rounded),
+            label: context.tr('quality_certificates'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications_rounded),
-            label: 'Alerts',
+            icon: const Icon(Icons.notifications_outlined),
+            selectedIcon: const Icon(Icons.notifications_rounded),
+            label: context.tr('notifications'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline_rounded),
+            selectedIcon: const Icon(Icons.person_rounded),
+            label: context.tr('profile'),
           ),
         ],
       ),

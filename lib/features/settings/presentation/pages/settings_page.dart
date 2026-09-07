@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
@@ -12,6 +14,7 @@ import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 import '../../../../shared/widgets/feedback/kc_status_badge.dart';
 import '../../../../shared/widgets/feedback/kc_toast.dart';
 import '../../../../shared/widgets/navigation/kc_page_header.dart';
+import '../../../../shared/widgets/navigation/language_selector.dart';
 
 import '../../providers/settings_providers.dart';
 import '../../widgets/settings_rate_card.dart';
@@ -240,6 +243,14 @@ class SettingsPage extends ConsumerWidget {
                     icon: Icons.notifications_active_rounded,
                     accentColor: const Color(0xFF7C3AED),
                     onTap: () => context.go(AppRoutes.settingsNotifications),
+                  ),
+                  _buildNavTile(
+                    context,
+                    title: context.tr('language_and_regional'),
+                    description: 'Active: ${AppLocalizations.languageNames[ref.watch(localeProvider).languageCode] ?? "English"}. Select from 7 supported Indian languages',
+                    icon: Icons.language_rounded,
+                    accentColor: const Color(0xFF059669),
+                    onTap: () => LanguageSelector.showLanguageDialog(context, ref),
                   ),
                 ],
               ),
