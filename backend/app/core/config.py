@@ -9,13 +9,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "KaratCore ERP Backend"
     API_V1_STR: str = "/api/v1"
 
-    # Database (Supabase PostgreSQL / SQLite)
+    # Database (PostgreSQL / SQLite)
     DATABASE_URL: str = "sqlite:///./karatcore.db"
-
-    # Supabase Integration
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
-    SUPABASE_SERVICE_ROLE_KEY: str = ""
 
     # JWT Security
     JWT_SECRET_KEY: str = "karatcore_super_secret_jwt_key_change_in_production_998214"
