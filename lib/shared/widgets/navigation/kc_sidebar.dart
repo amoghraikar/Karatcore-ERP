@@ -22,6 +22,14 @@ class KcSidebar extends ConsumerWidget {
   final bool isCollapsed;
   final VoidCallback? onToggleCollapse;
 
+  static const Map<String, String> _headerKeyMap = {
+    'Core Operations': 'core_operations',
+    'Jewellery & Assets': 'jewellery_and_assets',
+    'Finance & Analytics': 'finance_and_analytics',
+    'Security & Audit': 'security_and_audit',
+    'Store Administration': 'store_administration',
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -106,7 +114,7 @@ class KcSidebar extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(14, 18, 14, 8),
                         child: Text(
-                          context.tr(nav.sectionHeader!.toLowerCase().replaceAll(' ', '_').replaceAll('&', 'and')).toUpperCase(),
+                          context.tr(_headerKeyMap[nav.sectionHeader] ?? nav.sectionHeader!).toUpperCase(),
                           style: GoogleFonts.plusJakartaSans(
                             color: headerTextColor,
                             fontWeight: FontWeight.w700,
@@ -214,8 +222,25 @@ class _SidebarTile extends StatelessWidget {
   final bool isCollapsed;
   final VoidCallback onTap;
 
+  static const Map<String, String> _labelKeyMap = {
+    'Dashboard': 'dashboard',
+    'Customers': 'customers',
+    'KYC Verification': 'kyc_verification',
+    'Inventory & Stock': 'inventory_and_stock',
+    'Pledges & Loans': 'pledges_and_loans',
+    'Accounting Ledger': 'accounting_ledger',
+    'Reports & Analytics': 'reports_and_analytics',
+    'Audit Log': 'audit_log',
+    'Security Activity': 'security_activity',
+    'Notifications': 'notifications',
+    'Owner Profile': 'owner_profile',
+    'Store Settings': 'store_settings',
+    'Help & Docs': 'help_and_docs',
+  };
+
   String _getTranslatedLabel(BuildContext context, String rawLabel) {
-    final key = rawLabel.toLowerCase().replaceAll(' ', '_').replaceAll('&', 'and');
+    final key = _labelKeyMap[rawLabel];
+    if (key == null) return rawLabel;
     final translated = context.tr(key);
     return translated != key ? translated : rawLabel;
   }

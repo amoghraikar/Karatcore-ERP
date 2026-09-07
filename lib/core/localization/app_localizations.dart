@@ -538,9 +538,13 @@ class AppLocalizations {
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
+  static const Set<String> supportedLanguageCodes = {
+    'en', 'hi', 'ta', 'te', 'kn', 'gu', 'mr',
+  };
+
   @override
   bool isSupported(Locale locale) {
-    return ['en', 'hi', 'ta', 'te', 'kn', 'gu', 'mr'].contains(locale.languageCode);
+    return supportedLanguageCodes.contains(locale.languageCode);
   }
 
   @override
