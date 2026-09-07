@@ -81,7 +81,7 @@ class _IncomePageState extends ConsumerState<IncomePage> {
                 category: category,
                 amount: amt,
                 paymentMethod: method,
-                customerId: 'KC-CUS-000101',
+                customerId: customerController.text.trim().isNotEmpty ? customerController.text.trim() : 'WALK-IN',
                 customerName: customerController.text.trim(),
                 reference: refController.text.trim(),
                 description: descController.text.trim(),

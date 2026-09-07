@@ -75,7 +75,7 @@ class AccessDeniedPage extends ConsumerWidget {
                         children: [
                           Text('Current Session:', style: Theme.of(context).textTheme.bodySmall),
                           Text(
-                            user?.name ?? 'Demo Owner',
+                            user?.name ?? 'Store Owner',
                             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                           ),
                         ],

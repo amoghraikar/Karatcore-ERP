@@ -256,6 +256,9 @@ class CustomerModel {
   final List<CustomerActivityItem> activities;
 
   String get fullName => middleName.isEmpty ? '$firstName $lastName' : '$firstName $middleName $lastName';
+  String get name => fullName;
+  String get phone => mobile;
+  CustomerRiskLevel get riskCategory => riskStatus;
 
   String get initials {
     final first = firstName.isNotEmpty ? firstName[0] : '';

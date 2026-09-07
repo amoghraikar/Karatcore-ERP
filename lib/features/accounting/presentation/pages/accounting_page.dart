@@ -219,7 +219,7 @@ class AccountingPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Financial Performance & Cash Flow Trends (Mock Analytics)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  Text('Financial Performance & Cash Flow Trends', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 14),
                   if (context.isMobile) ...[
                     Container(

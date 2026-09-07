@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_owner
 from app.core.database import get_db
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import BusinessRuleError, NotFoundError
 from app.models.customer import Customer
 from app.models.owner import Owner
 from app.schemas.kyc import CustomerKYCSchema, KYCReviewAction, OwnerKYCDboardMetrics
@@ -59,7 +59,9 @@ def start_kyc_workflow(
     owner: Owner = Depends(get_current_owner),
 ):
     service = KYCService(db)
-    cust_id = payload.get("customer_id", "KC-CUS-000101")
+    cust_id = payload.get("customer_id")
+    if not cust_id:
+        raise BusinessRuleError("customer_id is required to initiate KYC workflow.")
     method = payload.get("method", "MANUAL_STORE_REVIEW")
     kyc = service.get_or_create_kyc(customer_id=cust_id, method=method)
 

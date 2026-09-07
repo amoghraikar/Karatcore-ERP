@@ -10,6 +10,7 @@ import '../../../../shared/widgets/feedback/kc_empty_state.dart';
 import '../../../../shared/widgets/feedback/kc_error_state.dart';
 import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 
+import '../../../customers/providers/customer_providers.dart';
 import '../../providers/kyc_providers.dart';
 import '../../widgets/kyc_status_chip.dart';
 
@@ -18,19 +19,41 @@ class KycHistoryAuditPage extends ConsumerWidget {
 
   final String? customerId;
 
-  String _getTargetCustomerId(BuildContext context) {
+  String _getTargetCustomerId(BuildContext context, WidgetRef ref) {
     if (customerId != null && customerId!.isNotEmpty) return customerId!;
     final path = GoRouterState.of(context).uri.path;
     final parts = path.split('/');
     if (parts.length > 2 && parts[2].isNotEmpty) {
       return parts[2];
     }
-    return 'KC-CUS-000101';
+    final customers = ref.read(customerListProvider).valueOrNull ?? [];
+    if (customers.isNotEmpty) {
+      return customers.first.id;
+    }
+    return '';
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final custId = _getTargetCustomerId(context);
+    final custId = _getTargetCustomerId(context, ref);
+    if (custId.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('KYC Audit Trail')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('No customer ID specified.'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.go('/kyc'),
+                child: const Text('Return to KYC Queue'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final recordAsync = ref.watch(kycDetailProvider(custId));
     final scheme = Theme.of(context).colorScheme;
 

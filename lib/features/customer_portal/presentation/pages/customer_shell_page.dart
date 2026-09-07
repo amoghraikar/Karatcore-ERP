@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/models/customer_session_model.dart';
+import '../../../customers/providers/customer_providers.dart';
 import '../../../../shared/widgets/navigation/language_selector.dart';
 import '../../providers/customer_portal_providers.dart';
 
@@ -51,6 +52,7 @@ class CustomerShellPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(currentCustomerSessionProvider);
+    final customersListAsync = ref.watch(customerListProvider);
     final selectedIndex = _calculateSelectedIndex(context);
     final scheme = Theme.of(context).colorScheme;
 
@@ -75,39 +77,62 @@ class CustomerShellPage extends ConsumerWidget {
           ],
         ),
         actions: [
-          // Customer Account Switcher for testing Data Isolation
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: scheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: session.customerId,
-                icon: const Icon(Icons.swap_horiz_rounded, size: 18),
-                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700, fontSize: 12),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'KC-CUS-000101',
-                    child: Text('Demo: Rahul Sharma (Customer A)'),
+          // Live Customer Account Switcher for multi-customer ERP
+          customersListAsync.maybeWhen(
+            data: (customers) {
+              if (customers.isEmpty) {
+                return Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
                   ),
-                  DropdownMenuItem(
-                    value: 'CUST-002',
-                    child: Text('Demo: Sunita Devi (Customer B)'),
+                  child: Text(
+                    'No Registered Customers',
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600, fontSize: 12),
                   ),
-                ],
-                onChanged: (val) {
-                  if (val == 'KC-CUS-000101') {
-                    ref.read(currentCustomerSessionProvider.notifier).state = CustomerSession.demoCustomerA;
-                  } else if (val == 'CUST-002') {
-                    ref.read(currentCustomerSessionProvider.notifier).state = CustomerSession.demoCustomerB;
-                  }
-                },
-              ),
-            ),
+                );
+              }
+              final validValue = customers.any((c) => c.id == session.customerId) ? session.customerId : customers.first.id;
+              return Container(
+                margin: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: validValue,
+                    icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+                    style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700, fontSize: 12),
+                    items: customers.map((c) {
+                      return DropdownMenuItem(
+                        value: c.id,
+                        child: Text('${c.name} (${c.id})'),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        final chosen = customers.firstWhere((c) => c.id == val);
+                        ref.read(currentCustomerSessionProvider.notifier).state = CustomerSession(
+                          customerId: chosen.id,
+                          customerName: chosen.name,
+                          mobile: chosen.phone,
+                          authenticated: true,
+                          sessionCreatedAt: DateTime.now(),
+                          lastActiveAt: DateTime.now(),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
           ),
           const LanguageSelector(),
           IconButton(

@@ -99,29 +99,7 @@ class SavedReportDetailPage extends ConsumerWidget {
                   ReportColumnConfig(key: 'status', label: 'Status'),
                   ReportColumnConfig(key: 'amount', label: 'Amount (₹)', isNumeric: true),
                 ],
-                rows: [
-                  {
-                    'recordId': 'REC-1001',
-                    'title': '${view.title} Sample Item 1',
-                    'category': view.category.label,
-                    'status': 'ACTIVE',
-                    'amount': '₹1,45,000',
-                  },
-                  {
-                    'recordId': 'REC-1002',
-                    'title': '${view.title} Sample Item 2',
-                    'category': view.category.label,
-                    'status': 'VERIFIED',
-                    'amount': '₹82,500',
-                  },
-                  {
-                    'recordId': 'REC-1003',
-                    'title': '${view.title} Sample Item 3',
-                    'category': view.category.label,
-                    'status': 'COMPLETED',
-                    'amount': '₹3,10,000',
-                  },
-                ],
+                rows: const [],
               ),
             ],
           );

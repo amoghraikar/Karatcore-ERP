@@ -55,12 +55,30 @@ class _CustomerDetailsPageState extends ConsumerState<CustomerDetailsPage> with 
     if (parts.length > 2 && parts[2].isNotEmpty) {
       return parts[2];
     }
-    return 'KC-CUS-000101'; // Default fallback
+    return '';
   }
 
   @override
   Widget build(BuildContext context) {
     final customerId = _getCustomerIdFromRoute();
+    if (customerId.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Customer Not Found')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('No customer ID specified.'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.go('/customers'),
+                child: const Text('Return to Customers'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final customerAsync = ref.watch(customerDetailProvider(customerId));
     final scheme = Theme.of(context).colorScheme;
 

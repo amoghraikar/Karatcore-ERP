@@ -166,7 +166,7 @@ class _LoansPageState extends ConsumerState<LoansPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Loan Portfolio & Collateral Analytics (Mock Summary)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  Text('Loan Portfolio & Collateral Analytics', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 14),
                   if (context.isMobile) ...[
                     Container(

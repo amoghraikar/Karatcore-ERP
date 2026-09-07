@@ -58,7 +58,11 @@ class _KycStartWizardPageState extends ConsumerState<KycStartWizardPage> {
     if (parts.length > 2 && parts[2].isNotEmpty) {
       return parts[2];
     }
-    return 'KC-CUS-000101';
+    final customers = ref.read(customerListProvider).valueOrNull ?? [];
+    if (customers.isNotEmpty) {
+      return customers.first.id;
+    }
+    return '';
   }
 
   bool _validateStep(int step) {

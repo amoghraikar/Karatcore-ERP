@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class ApiConfig {
   static String get baseUrl {
     const envUrl = String.fromEnvironment('API_URL');
@@ -18,9 +20,14 @@ class ApiConfig {
       return url;
     }
 
+    // Native mobile platforms (Android, iOS) connect directly to the live Render cloud backend
+    if (!kIsWeb) {
+      return 'https://karatcore-erp.onrender.com/api/v1';
+    }
+
     try {
       final host = Uri.base.host;
-      if (host == 'localhost' || host == '127.0.0.1' || host.isEmpty) {
+      if (host == 'localhost' || host == '127.0.0.1') {
         return 'http://localhost:8000/api/v1';
       }
       // On cloud web domains (like *.vercel.app), connect directly to the live Render backend

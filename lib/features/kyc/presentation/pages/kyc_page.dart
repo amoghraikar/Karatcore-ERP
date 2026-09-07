@@ -12,6 +12,8 @@ import '../../../../shared/widgets/feedback/kc_skeleton_loader.dart';
 import '../../../../shared/widgets/navigation/kc_page_header.dart';
 import '../../../../shared/widgets/navigation/kc_search_bar_filter.dart';
 
+import '../../../customers/models/customer_model.dart';
+import '../../../customers/providers/customer_providers.dart';
 import '../../providers/kyc_providers.dart';
 import '../../repository/kyc_repository.dart';
 import '../../widgets/kyc_filter_dialog.dart';
@@ -27,6 +29,18 @@ class KycPage extends ConsumerStatefulWidget {
 class _KycPageState extends ConsumerState<KycPage> {
   late TextEditingController _searchController;
   bool _isSearching = false;
+
+  void _startKyc(BuildContext context) {
+    final customers = ref.read(customerListProvider).valueOrNull ?? [];
+    final pending = customers.where((c) => c.kycStatus != CustomerKycStatus.verified).toList();
+    if (pending.isNotEmpty) {
+      context.go('/kyc/${pending.first.id}/start');
+    } else if (customers.isNotEmpty) {
+      context.go('/kyc/${customers.first.id}/start');
+    } else {
+      context.go('/customers/new');
+    }
+  }
 
   @override
   void initState() {
@@ -70,7 +84,7 @@ class _KycPageState extends ConsumerState<KycPage> {
                 KcPrimaryButton(
                   label: 'Initiate KYC',
                   icon: Icons.verified_user_rounded,
-                  onPressed: () => context.go('/kyc/KC-CUS-000101/start'),
+                  onPressed: () => _startKyc(context),
                 ),
                 KcOutlinedButton(
                   label: 'KYC Reports',
@@ -270,7 +284,7 @@ class _KycPageState extends ConsumerState<KycPage> {
                               _searchController.clear();
                               _onSearchChanged('');
                             }
-                          : () => context.go('/kyc/KC-CUS-000101/start'),
+                          : () => _startKyc(context),
                     ),
                   );
                 }

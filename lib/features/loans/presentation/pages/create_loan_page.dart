@@ -12,8 +12,8 @@ import '../../../../shared/widgets/cards/kc_card.dart';
 import '../../../../shared/widgets/feedback/kc_status_badge.dart';
 
 import '../../../../shared/widgets/inputs/kc_text_field.dart';
+import '../../../customers/providers/customer_providers.dart';
 import '../../../ornaments/models/ornament_model.dart';
-import '../../../ornaments/providers/inventory_providers.dart';
 import '../../models/loan_model.dart';
 import '../../providers/loan_providers.dart';
 
@@ -29,9 +29,10 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
   final _formKey = GlobalKey<FormState>();
 
   // Step 1: Customer Selection
-  String _selectedCustomerId = 'KC-CUS-000101';
-  String _selectedCustomerName = 'Rahul Kumar Sharma';
-  String _selectedCustomerKycStatus = 'Verified';
+  String _selectedCustomerId = '';
+  String _selectedCustomerName = '';
+  String _selectedCustomerPhone = '';
+  String _selectedCustomerKycStatus = 'Pending';
   String _selectedCustomerRisk = 'Low Risk';
 
   // Step 2 & 3: Collateral Selection
@@ -59,19 +60,19 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
   @override
   void initState() {
     super.initState();
-    _loadSampleCollateral();
-  }
-
-  Future<void> _loadSampleCollateral() async {
-    final list = await ref.read(inventoryRepositoryProvider).getOrnaments();
-    if (list.isNotEmpty && mounted) {
-      setState(() {
-        _selectedCollateral.add(list.first);
-        if (list.length > 1) {
-          _selectedCollateral.add(list[1]);
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final customers = await ref.read(customerRepositoryProvider).getCustomers();
+      if (customers.isNotEmpty && mounted) {
+        setState(() {
+          final first = customers.first;
+          _selectedCustomerId = first.id;
+          _selectedCustomerName = first.name;
+          _selectedCustomerPhone = first.phone;
+          _selectedCustomerKycStatus = first.kycStatus.label;
+          _selectedCustomerRisk = first.riskCategory.label;
+        });
+      }
+    });
   }
 
   @override
@@ -319,7 +320,8 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
   }
 
   Widget _buildStep1Customer() {
-    final isVerified = _selectedCustomerKycStatus == 'Verified';
+    final isVerified = _selectedCustomerKycStatus.toLowerCase() == 'verified';
+    final customersAsync = ref.watch(customerListProvider);
 
     return Column(
       key: const ValueKey(0),
@@ -329,51 +331,84 @@ class _CreateLoanPageState extends ConsumerState<CreateLoanPage> {
         const SizedBox(height: 16),
 
         // Customer Selection Card
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const CircleAvatar(radius: 24, child: Icon(Icons.person_rounded)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        customersAsync.maybeWhen(
+          data: (customers) {
+            if (customers.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
                   children: [
-                    Text(_selectedCustomerName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                    const SizedBox(height: 2),
-                    Text('Customer ID: $_selectedCustomerId • Mobile: +91 98765 43210', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    const Icon(Icons.info_outline_rounded, color: Colors.amber),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'No customers found. Please register a customer before creating a loan.',
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => context.go('/customers/new'),
+                      child: const Text('Add Customer'),
+                    ),
                   ],
                 ),
+              );
+            }
+
+            final currentId = customers.any((c) => c.id == _selectedCustomerId)
+                ? _selectedCustomerId
+                : customers.first.id;
+
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(12),
               ),
-              DropdownButton<String>(
-                value: _selectedCustomerId,
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() {
-                      _selectedCustomerId = val;
-                      if (val == 'KC-CUS-000105') {
-                        _selectedCustomerName = 'Amitabh Banerjee';
-                        _selectedCustomerKycStatus = 'Pending';
-                        _selectedCustomerRisk = 'High Risk';
-                      } else {
-                        _selectedCustomerName = 'Rahul Kumar Sharma';
-                        _selectedCustomerKycStatus = 'Verified';
-                        _selectedCustomerRisk = 'Low Risk';
+              child: Row(
+                children: [
+                  const CircleAvatar(radius: 24, child: Icon(Icons.person_rounded)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(_selectedCustomerName.isNotEmpty ? _selectedCustomerName : customers.first.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                        const SizedBox(height: 2),
+                        Text('Customer ID: $currentId • Mobile: ${_selectedCustomerPhone.isNotEmpty ? _selectedCustomerPhone : customers.first.phone}', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                      ],
+                    ),
+                  ),
+                  DropdownButton<String>(
+                    value: currentId,
+                    onChanged: (val) {
+                      if (val != null) {
+                        final found = customers.firstWhere((c) => c.id == val);
+                        setState(() {
+                          _selectedCustomerId = found.id;
+                          _selectedCustomerName = found.name;
+                          _selectedCustomerPhone = found.phone;
+                          _selectedCustomerKycStatus = found.kycStatus.label;
+                          _selectedCustomerRisk = found.riskCategory.label;
+                        });
                       }
-                    });
-                  }
-                },
-                items: const [
-                  DropdownMenuItem(value: 'KC-CUS-000101', child: Text('Rahul Kumar Sharma (KYC Verified)')),
-                  DropdownMenuItem(value: 'KC-CUS-000105', child: Text('Amitabh Banerjee (KYC Pending Warning)')),
+                    },
+                    items: customers.map((c) {
+                      return DropdownMenuItem(
+                        value: c.id,
+                        child: Text('${c.name} (${c.kycStatus.label})'),
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
+          orElse: () => const Center(child: CircularProgressIndicator()),
         ),
         const SizedBox(height: 16),
 

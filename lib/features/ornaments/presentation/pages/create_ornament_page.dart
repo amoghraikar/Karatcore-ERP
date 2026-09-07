@@ -10,8 +10,8 @@ import '../../../../shared/widgets/buttons/kc_outlined_button.dart';
 import '../../../../shared/widgets/buttons/kc_primary_button.dart';
 import '../../../../shared/widgets/cards/kc_card.dart';
 
-import '../../../../shared/widgets/feedback/kc_status_badge.dart';
 import '../../../../shared/widgets/inputs/kc_text_field.dart';
+import '../../../customers/providers/customer_providers.dart';
 import '../../models/ornament_model.dart';
 import '../../providers/inventory_providers.dart';
 
@@ -26,17 +26,17 @@ class _CreateOrnamentPageState extends ConsumerState<CreateOrnamentPage> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
 
-  // Step 1: Basic Info
-  final _nameController = TextEditingController(text: 'Royal 22K Gold Antique Necklace');
+  // Step 1: Identification
+  final _nameController = TextEditingController(text: '22K Traditional Antique Gold Necklace');
   OrnamentCategory _category = OrnamentCategory.necklaces;
-  final _subcategoryController = TextEditingController(text: 'Heritage Antique');
-  final _descriptionController = TextEditingController(text: 'Handcrafted 22K Gold antique necklace set with ruby stones and intricate filigree work.');
+  final _subcategoryController = TextEditingController(text: 'Antique Bridal');
+  final _descriptionController = TextEditingController(text: 'Intricate handmade finish with BIS hallmark certification.');
 
-  // Step 2: Metal & Purity
+  // Step 2: Metal & Karatage
   MetalType _metalType = MetalType.gold;
   OrnamentPurity _purity = OrnamentPurity.k22_916;
 
-  // Step 3: Weight Breakdown
+  // Step 3: Weight Specifications
   final _grossWeightController = TextEditingController(text: '48.50');
   final _stoneWeightController = TextEditingController(text: '2.50');
   final _otherWeightController = TextEditingController(text: '0.50');
@@ -48,8 +48,8 @@ class _CreateOrnamentPageState extends ConsumerState<CreateOrnamentPage> {
 
   // Step 5: Ownership
   OwnershipType _ownershipType = OwnershipType.shopOwned;
-  final String _selectedCustomerId = 'KC-CUS-000101';
-  final String _selectedCustomerName = 'Rahul Kumar Sharma';
+  String _selectedCustomerId = '';
+  String _selectedCustomerName = '';
 
   // Step 6: Location
   String _branch = 'Main Branch (Store 01)';
@@ -59,6 +59,20 @@ class _CreateOrnamentPageState extends ConsumerState<CreateOrnamentPage> {
 
   bool _isSubmitting = false;
   OrnamentModel? _createdOrnament;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final customers = await ref.read(customerRepositoryProvider).getCustomers();
+      if (customers.isNotEmpty && mounted) {
+        setState(() {
+          _selectedCustomerId = customers.first.id;
+          _selectedCustomerName = customers.first.name;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -542,25 +556,51 @@ class _CreateOrnamentPageState extends ConsumerState<CreateOrnamentPage> {
         ),
         if (_ownershipType == OwnershipType.customerOwned || _ownershipType == OwnershipType.pledged) ...[
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(10)),
-            child: Row(
-              children: [
-                const Icon(Icons.person_rounded, size: 28, color: Colors.blue),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Customer: $_selectedCustomerName', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      Text('Customer ID: $_selectedCustomerId', style: const TextStyle(fontSize: 12)),
-                    ],
+          ref.watch(customerListProvider).maybeWhen(
+            data: (customers) {
+              if (customers.isEmpty) {
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: const Text('No registered customers found. Please add a customer first to assign ownership.'),
+                );
+              }
+              final currentVal = customers.any((c) => c.id == _selectedCustomerId)
+                  ? _selectedCustomerId
+                  : customers.first.id;
+              return Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const KcStatusBadge(label: 'KYC Verified', statusColor: Color(0xFF059669), icon: Icons.verified_rounded),
-              ],
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Assign to Registered Customer *', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      initialValue: currentVal,
+                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      items: customers.map((c) => DropdownMenuItem(value: c.id, child: Text('${c.name} (${c.id})'))).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          final chosen = customers.firstWhere((c) => c.id == val);
+                          setState(() {
+                            _selectedCustomerId = chosen.id;
+                            _selectedCustomerName = chosen.name;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+            orElse: () => const Center(child: CircularProgressIndicator()),
           ),
         ],
         const SizedBox(height: 24),
